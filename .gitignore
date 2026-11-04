@@ -13,8 +13,8 @@ mlflow.db
 mlruns/
 mlartifacts/
 
-# Data (lisensi redistribusi belum diverifikasi, bisa dibuat ulang dari sumber UCI)
-dataset/
+# Data turunan (dibuat ulang dengan script di Fase 1).
+# dataset/ sengaja dilacak: lisensi UCI CC BY 4.0 mengizinkan redistribusi dengan atribusi.
 program/artifacts/*.csv
 
 # Python / Jupyter

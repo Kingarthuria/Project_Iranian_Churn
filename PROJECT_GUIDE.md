@@ -18,7 +18,7 @@
 | Pekerjaan lama | **Dilanjutkan dan diperbaiki**, bukan dimulai ulang |
 | Bahasa | Penjelasan dan komentar dalam Bahasa Indonesia, nama variabel dan fungsi dalam Bahasa Inggris |
 
-**Prinsip utama proyek:** kejujuran analisis lebih penting daripada angka yang bagus.
+**Prinsip utama proyek:** kejujuran dan kebenaran analisis lebih penting daripada angka yang bagus.
 Untuk portofolio, model dengan AUC 0,79 yang divalidasi benar lebih bernilai daripada AUC 0,98 yang bocor.
 
 ---
@@ -27,6 +27,11 @@ Untuk portofolio, model dengan AUC 0,79 yang divalidasi benar lebih bernilai dar
 
 - 3.150 baris, 14 kolom, tanpa missing value, 300 baris duplikat persis. Setelah dedup: **2.850 baris**.
 - Churn rate: 15,7% (mentah), **15,65%** (setelah dedup). Kelas tidak seimbang.
+- **Sumber dan lisensi:** UCI Machine Learning Repository, **CC BY 4.0** (boleh disertakan di repo dengan atribusi).
+  Sitasi: *Iranian Churn [Dataset]. (2020). UCI Machine Learning Repository. https://doi.org/10.24432/C5JW3Z*
+- **Definisi label (dokumentasi UCI, ditinjau 2026-11-04):** semua atribut kecuali `Churn` adalah agregat **9 bulan pertama**.
+  `Churn` adalah **status pelanggan di akhir bulan ke-12**, tiga bulan di antaranya adalah *planning gap*.
+  Dokumentasi **tidak** mendefinisikan "churn" secara operasional, cara `Status` ditentukan, arti `Customer_Value`, maupun pembuat data.
 - Nama kolom mentah mengandung **spasi ganda** (`Call  Failure`, `Subscription  Length`, `Charge  Amount`).
   Versi bersih memakai satu underscore (`Call_Failure`). Jangan gunakan `col.replace(' ', '_')` begitu saja
   karena menghasilkan `Call__Failure` (dua underscore).
@@ -69,7 +74,10 @@ Ini fakta yang sudah dihitung dan jadi dasar semua keputusan modeling.
 3. **Sinyal yang kuat:** `Complains = 1` dan `Status = 2`. Sinyal lain lemah atau tidak terbukti setelah koreksi.
 4. **Baseline yang harus dikalahkan:** `Status + Complains + Seconds_of_Use` dengan AUC group-CV **0,828**.
 5. **Semua fitur bersama** hanya menghasilkan AUC group-CV 0,79 (bukan 0,98), dan tanpa `Status` turun ke 0,76.
-6. Ada **red flag** yang belum diselesaikan: pelanggan dengan pemakaian tinggi churn tepat 0%. Label `Churn` mungkin lebih "mudah" daripada churn nyata.
+6. **Red flag "pemakaian tinggi = churn 0%" (ditinjau 2026-11-04):** polanya nyata (0 churner dari 804, 651, 347, dan 186 baris pada ambang `Seconds_of_Use > 6123`, `Frequency_of_use > 100`, `Frequency_of_SMS > 204`, `Distinct_Called_Numbers > 48`), tetapi baris-baris itu hanya berasal dari **16, 15, 9, dan 14 dari 50 profil**. Churn hampir "semua atau tidak sama sekali" per profil (35 profil 0%, 7 profil ≈ 100%, 8 profil campuran). Jadi penyebabnya **struktur klaster, bukan aturan label**.
+   - `Status` **bukan** salinan label: `Status = 2` churn 47,5% (325 dari 684), dan 121 churner berstatus aktif.
+   - Menurut desain terdokumentasi tidak ada kebocoran waktu (fitur diukur sebelum label, jeda 3 bulan). Ini bukan bukti bahwa label bersih.
+   - **Masih terbuka:** (a) kapan `Status` diukur dan apakah pelanggan yang pergi sebelum bulan ke-9 teragregasi lebih pendek (churner median 43,5 detik/bulan vs 110,8, konsisten tetapi tidak membuktikan); (b) UCI menyebut data "dikumpulkan secara acak", padahal strukturnya 50 profil yang digandakan, dan tidak ada kontak pembuat untuk klarifikasi.
 7. Churner bernilai rendah: 15,6% pelanggan tetapi hanya ~4,4% total `Customer_Value`. Ini mengubah cerita bisnis.
 
 Sumber detail: `program/artifacts/feature_spec.json`, `program/Real_EDA.ipynb`, `kelemahan/Review_Kelemahan_EDA.docx`.
@@ -133,7 +141,7 @@ A:\project_iranian_churn\
 | Fase | Status |
 |---|---|
 | EDA v1 | Usang, dipertahankan hanya sebagai riwayat |
-| EDA v2 + serah-terima | Selesai (perlu pemeriksaan red flag label) |
+| EDA v2 + serah-terima | Selesai. Red flag label sudah ditinjau (bagian 3 poin 6), dua pertanyaan tetap terbuka |
 | Modeling | **Ada, tetapi tidak mengikuti keputusan D2, D4, D5, D10.** Lihat bagian 7 |
 | MLflow | Berjalan, tetapi konfigurasi tidak konsisten |
 | Deployment dan monitoring | Belum dimulai |
@@ -165,7 +173,7 @@ Kerjakan **berurutan**. Jangan lanjut ke fase berikutnya sebelum fase sekarang m
 - [x] `requirements.txt` tahap EDA (Python 3.10, 8 library). Bertambah per fase, lihat bagian 9
 - [ ] `git init`, buat `.gitignore` (`mlruns/`, `*.db`, `.env`, `__pycache__/`)
 - [ ] Susun folder target (bagian 10)
-- [ ] Selesaikan red flag label `Churn`: baca dokumentasi UCI, tulis hasilnya di Log Keputusan
+- [x] Red flag label `Churn`: dokumentasi UCI dibaca dan diuji ke data, hasil di bagian 3 poin 6 dan Log Keputusan
 
 **DoD:** environment bisa dibuat ulang dari file, repo bersih, red flag terdokumentasi.
 
@@ -312,7 +320,9 @@ project_iranian_churn/
 |---|---|---|
 | 2026-11-04 | Tujuan: portofolio. Cakupan: EDA sampai monitoring. Lanjutkan pekerjaan lama | Diputuskan |
 | 2026-11-04 | Metrik utama: PR-AUC + recall@top-K (usulan, lihat bagian 5) | **Menunggu persetujuan** |
-| 2026-11-04 | Apakah definisi label `Churn` di dokumentasi UCI menjelaskan pola "pemakaian tinggi = 0% churn"? | **Terbuka** |
+| 2026-11-04 | Definisi label `Churn` di UCI tidak menjelaskan pola "pemakaian tinggi = 0% churn". Penyebabnya struktur klaster (hanya 9 sampai 16 profil di balik tiap ambang), bukan aturan label. `Status` bukan salinan label | Diputuskan |
+| 2026-11-04 | Lisensi dataset CC BY 4.0, jadi `dataset/` disertakan di repo (dihapus dari `.gitignore`) dengan atribusi di README | Diputuskan |
+| 2026-11-04 | Kapan `Status` diukur, dan mengapa data "acak" berstruktur 50 profil digandakan? Tidak ada jawaban di sumber manapun. Dicatat sebagai keterbatasan di README | **Terbuka** |
 | 2026-11-04 | Apakah model dengan `Status`/`Complains` boleh jadi model final, atau model "tanpa keduanya" yang dideploy? | **Terbuka** |
 | 2026-11-04 | Nilai K untuk recall@top-K (10%, 20%, atau 40%)? | **Terbuka** |
 | 2026-11-04 | Docker **tidak dipakai untuk saat ini**; deploy lewat `venv` + layanan gratis (Render / Hugging Face Spaces) | Diputuskan |
