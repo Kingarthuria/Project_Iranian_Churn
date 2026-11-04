@@ -2,7 +2,7 @@
 
 - **Tanggal:** 2026-11-04
 - **Data:** 2.850 baris setelah 300 duplikat persis dihapus
-- **Sumber analisis:** `program/EDA_Project_Churn_v2.ipynb`, bagian Univariate Analysis dan Outlier
+- **Sumber analisis:** `program/EDA_Project_Churn_v2.ipynb`, bagian Univariate Analysis dan Outlier. Angka per kelompok ada di `program/analisis_duplikat_v2.ipynb`, bagian "Asal Baris Outlier"
 - **Kelompok:** kelompok audit, yaitu sisa bagi 50 dari posisi baris (lihat `02_verifikasi_50_kelompok.md`)
 
 ## Keputusan
@@ -10,6 +10,7 @@
 - **Outlier:** semua dipertahankan. Tidak ada baris yang dihapus dan tidak ada nilai yang dipotong, karena tidak ada bukti bahwa nilainya salah.
 - **Rencana *flag*:** dibatalkan untuk sekarang. Bisa dibahas lagi saat feature engineering, dengan batas yang dihitung di dalam fold.
 - **Narasi:** klaim yang terlalu kuat ditulis ulang.
+- **Notebook EDA berdiri sendiri:** tidak merujuk file lain dan tidak memuat analisis kelompok posisi. Rujukan UCI dipertahankan. Kalimat keterbatasan tetap wajib di README dan laporan model.
 
 ## Hasil outlier (IQR dari seluruh data)
 
@@ -51,7 +52,8 @@ Batas dan pilihan *flag* ditentukan setelah melihat churn pada seluruh data, seh
 - Label `Insight` kini memakai p-value dan arah selisih.
 - Tafsir p-value `Call_Failure` diperbaiki.
 - Batas di sel irisan outlier kini dihitung dari kode.
-- Keterbatasan ditambahkan.
+- `Subscription_Length` ditulis deskriptif (28,4% berbanding 14,6%), tanpa klaim tentang pelanggan baru dan tanpa pembahasan kelompok.
+- Uji statistik ditulis mengasumsikan tiap baris independen, mengikuti dokumentasi UCI.
 
 ## Yang masih perlu ditinjau
 
