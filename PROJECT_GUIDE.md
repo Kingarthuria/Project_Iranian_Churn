@@ -2,7 +2,7 @@
 
 > File ini adalah **sumber kebenaran** project. Isi hanya fakta yang sudah pasti. Bagian yang belum diketahui dibiarkan kosong.
 > Berikan ke AI di awal setiap sesi ("baca PROJECT_GUIDE.md dulu"). Perbarui **Status** dan **Log Keputusan** setiap selesai satu langkah.
-> Terakhir diperbarui: 2026-11-04 (Fase 0 selesai)
+> Terakhir diperbarui: 2026-11-04 (audit struktur data disimpan, Fase 1 berjalan)
 
 ---
 
@@ -65,7 +65,11 @@ Belum ada.
 
 | # | Temuan | Dihitung di | Tanggal |
 |---|---|---|---|
-| | Belum ada | | |
+| 1 | Ada 300 duplikat persis (9,52%): 253 baris beraktivitas dan 47 baris beraktivitas nol. Beraktivitas nol berarti `Seconds of Use`, `Frequency of use`, dan `Frequency of SMS` semuanya 0 | `program/analisis_duplikat_v2.ipynb` | 2026-11-04 |
+| 2 | Sisa bagi 50 dari posisi baris menjelaskan 99,1% variasi `Seconds of Use` dan 92,7% variasi `Churn`. Pola selisih yang sama diikuti 91,1% nilai `Seconds of Use` | `program/analisis_duplikat_v2.ipynb` | 2026-11-04 |
+| 3 | Sebanyak 441 dari 495 baris churn berasal dari 7 kelompok sisa bagi 50 yang seluruh barisnya churn | `program/analisis_duplikat_v2.ipynb` | 2026-11-04 |
+| 4 | Semua 365 pasangan kembar beraktivitas berada di kelompok sisa bagi 50 yang sama | `program/analisis_duplikat_v2.ipynb` | 2026-11-04 |
+| 5 | ROC-AUC CV acak vs grup per kelompok (audit, bukan skor final): Logistic Regression 0,932 vs 0,841 (0,607–1,000), RandomForest 0,984 vs 0,790 (0,369–0,998) | `program/analisis_duplikat_v2.ipynb` | 2026-11-04 |
 
 ---
 
@@ -75,7 +79,9 @@ Belum ada.
 
 | # | Keputusan | Alasan | Tanggal |
 |---|---|---|---|
-| | Belum ada keputusan analisis | | |
+| 1 | Project dilanjutkan dengan asumsi tiap baris adalah satu pelanggan, walau audit menemukan pola berulang per 50 baris | Keputusan pengguna: mengikuti UCI dan keempat paper di `jurnal/`, dan project ini untuk portofolio pembelajaran | 2026-11-04 |
+| 2 | README dan laporan model wajib memuat kalimat keterbatasan di bagian 7, tanpa skor pembanding. Narasi tidak boleh menyebut baris terbukti independen, atau menyebut skor CV acak sebagai performa pada pelanggan baru | Keputusan pengguna, agar asumsi tetap terbuka | 2026-11-04 |
+| 3 | Audit disimpan di repo sebagai simpanan (`program/analisis_duplikat_v2.ipynb` dan `ringkasan_temuan/`), bukan fokus project | Keputusan pengguna | 2026-11-04 |
 
 ---
 
@@ -90,7 +96,7 @@ Belum diputuskan. Akan dibahas dengan pengguna setelah EDA.
 | Fase | Status |
 |---|---|
 | 0 Housekeeping | **Selesai.** `requirements.txt`, Git, GitHub privat, dan struktur folder sudah ada. Environment `ds_env` terverifikasi (dry-run 0 paket baru, `pip check` bersih) |
-| 1 EDA dan data preparation | Ada `program/EDA_Project_Churn.ipynb` (milik pengguna), belum ditinjau ulang bersama AI |
+| 1 EDA dan data preparation | **Berjalan.** Audit duplikat dan struktur data selesai dan disimpan. Peninjauan `program/EDA_Project_Churn.ipynb` baru sampai catatan sel 0–25. Penanganan duplikat belum diputuskan |
 | 2 Modeling | Belum dimulai |
 | 3 Evaluasi dan refactor | Belum dimulai |
 | 4 Experiment tracking | Belum dimulai |
@@ -102,7 +108,11 @@ Belum diputuskan. Akan dibahas dengan pengguna setelah EDA.
 
 ## 7. Masalah yang Diketahui
 
-Belum ada.
+**Independensi baris tidak terjamin.** Lihat temuan 2–5 di bagian 3 dan `ringkasan_temuan/`. Penyebabnya belum diketahui. Keputusan penanganannya ada di bagian 4.
+
+Kalimat keterbatasan yang wajib masuk README dan laporan model:
+
+> Analisis mengikuti dokumentasi UCI yang menyatakan tiap baris mewakili satu pelanggan. Audit menemukan pola berulang per 50 baris, sehingga independensi antarbaris tidak terjamin dan skor model bisa terlalu optimistis.
 
 ---
 
@@ -209,6 +219,7 @@ project_iranian_churn/
 ├── dataset/          # data mentah, read-only (dilacak, CC BY 4.0)
 ├── jurnal/           # referensi, diabaikan Git
 ├── program/          # notebook eksplorasi
+├── ringkasan_temuan/ # ringkasan temuan bernomor (.md)
 ├── src/              # logika yang dipakai ulang
 ├── tests/
 └── docs/             # decision log, laporan
@@ -226,7 +237,9 @@ project_iranian_churn/
 | 2026-11-04 | Dataset dilacak di Git (lisensi CC BY 4.0 mengizinkan redistribusi dengan atribusi) | Diputuskan |
 | 2026-11-04 | Folder `src/`, `tests/`, `docs/` dibuat dengan `README.md` singkat per folder (bukan `.gitkeep`) | Diputuskan |
 | 2026-11-04 | `program/EDA_Project_Churn.ipynb` (5,9 MB karena output tersimpan) tidak diubah di Fase 0. Keputusan strip output ditunda ke Fase 1 | Diputuskan |
-| | Penanganan duplikat dan outlier | **Terbuka** |
+| 2026-11-04 | Lanjut dengan asumsi tiap baris adalah satu pelanggan, dengan kalimat keterbatasan di hasil akhir. Audit disimpan di repo (bagian 4) | Diputuskan |
+| | Penanganan duplikat: hapus 300 baris atau hanya 253 baris beraktivitas | **Terbuka** |
+| | Penanganan outlier | **Terbuka** |
 | | Strategi validasi (setelah memeriksa independensi baris) | **Terbuka** |
 | | Metrik evaluasi utama | **Terbuka** |
 | | Fitur yang dipakai dan yang dibuang | **Terbuka** |
