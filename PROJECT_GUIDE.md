@@ -70,6 +70,7 @@ Belum ada.
 | 3 | Sebanyak 441 dari 495 baris churn berasal dari 7 kelompok sisa bagi 50 yang seluruh barisnya churn | `program/analisis_duplikat_v2.ipynb` | 2026-11-04 |
 | 4 | Semua 365 pasangan kembar beraktivitas berada di kelompok sisa bagi 50 yang sama | `program/analisis_duplikat_v2.ipynb` | 2026-11-04 |
 | 5 | ROC-AUC CV acak vs grup per kelompok (audit, bukan skor final): Logistic Regression 0,932 vs 0,841 (0,607–1,000), RandomForest 0,984 vs 0,790 (0,369–0,998) | `program/analisis_duplikat_v2.ipynb` | 2026-11-04 |
+| 6 | Semua 59 baris churn dengan `Subscription_Length` di bawah 15,5 berasal dari kelompok audit 49. Tanpa kelompok itu, churn rate grup ini 0,0%, dan baris lainnya 14,6% | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
 
 ---
 
@@ -89,6 +90,8 @@ Belum ada.
 | 8 | Pertahankan 85 baris dengan semua aktivitas nol. Penanda `is_zero_activity` bisa dibahas saat feature engineering | Tidak ada bukti barisnya salah, dan churn rate-nya tinggi (51,8% vs 14,5%). Keterbatasan: 26 baris berstatus aktif tanpa aktivitas | 2026-11-04 |
 | 9 | Pertahankan 54 baris dengan `Subscription Length` di bawah 9. Tidak ada klaim tentang pelanggan baru, dan fitur per bulan tidak boleh menganggap semua baris mencakup 9 bulan penuh | Satuan kolom belum pasti, nilainya naik bertahap, dan baris ini hampir seluruhnya berasal dari dua kelompok dengan hasil berlawanan | 2026-11-04 |
 | 10 | Pakai `Age Group` untuk modeling. `Age` tidak masuk fitur model, tetapi tetap ada di data dan EDA | Keduanya berpasangan satu-satu, dan kode `Age Group` didokumentasikan UCI, sedangkan arti `Age` belum dijelaskan | 2026-11-04 |
+| 11 | Semua outlier dipertahankan, tidak ada baris yang dihapus atau nilai yang dipotong | Tidak ada bukti bahwa nilainya salah | 2026-11-04 |
+| 12 | Rencana flag dari sel kesimpulan outlier dibatalkan untuk sekarang. Bisa dibahas lagi saat feature engineering, dengan batas dihitung di dalam fold | Batasnya dipilih setelah melihat churn pada seluruh data, dan flag merah pada dasarnya menandai satu kelompok audit | 2026-11-04 |
 
 ---
 
@@ -103,7 +106,7 @@ Belum diputuskan. Akan dibahas dengan pengguna setelah EDA.
 | Fase | Status |
 |---|---|
 | 0 Housekeeping | **Selesai.** `requirements.txt`, Git, GitHub privat, dan struktur folder sudah ada. Environment `ds_env` terverifikasi (dry-run 0 paket baru, `pip check` bersih) |
-| 1 EDA dan data preparation | **Berjalan.** Audit duplikat dan struktur data selesai dan disimpan. Catatan sel 0–25 selesai dan diterapkan di `program/EDA_Project_Churn_v2.ipynb`. Bagian univariat dan sel berikutnya belum ditinjau |
+| 1 EDA dan data preparation | **Berjalan.** Audit duplikat dan struktur data selesai dan disimpan. Bagian persiapan, duplikat, kualitas kolom, univariat, dan outlier selesai ditinjau dan diterapkan di `program/EDA_Project_Churn_v2.ipynb`. Bagian hubungan fitur dan seterusnya belum ditinjau |
 | 2 Modeling | Belum dimulai |
 | 3 Evaluasi dan refactor | Belum dimulai |
 | 4 Experiment tracking | Belum dimulai |
@@ -252,7 +255,7 @@ project_iranian_churn/
 | 2026-11-04 | 85 baris dengan semua aktivitas nol dipertahankan (bagian 4) | Diputuskan |
 | 2026-11-04 | 54 baris dengan `Subscription Length` di bawah 9 dipertahankan (bagian 4) | Diputuskan |
 | 2026-11-04 | `Age Group` dipakai untuk modeling, `Age` tidak masuk fitur model (bagian 4). Fitur lain belum diputuskan | Diputuskan |
-| | Penanganan outlier | **Terbuka** |
+| 2026-11-04 | Semua outlier dipertahankan, dan rencana flag dibatalkan untuk sekarang (bagian 4) | Diputuskan |
 | | Strategi validasi (setelah memeriksa independensi baris) | **Terbuka** |
 | | Metrik evaluasi utama | **Terbuka** |
 | | Fitur yang dipakai dan yang dibuang | **Terbuka** |
