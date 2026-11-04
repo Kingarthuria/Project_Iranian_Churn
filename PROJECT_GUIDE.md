@@ -2,7 +2,7 @@
 
 > File ini adalah **sumber kebenaran** project. Isi hanya fakta yang sudah pasti. Bagian yang belum diketahui dibiarkan kosong.
 > Berikan ke AI di awal setiap sesi ("baca PROJECT_GUIDE.md dulu"). Perbarui **Status** dan **Log Keputusan** setiap selesai satu langkah.
-> Terakhir diperbarui: 2026-11-04 (restart dari nol)
+> Terakhir diperbarui: 2026-11-04 (Fase 0 selesai)
 
 ---
 
@@ -89,7 +89,7 @@ Belum diputuskan. Akan dibahas dengan pengguna setelah EDA.
 
 | Fase | Status |
 |---|---|
-| 0 Housekeeping | `requirements.txt`, Git, dan GitHub privat sudah ada. Struktur folder belum |
+| 0 Housekeeping | **Selesai.** `requirements.txt`, Git, GitHub privat, dan struktur folder sudah ada. Environment `ds_env` terverifikasi (dry-run 0 paket baru, `pip check` bersih) |
 | 1 EDA dan data preparation | Ada `program/EDA_Project_Churn.ipynb` (milik pengguna), belum ditinjau ulang bersama AI |
 | 2 Modeling | Belum dimulai |
 | 3 Evaluasi dan refactor | Belum dimulai |
@@ -113,7 +113,7 @@ Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 ### Fase 0: Housekeeping
 - [x] Environment dan `requirements.txt` (bertahap, lihat bagian 9)
 - [x] `git init`, `.gitignore`, repo GitHub privat
-- [ ] Struktur folder (bagian 10)
+- [x] Struktur folder (bagian 10)
 - [x] Baca dokumentasi sumber data dan catat apa yang tidak dijelaskan (bagian 2)
 
 **DoD:** environment bisa dibuat ulang dari file, repo bersih, dokumentasi sumber sudah dibaca.
@@ -224,6 +224,8 @@ project_iranian_churn/
 | 2026-11-04 | Tujuan portofolio, cakupan EDA sampai monitoring, bahasa Indonesia, notebook lalu `src/` | Diputuskan |
 | 2026-11-04 | Tanpa Docker untuk saat ini, deploy lewat `venv` dan layanan gratis | Diputuskan |
 | 2026-11-04 | Dataset dilacak di Git (lisensi CC BY 4.0 mengizinkan redistribusi dengan atribusi) | Diputuskan |
+| 2026-11-04 | Folder `src/`, `tests/`, `docs/` dibuat dengan `README.md` singkat per folder (bukan `.gitkeep`) | Diputuskan |
+| 2026-11-04 | `program/EDA_Project_Churn.ipynb` (5,9 MB karena output tersimpan) tidak diubah di Fase 0. Keputusan strip output ditunda ke Fase 1 | Diputuskan |
 | | Penanganan duplikat dan outlier | **Terbuka** |
 | | Strategi validasi (setelah memeriksa independensi baris) | **Terbuka** |
 | | Metrik evaluasi utama | **Terbuka** |
