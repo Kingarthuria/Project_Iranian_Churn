@@ -7,7 +7,7 @@
 ## Keputusan
 
 - **Sel validasi:** disederhanakan menjadi saringan eksploratif, dengan label "lolos saringan".
-- **Value at Risk:** memakai 3 sinyal, yaitu `Complains=1`, `Status=2`, dan `Seconds_of_Use` Rendah, ditambah insight nilai.
+- **Value at Risk:** memakai 3 sinyal, yaitu `Complains=1`, `Status=2`, dan `Seconds_of_Use` Rendah, ditambah insight nilai. Bagian ini kemudian diganti dengan "Pertanyaan Bisnis" (lihat `08_pertanyaan_bisnis.md`), dan angka 3 sinyalnya tetap dipakai.
 - **Rekomendasi bisnis:** ditulis sebagai hipotesis yang perlu diuji.
 
 ## Temuan utama

@@ -76,6 +76,7 @@ Belum ada.
 | 9 | Baris dengan komplain dan berstatus non-aktif punya churn rate 89,3% (133 dari 149). Menurut UCI, kedua kolom berasal dari 9 bulan pertama. Cara `Status` ditentukan dan definisi churn tidak dijelaskan, jadi hubungan ini perlu dibaca hati-hati | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
 | 10 | Baris churn hanya memegang 4,4% total `Customer_Value` (median 102,6 berbanding 271,5). Dibaca sebagai porsi relatif, bukan uang | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
 | 11 | Gabungan `Complains=1`, `Status=2`, dan `Seconds_of_Use` Rendah mencakup 992 baris (34,8%) dan 90,8% baris churn. Deskriptif, karena sinyal dipilih setelah melihat churn | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
+| 12 | Selisih churn rate, IK 95%: komplain 72,8 poin (67,3 sampai 77,3), non-aktif 41,9 poin (38,1 sampai 45,8), `Seconds_of_Use` kuartil terendah 25,3 poin (21,7 sampai 29,1). Eksploratif | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
 
 ---
 
@@ -102,6 +103,8 @@ Belum ada.
 | 15 | Modeling membandingkan hasil dengan dan tanpa `Status` serta `Complains`. Fitur selain `Age_Binning` dan `Age_Group` belum diputuskan dan diuji saat modeling | Perbandingan ini melihat seberapa besar skor bergantung pada kedua kolom, bukan menguji leakage, karena menurut UCI keduanya mendahului label. Keputusan fitur butuh pengujian performa | 2026-11-04 |
 | 16 | Sel validasi kombinasi disederhanakan menjadi saringan eksploratif: minimal 50 baris, minimal 1% data, dan stabil di 20 split | Sel lama punya dua masalah kode, dan p-value-nya tidak menguji kombinasi | 2026-11-04 |
 | 17 | Value at Risk memakai 3 sinyal, tanpa `Subscription_Length`. Rekomendasi bisnis ditulis sebagai hipotesis yang perlu diuji | Sesuai keputusan tidak membuat klaim pelanggan baru, dan temuannya hanya asosiasi | 2026-11-04 |
+| 18 | Bagian Value at Risk di notebook EDA diganti dengan Pertanyaan Bisnis. Analisis risiko × nilai ditunda ke Fase 3 | Nama lama kurang tepat dan `Customer_Value` tidak punya satuan. Pertanyaan bisnis lebih tepat dijawab dengan besar efek dan rentangnya | 2026-11-04 |
+| 19 | Dataset bersih disimpan di folder baru `dataset_clean/`, terpisah dari `dataset/`. Script dan folder dibuat saat pengguna memberi aba-aba | Data mentah tetap read-only | 2026-11-04 |
 
 ---
 
@@ -168,6 +171,7 @@ Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 
 ### Fase 3: Evaluasi, interpretasi, dan refactor
 - [ ] Pilih threshold berdasarkan skenario biaya (tandai asumsi)
+- [ ] Analisis risiko × nilai: peluang churn dari prediksi di luar data latih × `Customer_Value`
 - [ ] Interpretasi model dengan bahasa asosiatif, bukan kausal
 - [ ] Analisis error
 - [ ] Pindahkan logika ke `src/`, tambah test sederhana
@@ -237,6 +241,7 @@ project_iranian_churn/
 ├── requirements.txt
 ├── .gitignore
 ├── dataset/          # data mentah, read-only (dilacak, CC BY 4.0)
+├── dataset_clean/    # data bersih, dibuat ulang dari script (belum dibuat)
 ├── jurnal/           # referensi, diabaikan Git
 ├── program/          # notebook eksplorasi
 ├── ringkasan_temuan/ # ringkasan temuan bernomor (.md)
@@ -273,6 +278,7 @@ project_iranian_churn/
 | 2026-11-04 | MI dilaporkan dengan rata-rata 10 seed dan rentang (bagian 3) | Diputuskan |
 | 2026-11-04 | Koreksi: `Status` dan `Complains` tidak disebut risiko leakage, karena menurut UCI semua fitur berasal dari 9 bulan pertama. Perbandingan dengan dan tanpa keduanya tetap dilakukan untuk melihat ketergantungan skor (bagian 4) | Diputuskan |
 | 2026-11-04 | Klaim lama seperti "pelanggan baru" dan "loyal" dihapus dari notebook EDA v2. Sel validasi disederhanakan dan Value at Risk memakai 3 sinyal (bagian 4) | Diputuskan |
+| 2026-11-04 | Value at Risk diganti dengan Pertanyaan Bisnis, dan dataset bersih nanti di `dataset_clean/` (bagian 4) | Diputuskan |
 | | Riwayat Git masih memuat nama tampilan dan `userId` Google dari metadata Colab. Dibersihkan sebelum repo dipublikasikan | **Terbuka** |
 | | Strategi validasi (setelah memeriksa independensi baris) | **Terbuka** |
 | | Metrik evaluasi utama | **Terbuka** |
