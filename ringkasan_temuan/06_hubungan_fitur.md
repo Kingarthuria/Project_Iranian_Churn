@@ -9,7 +9,7 @@
 - **Narasi:** angka dicocokkan dengan output, rujukan yang tidak ada dihapus, dan klaim dilunakkan menjadi asosiasi.
 - **Mutual Information (MI):** dilaporkan dengan rata-rata, minimum, dan maksimum dari 10 seed.
 - **Fitur:** tabel menjadi kandidat tanpa putusan. `Age_Binning` tidak masuk fitur model, dan `Age_Group` dipakai.
-- **`Status` dan `Complains`:** risiko leakage dicatat, dan modeling membandingkan hasil dengan dan tanpa kedua fitur.
+- **`Status` dan `Complains`:** modeling membandingkan hasil dengan dan tanpa kedua fitur, untuk melihat seberapa besar skor bergantung padanya.
 
 ## Temuan utama
 
@@ -65,9 +65,11 @@ Label lama "tidak ada hubungan, kandidat DROP" di sel Kruskal-Wallis diganti men
 
 Kolom ini sangat mungkin hasil hitungan dari fitur lain, tetapi rumusnya tidak dijelaskan dokumentasi UCI. Setelah `Age_Binning` dan `Customer_Value` dikeluarkan, VIF `Frequency_of_SMS` turun dari 39,68 menjadi 1,17. VIF `Seconds_of_Use` (14,03) dan `Frequency_of_use` (18,15) tetap tinggi.
 
-### 5. Risiko leakage pada `Status` dan `Complains`
+### 5. Cara membaca `Status` dan `Complains`
 
-Waktu pengukuran keduanya tidak dijelaskan dokumentasi UCI. Risiko ini belum terbukti.
+Menurut dokumentasi UCI, semua fitur berasal dari 9 bulan pertama, jadi secara waktu mendahului label. Namun, cara `Status` ditentukan dan definisi churn tidak dijelaskan, jadi hubungan keduanya perlu dibaca hati-hati.
+
+**Koreksi:** kedua kolom ini sempat ditulis sebagai risiko leakage. Tulisan itu terlalu kuat, karena dokumentasi UCI menyebut semua atribut selain `Churn` berasal dari 9 bulan pertama. Pengguna yang menunjukkan hal ini.
 
 | `Complains` | `Status` | Baris | Baris churn | Churn rate |
 |---|---|---|---|---|

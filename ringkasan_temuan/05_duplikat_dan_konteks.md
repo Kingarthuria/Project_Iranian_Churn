@@ -63,5 +63,5 @@ Mekanisme pastinya belum dibuktikan. Yang teramati hanya bahwa anomali itu hilan
 
 | Notebook asli | Notebook v2 | Alasan |
 |---|---|---|
-| Planning gap "secara desain berfungsi mencegah" leakage, dan fitur "aman digunakan" tanpa risiko leakage berbasis waktu | Menurut dokumentasi UCI, fitur mendahului label, tetapi cara dan waktu pengukuran `Status` tidak dijelaskan, jadi risikonya belum bisa disingkirkan | Dokumentasi tidak cukup untuk membuktikan fitur bebas leakage |
+| Planning gap "secara desain berfungsi mencegah" leakage, dan fitur "aman digunakan" tanpa risiko leakage berbasis waktu | Menurut dokumentasi UCI, semua fitur berasal dari 9 bulan pertama, jadi secara waktu mendahului label. Namun, cara `Status` ditentukan dan definisi churn tidak dijelaskan, jadi hubungan keduanya perlu dibaca hati-hati. | Dokumentasi mendukung urutan waktu, tetapi tidak menjelaskan cara `Status` ditentukan dan definisi churn |
 | Menyebut 13 kolom, tetapi hanya 12 nama | `Age` ditambahkan | Daftar kolomnya belum lengkap |
