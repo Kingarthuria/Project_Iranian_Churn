@@ -101,7 +101,7 @@ Hubungan ini asosiatif, bukan kausal.
 | Baris | 112 | 921 | 1.296 | 367 | 154 |
 | Churn rate | 0,0% | 17,0% | 16,4% | 20,2% | 1,3% |
 
-## 7. Hampir-duplikat
+## 6. Hampir-duplikat
 
 **Keputusan: dipertahankan dan dicatat.** Sesuai asumsi kerja, tidak ada dasar untuk menyebut baris ini duplikat.
 
@@ -117,7 +117,7 @@ Hubungan ini asosiatif, bukan kausal.
 | `Status` | 2 | 0 |
 | `Charge Amount` | 1 | 0 |
 
-## 6. Kerapian kode di `program/EDA_Project_Churn_v2.ipynb`
+## 7. Kerapian kode di `program/EDA_Project_Churn_v2.ipynb`
 
 **Keputusan: diperbaiki.** Output teks tidak berubah selain nama kolom dan lebar kolom tabel.
 
