@@ -82,6 +82,7 @@ Belum ada.
 | 1 | Project dilanjutkan dengan asumsi tiap baris adalah satu pelanggan, walau audit menemukan pola berulang per 50 baris | Keputusan pengguna: mengikuti UCI dan keempat paper di `jurnal/`, dan project ini untuk portofolio pembelajaran | 2026-11-04 |
 | 2 | README dan laporan model wajib memuat kalimat keterbatasan di bagian 7, tanpa skor pembanding. Narasi tidak boleh menyebut baris terbukti independen, atau menyebut skor CV acak sebagai performa pada pelanggan baru | Keputusan pengguna, agar asumsi tetap terbuka | 2026-11-04 |
 | 3 | Audit disimpan di repo sebagai simpanan (`program/analisis_duplikat_v2.ipynb` dan `ringkasan_temuan/`), bukan fokus project | Keputusan pengguna | 2026-11-04 |
+| 4 | Hapus 300 duplikat persis (`keep='first'`), sisa 2.850 baris. Diterapkan di `program/EDA_Project_Churn_v2.ipynb` | Baris identik bisa terpisah ke train dan test, dan menghindari pembobotan ganda. Keterbatasan: hanya menangani duplikat persis, dan 47 baris beraktivitas nol mungkin pelanggan sah | 2026-11-04 |
 
 ---
 
@@ -96,7 +97,7 @@ Belum diputuskan. Akan dibahas dengan pengguna setelah EDA.
 | Fase | Status |
 |---|---|
 | 0 Housekeeping | **Selesai.** `requirements.txt`, Git, GitHub privat, dan struktur folder sudah ada. Environment `ds_env` terverifikasi (dry-run 0 paket baru, `pip check` bersih) |
-| 1 EDA dan data preparation | **Berjalan.** Audit duplikat dan struktur data selesai dan disimpan. Peninjauan `program/EDA_Project_Churn.ipynb` baru sampai catatan sel 0–25. Penanganan duplikat belum diputuskan |
+| 1 EDA dan data preparation | **Berjalan.** Audit duplikat dan struktur data selesai dan disimpan. Bagian duplikat diperbaiki di `program/EDA_Project_Churn_v2.ipynb`. Catatan sel 0–25 lainnya dan sel berikutnya belum ditinjau |
 | 2 Modeling | Belum dimulai |
 | 3 Evaluasi dan refactor | Belum dimulai |
 | 4 Experiment tracking | Belum dimulai |
@@ -238,7 +239,8 @@ project_iranian_churn/
 | 2026-11-04 | Folder `src/`, `tests/`, `docs/` dibuat dengan `README.md` singkat per folder (bukan `.gitkeep`) | Diputuskan |
 | 2026-11-04 | `program/EDA_Project_Churn.ipynb` (5,9 MB karena output tersimpan) tidak diubah di Fase 0. Keputusan strip output ditunda ke Fase 1 | Diputuskan |
 | 2026-11-04 | Lanjut dengan asumsi tiap baris adalah satu pelanggan, dengan kalimat keterbatasan di hasil akhir. Audit disimpan di repo (bagian 4) | Diputuskan |
-| | Penanganan duplikat: hapus 300 baris atau hanya 253 baris beraktivitas | **Terbuka** |
+| 2026-11-04 | Hapus 300 duplikat persis. Analisis duplikat diperbaiki di notebook v2, notebook asli tidak diubah (bagian 4) | Diputuskan |
+| | 14 grup dengan fitur identik tetapi label `Churn` berbeda | **Terbuka** |
 | | Penanganan outlier | **Terbuka** |
 | | Strategi validasi (setelah memeriksa independensi baris) | **Terbuka** |
 | | Metrik evaluasi utama | **Terbuka** |
