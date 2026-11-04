@@ -3,7 +3,7 @@
 - **Tanggal:** 2026-11-04
 - **Status:** berjalan, catatan baru ditambahkan di file ini setelah diputuskan
 - **Data:** 2.850 baris setelah 300 duplikat persis dihapus
-- **Asal angka:** pengecekan terpisah pada `dataset/Customer Churn.csv`, belum tersimpan di notebook
+- **Asal angka:** `program/analisis_duplikat_v2.ipynb`, bagian "Bukti Kualitas Kolom" dan "Ringkasan dampak pada baris"
 - **Kelompok:** kelompok audit, yaitu sisa bagi 50 dari posisi baris (lihat `02_verifikasi_50_kelompok.md`)
 
 ## 0. 14 grup dengan fitur identik tetapi label berbeda
@@ -100,6 +100,22 @@ Hubungan ini asosiatif, bukan kausal.
 |---|---|---|---|---|---|
 | Baris | 112 | 921 | 1.296 | 367 | 154 |
 | Churn rate | 0,0% | 17,0% | 16,4% | 20,2% | 1,3% |
+
+## 7. Hampir-duplikat
+
+**Keputusan: dipertahankan dan dicatat.** Sesuai asumsi kerja, tidak ada dasar untuk menyebut baris ini duplikat.
+
+- **Temuan:** setelah deduplikasi persis, 75 baris beraktivitas masih punya pasangan yang berbeda di satu kolom saja.
+- **Keterbatasan:** baris yang sangat mirip masih bisa terpisah ke train dan test.
+
+| Kolom yang berbeda | Semua pasangan | Keduanya beraktivitas |
+|---|---|---|
+| `Subscription Length` | 335 | 39 |
+| `Complains` | 27 | 18 |
+| `Churn` | 14 | 3 |
+| `Tariff Plan` | 4 | 4 |
+| `Status` | 2 | 0 |
+| `Charge Amount` | 1 | 0 |
 
 ## 6. Kerapian kode di `program/EDA_Project_Churn_v2.ipynb`
 

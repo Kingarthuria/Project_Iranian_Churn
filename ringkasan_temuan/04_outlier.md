@@ -40,11 +40,11 @@ Notebook lama menyebut baris dengan `Subscription_Length` di bawah 15,5 lebih mu
 
 Lima fitur penggunaan tidak punya baris churn pada grup outlier, tetapi outlier-nya hanya berasal dari 2 sampai 9 kelompok. P-value di bawah 0,001 bisa terlalu kecil karena independensi antarbaris tidak terjamin.
 
-Uji kasar per kelompok tidak signifikan untuk fitur yang bisa diuji (Fisher p ≥ 0,41). Jumlah kelompoknya sedikit, jadi ini bukan bukti bahwa hubungannya tidak ada. Uji ini berasal dari pengecekan terpisah dan belum tersimpan di notebook.
+Uji kasar per kelompok tidak signifikan untuk fitur yang bisa diuji (Fisher p ≥ 0,41). Jumlah kelompoknya sedikit, jadi ini bukan bukti bahwa hubungannya tidak ada. `Call_Failure` tidak bisa diuji karena tidak ada kelompok yang mayoritas barisnya outlier. Uji ini ada di `program/analisis_duplikat_v2.ipynb`, bagian "Bukti Pelengkap Outlier".
 
 ### 3. Rencana *flag* berisiko
 
-Batas dan pilihan *flag* ditentukan setelah melihat churn pada seluruh data, sehingga bisa membuat skor terlalu optimistis. *Flag* merah pada dasarnya menandai kelompok 49. Gabungan *flag* hijau mencakup 548 baris dari 14 kelompok, juga dari pengecekan terpisah.
+Batas dan pilihan *flag* ditentukan setelah melihat churn pada seluruh data, sehingga bisa membuat skor terlalu optimistis. *Flag* merah pada dasarnya menandai kelompok 49. Gabungan *flag* hijau mencakup 548 baris dari 14 kelompok, tanpa baris churn.
 
 ### 4. Perubahan narasi di notebook v2
 

@@ -93,6 +93,7 @@ Belum ada.
 | 11 | Semua outlier dipertahankan, tidak ada baris yang dihapus atau nilai yang dipotong | Tidak ada bukti bahwa nilainya salah | 2026-11-04 |
 | 12 | Rencana flag dari sel kesimpulan outlier dibatalkan untuk sekarang. Bisa dibahas lagi saat feature engineering, dengan batas dihitung di dalam fold | Batasnya dipilih setelah melihat churn pada seluruh data, dan flag merah pada dasarnya menandai satu kelompok audit | 2026-11-04 |
 | 13 | `program/EDA_Project_Churn_v2.ipynb` berdiri sendiri: tidak merujuk file lain dan tidak memuat analisis kelompok posisi. Rujukan UCI dipertahankan. README dan laporan model tetap memuat kalimat keterbatasan (bagian 7) | Keputusan pengguna, mengikuti kesepakatan bahwa tiap baris adalah satu pelanggan. UCI adalah sumber data dan atribusinya diwajibkan lisensi. Keterbatasan: pembaca notebook EDA tidak melihat bukti pola berulang | 2026-11-04 |
+| 14 | Pertahankan hampir-duplikat (75 baris beraktivitas dengan pasangan yang berbeda di satu kolom) | Sesuai asumsi kerja, tidak ada dasar untuk menyebutnya duplikat. Keterbatasan: baris sangat mirip masih bisa terpisah ke train dan test | 2026-11-04 |
 
 ---
 
@@ -258,6 +259,11 @@ project_iranian_churn/
 | 2026-11-04 | `Age Group` dipakai untuk modeling, `Age` tidak masuk fitur model (bagian 4). Fitur lain belum diputuskan | Diputuskan |
 | 2026-11-04 | Semua outlier dipertahankan, dan rencana flag dibatalkan untuk sekarang (bagian 4) | Diputuskan |
 | 2026-11-04 | Notebook EDA v2 berdiri sendiri, analisis kelompok posisi hanya ada di notebook audit (bagian 4) | Diputuskan |
+| 2026-11-04 | Sitasi empat paper di `jurnal/` ditambahkan ke sel 4 notebook EDA v2 sebagai bacaan terkait, bukan dasar analisis | Diputuskan |
+| 2026-11-04 | Sitasi Jafari-Marandi dkk. (2020) dihapus dari notebook EDA v2, karena halaman UCI tidak mencantumkan nama pembuat. Sumber dataset memakai sitasi resmi UCI | Diputuskan |
+| 2026-11-04 | Hampir-duplikat dipertahankan (bagian 4) | Diputuskan |
+| | Klaim lama seperti "pelanggan baru" dan "loyal" di sel notebook EDA v2 yang belum ditinjau. Diperbaiki saat bagiannya ditinjau | **Terbuka** |
+| | Riwayat Git masih memuat nama tampilan dan `userId` Google dari metadata Colab. Dibersihkan sebelum repo dipublikasikan | **Terbuka** |
 | | Strategi validasi (setelah memeriksa independensi baris) | **Terbuka** |
 | | Metrik evaluasi utama | **Terbuka** |
 | | Fitur yang dipakai dan yang dibuang | **Terbuka** |
