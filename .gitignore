@@ -13,9 +13,8 @@ mlflow.db
 mlruns/
 mlartifacts/
 
-# Data turunan (dibuat ulang dengan script di Fase 1).
-# dataset/ sengaja dilacak: lisensi UCI CC BY 4.0 mengizinkan redistribusi dengan atribusi.
-program/artifacts/*.csv
+# Jurnal/artikel referensi (hak cipta, cukup dicatat sitasinya di README)
+jurnal/
 
 # Python / Jupyter
 __pycache__/
@@ -30,6 +29,3 @@ __pycache__/
 # OS
 Thumbs.db
 .DS_Store
-
-# Jurnal/artikel referensi (hak cipta, cukup dicatat sitasinya di README)
-jurnal/

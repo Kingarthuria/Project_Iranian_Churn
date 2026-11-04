@@ -1,8 +1,8 @@
 # PROJECT GUIDE: Iranian Customer Churn
 
-> File ini adalah **sumber kebenaran** proyek. Berikan ke AI di awal setiap sesi
-> ("baca PROJECT_GUIDE.md dulu"). Perbarui bagian **Status** dan **Log Keputusan** setiap selesai satu fase.
-> Terakhir diperbarui: 2026-11-04
+> File ini adalah **sumber kebenaran** project. Isi hanya fakta yang sudah pasti. Bagian yang belum diketahui dibiarkan kosong.
+> Berikan ke AI di awal setiap sesi ("baca PROJECT_GUIDE.md dulu"). Perbarui **Status** dan **Log Keputusan** setiap selesai satu langkah.
+> Terakhir diperbarui: 2026-11-04 (restart dari nol)
 
 ---
 
@@ -11,279 +11,189 @@
 | Item | Isi |
 |---|---|
 | Tujuan | **Portofolio / pembelajaran**: menunjukkan alur data science dan MLOps end-to-end yang rapi, jujur, dan bisa dijelaskan |
-| Masalah | Memprediksi pelanggan telekomunikasi Iran yang akan churn |
-| Dataset | `dataset/Customer Churn.csv` (UCI *Iranian Churn Dataset*, Jafari-Marandi dkk., 2020) |
-| Target | `Churn` (1 = berhenti, 0 = bertahan) |
-| Cakupan | EDA, cleaning, feature engineering, modeling, MLflow, deployment, monitoring |
-| Pekerjaan lama | **Dilanjutkan dan diperbaiki**, bukan dimulai ulang |
+| Masalah | Memprediksi pelanggan sebuah perusahaan telekomunikasi Iran yang churn |
+| Dataset | `dataset/Customer Churn.csv` (UCI *Iranian Churn Dataset*) |
+| Target | `Churn` (1 = churn, 0 = non-churn, menurut UCI) |
+| Cakupan | EDA, cleaning, feature engineering, modeling, experiment tracking, deployment, monitoring |
 | Bahasa | Penjelasan dan komentar dalam Bahasa Indonesia, nama variabel dan fungsi dalam Bahasa Inggris |
+| Alur kode | Notebook untuk eksplorasi, logika yang dipakai ulang dipindah ke `src/` |
+| Deployment | Tanpa Docker untuk saat ini |
 
-**Prinsip utama proyek:** kejujuran dan kebenaran analisis lebih penting daripada angka yang bagus.
-Untuk portofolio, model dengan AUC 0,79 yang divalidasi benar lebih bernilai daripada AUC 0,98 yang bocor.
+**Prinsip utama:** kejujuran dan kebenaran analisis lebih penting daripada angka yang bagus.
 
 ---
 
 ## 2. Dataset
 
-- 3.150 baris, 14 kolom, tanpa missing value, 300 baris duplikat persis. Setelah dedup: **2.850 baris**.
-- Churn rate: 15,7% (mentah), **15,65%** (setelah dedup). Kelas tidak seimbang.
-- **Sumber dan lisensi:** UCI Machine Learning Repository, **CC BY 4.0** (boleh disertakan di repo dengan atribusi).
+- **Sumber:** UCI Machine Learning Repository, lisensi **CC BY 4.0** (boleh disertakan di repo dengan atribusi).
   Sitasi: *Iranian Churn [Dataset]. (2020). UCI Machine Learning Repository. https://doi.org/10.24432/C5JW3Z*
-- **Definisi label (dokumentasi UCI, ditinjau 2026-11-04):** semua atribut kecuali `Churn` adalah agregat **9 bulan pertama**.
-  `Churn` adalah **status pelanggan di akhir bulan ke-12**, tiga bulan di antaranya adalah *planning gap*.
-  Dokumentasi **tidak** mendefinisikan "churn" secara operasional, cara `Status` ditentukan, arti `Customer_Value`, maupun pembuat data.
-- Nama kolom mentah mengandung **spasi ganda** (`Call  Failure`, `Subscription  Length`, `Charge  Amount`).
-  Versi bersih memakai satu underscore (`Call_Failure`). Jangan gunakan `col.replace(' ', '_')` begitu saja
-  karena menghasilkan `Call__Failure` (dua underscore).
+- **Ukuran menurut UCI:** 3.150 baris, masing-masing mewakili satu pelanggan. UCI menyebut data "dikumpulkan secara acak" dari basis data sebuah perusahaan telekomunikasi Iran selama 12 bulan.
+- **Definisi label menurut UCI (ditinjau 2026-11-04):** semua atribut kecuali `Churn` adalah agregat **9 bulan pertama**. `Churn` adalah **status pelanggan di akhir bulan ke-12**. Tiga bulan di antaranya adalah *planning gap*.
+- **Yang tidak dijelaskan UCI:** arti operasional "churn" (berhenti berlangganan, pindah operator, atau tidak aktif), cara `Status` ditentukan dan kapan diukur, cara menghitung `Customer Value`, cara pengambilan sampel acak, dan siapa pembuat datanya.
+- Jurnal referensi yang sudah dikumpulkan ada di `jurnal/` (diabaikan Git).
 
 ### Data dictionary
 
-| Kolom (bersih) | Tipe | Arti | Catatan |
+> Nama kolom persis seperti header file. Kolom yang artinya belum ada: tanyakan ke pengguna.
+
+| Kolom | Arti menurut UCI |
+|---|---|
+| `Call  Failure` | belum ada deskripsi, tanyakan ke pengguna |
+| `Complains` | biner: 0 = tidak ada komplain, 1 = ada komplain |
+| `Subscription  Length` | belum ada deskripsi, tanyakan ke pengguna |
+| `Charge  Amount` | ordinal: 0 = jumlah terendah, 9 = tertinggi |
+| `Seconds of Use` | total detik panggilan |
+| `Frequency of use` | belum ada deskripsi, tanyakan ke pengguna |
+| `Frequency of SMS` | belum ada deskripsi, tanyakan ke pengguna |
+| `Distinct Called Numbers` | belum ada deskripsi, tanyakan ke pengguna |
+| `Age Group` | ordinal: 1 = lebih muda, 5 = lebih tua |
+| `Tariff Plan` | biner: 1 = pay as you go, 2 = kontrak |
+| `Status` | biner: 1 = aktif, 2 = non-aktif |
+| `Age` | belum ada deskripsi, tanyakan ke pengguna |
+| `Customer Value` | "nilai pelanggan yang dihitung" (tanpa rumus) |
+| `Churn` | **target**: biner, 1 = churn, 0 = non-churn |
+
+### Kolom bantu (BUKAN fitur)
+
+Belum ada.
+
+---
+
+## 3. Temuan Kunci
+
+> Hanya hasil yang **dihitung dari kode** dan bisa dilacak ke notebook tertentu.
+
+| # | Temuan | Dihitung di | Tanggal |
 |---|---|---|---|
-| `Call_Failure` | int | Jumlah panggilan gagal | 0–36 |
-| `Complains` | biner | 1 = pernah komplain | Risiko leakage, lihat bagian 4 |
-| `Subscription_Length` | int | Lama berlangganan (bulan) | 3–47. Hubungan dengan churn **tidak monoton** |
-| `Charge_Amount` | ordinal | Tingkat tagihan, 0 = terendah | 0–10. Efeknya hanya efek `Status` |
-| `Seconds_of_Use` | int | Total durasi panggilan (detik) | Skewed, pertimbangkan `log1p` |
-| `Frequency_of_use` | int | Jumlah panggilan | |
-| `Frequency_of_SMS` | int | Jumlah SMS | |
-| `Distinct_Called_Numbers` | int | Jumlah nomor berbeda yang dihubungi | |
-| `Age_Group` | ordinal | Kelompok usia 1–5 | Efek **U-terbalik**, jangan di-drop |
-| `Age` | int | Usia (15, 25, 30, 45, 55) | Duplikat 1:1 dengan `Age_Group`, **drop** |
-| `Tariff_Plan` | biner | 1 = pay-as-you-go, 2 = contractual | Efek kecil, terkonfusi `Status` |
-| `Status` | biner | 1 = aktif, 2 = non-aktif | Risiko leakage, lihat bagian 4 |
-| `Customer_Value` | float | Nilai pelanggan terhitung | Fungsi dari fitur usage (R² ≈ 0,96), **drop** |
-| `Churn` | biner | **Target** | |
-
-### Kolom tambahan di `program/artifacts/Customer_Churn_clean.csv` (19 kolom)
-
-`orig_pos`, `seed`, `seed_churn`, `fold_r0`, `fold_r1`, `fold_r2` adalah **kolom bantu, BUKAN fitur**.
-`seed_churn` memuat label tingkat profil sehingga memakainya sebagai fitur berarti bocor total.
+| | Belum ada | | |
 
 ---
 
-## 3. Temuan Kunci dari EDA (v2, `Real_EDA.ipynb`)
+## 4. Keputusan yang Sudah Dikunci
 
-Ini fakta yang sudah dihitung dan jadi dasar semua keputusan modeling.
+> Keputusan analisis diambil **bersama pengguna**, bukan sepihak oleh AI.
 
-1. **Data bukan sampel acak independen.** Data berasal dari sekitar **50 profil dasar** (`seed = orig_pos mod 50`) yang digandakan dengan sedikit jitter.
-   - ICC churn = 0,923
-   - **Ukuran sampel efektif ≈ 54**, bukan 2.850
-   - Hanya 8 dari 50 profil yang churn
-2. **Konsekuensi:** split acak per baris membocorkan "saudara kandung" baris ke test set. Metrik jadi terlalu optimis.
-3. **Sinyal yang kuat:** `Complains = 1` dan `Status = 2`. Sinyal lain lemah atau tidak terbukti setelah koreksi.
-4. **Baseline yang harus dikalahkan:** `Status + Complains + Seconds_of_Use` dengan AUC group-CV **0,828**.
-5. **Semua fitur bersama** hanya menghasilkan AUC group-CV 0,79 (bukan 0,98), dan tanpa `Status` turun ke 0,76.
-6. **Red flag "pemakaian tinggi = churn 0%" (ditinjau 2026-11-04):** polanya nyata (0 churner dari 804, 651, 347, dan 186 baris pada ambang `Seconds_of_Use > 6123`, `Frequency_of_use > 100`, `Frequency_of_SMS > 204`, `Distinct_Called_Numbers > 48`), tetapi baris-baris itu hanya berasal dari **16, 15, 9, dan 14 dari 50 profil**. Churn hampir "semua atau tidak sama sekali" per profil (35 profil 0%, 7 profil ≈ 100%, 8 profil campuran). Jadi penyebabnya **struktur klaster, bukan aturan label**.
-   - `Status` **bukan** salinan label: `Status = 2` churn 47,5% (325 dari 684), dan 121 churner berstatus aktif.
-   - Menurut desain terdokumentasi tidak ada kebocoran waktu (fitur diukur sebelum label, jeda 3 bulan). Ini bukan bukti bahwa label bersih.
-   - **Masih terbuka:** (a) kapan `Status` diukur dan apakah pelanggan yang pergi sebelum bulan ke-9 teragregasi lebih pendek (churner median 43,5 detik/bulan vs 110,8, konsisten tetapi tidak membuktikan); (b) UCI menyebut data "dikumpulkan secara acak", padahal strukturnya 50 profil yang digandakan, dan tidak ada kontak pembuat untuk klarifikasi.
-7. Churner bernilai rendah: 15,6% pelanggan tetapi hanya ~4,4% total `Customer_Value`. Ini mengubah cerita bisnis.
-
-Sumber detail: `program/artifacts/feature_spec.json`, `program/Real_EDA.ipynb`, `kelemahan/Review_Kelemahan_EDA.docx`.
-
----
-
-## 4. Keputusan yang Sudah Dikunci (jangan dilanggar tanpa alasan tertulis)
-
-| # | Keputusan | Alasan |
-|---|---|---|
-| D1 | Pakai data **setelah dedup** (2.850 baris) | 300 salinan persis adalah replikasi baris |
-| D2 | **Drop** `Age` dan `Customer_Value` | Redundan / turunan eksak fitur lain |
-| D3 | Pertahankan `Age_Group`, `Subscription_Length`, `Frequency_of_use` | Ablasi: membuang ketiganya menurunkan AUC |
-| D4 | **Validasi wajib** `StratifiedGroupKFold(n_splits=5, shuffle=True)`, grup = `seed`, 3 ulangan | Mencegah kontaminasi antar baris sejenis |
-| D5 | **Dilarang:** random `train_test_split` per baris, KFold biasa, random holdout | Metrik jadi menyesatkan |
-| D6 | Ketidakpastian dihitung dengan **bootstrap per profil**, bukan per baris | Baris tidak independen |
-| D7 | Bahasa hasil: **asosiatif, bukan kausal** | Tidak ada dimensi waktu atau eksperimen |
-| D8 | `Status` dan `Complains` ditandai **berisiko leakage**; selalu laporkan model **dengan dan tanpa** keduanya | Hasil dengan keduanya belum tentu berguna untuk prediksi dini |
-| D9 | Seed global `42` | Reproduksibilitas |
-| D10 | Preprocessing (scaler dll.) **di dalam Pipeline**, di-fit hanya pada data train per fold | Mencegah leakage |
-| D11 | Resampling (SMOTE) hanya boleh **di dalam fold**, dan harus dibandingkan dengan `class_weight`. Perlu waspada karena SMOTE menginterpolasi antar baris yang sudah saling tiruan | Interpolasi pada klaster bisa menggelembungkan skor |
-
----
-
-## 5. Metrik Evaluasi (usulan, belum final)
-
-Churn hanya 15,7%, jadi **accuracy tidak boleh jadi metrik utama**.
-
-| Metrik | Peran | Kelebihan | Kekurangan |
+| # | Keputusan | Alasan | Tanggal |
 |---|---|---|---|
-| **PR-AUC** | **Utama (usulan)** | Tidak bergantung threshold, peka pada kelas minoritas | Sulit dijelaskan ke non-teknis |
-| **Recall@top-K** (misal top 10% / 20% skor) | **Metrik bisnis (usulan)** | Langsung terjemah ke anggaran kampanye retensi | Bergantung pilihan K |
-| ROC-AUC | Pendamping | Standar, bisa dibandingkan dengan literatur | Optimis pada data imbalanced |
-| Recall / F1 kelas churn | Pelaporan di threshold terpilih | Mudah dipahami | Bergantung threshold |
-| Accuracy | **Hanya informasi** | - | Model "tebak semua bertahan" sudah 84% |
-
-Ini selaras dengan `cv_protocol.metrics` di `feature_spec.json` (PR-AUC, ROC-AUC, recall@top-K).
-**Keputusan final dicatat di bagian 11.**
-
-Aturan pelaporan: selalu sertakan baseline (`DummyClassifier` dan model 3 fitur di atas) dan **rentang ketidakpastian** (bootstrap per profil).
+| | Belum ada keputusan analisis | | |
 
 ---
 
-## 6. Status Pekerjaan Saat Ini
+## 5. Metrik Evaluasi
 
-```
-A:\project_iranian_churn\
-├── PROJECT_GUIDE.md              <- file ini
-├── dataset\Customer Churn.csv    <- data mentah, JANGAN DIUBAH
-├── kelemahan\Review_Kelemahan_EDA.docx   <- review kelemahan EDA v1
-├── mlflow.db                     <- backend MLflow (SQLite)
-└── program\
-    ├── EDA_Project_Churn.ipynb   <- EDA v1 (usang, ada banyak klaim keliru)
-    ├── Real_EDA.ipynb            <- EDA v2 (acuan, sadar klaster)
-    ├── model.ipynb               <- modeling v1 (PERLU DIPERBAIKI)
-    └── artifacts\
-        ├── Customer_Churn_clean.csv   <- 2.850 baris + kolom bantu
-        └── feature_spec.json          <- kontrak antara EDA dan modeling
-```
+Belum diputuskan. Akan dibahas dengan pengguna setelah EDA.
+
+---
+
+## 6. Status Pekerjaan
 
 | Fase | Status |
 |---|---|
-| EDA v1 | Usang, dipertahankan hanya sebagai riwayat |
-| EDA v2 + serah-terima | Selesai. Red flag label sudah ditinjau (bagian 3 poin 6), dua pertanyaan tetap terbuka |
-| Modeling | **Ada, tetapi tidak mengikuti keputusan D2, D4, D5, D10.** Lihat bagian 7 |
-| MLflow | Berjalan, tetapi konfigurasi tidak konsisten |
-| Deployment dan monitoring | Belum dimulai |
+| 0 Housekeeping | `requirements.txt`, Git, dan GitHub privat sudah ada. Struktur folder belum |
+| 1 EDA dan data preparation | Ada `program/EDA_Project_Churn.ipynb` (milik pengguna), belum ditinjau ulang bersama AI |
+| 2 Modeling | Belum dimulai |
+| 3 Evaluasi dan refactor | Belum dimulai |
+| 4 Experiment tracking | Belum dimulai |
+| 5 Deployment | Belum dimulai |
+| 6 Monitoring | Belum dimulai |
+| 7 Dokumentasi portofolio | Belum dimulai |
 
 ---
 
-## 7. Masalah Diketahui di `model.ipynb` (harus diperbaiki di Fase 2)
+## 7. Masalah yang Diketahui
 
-| # | Masalah | Dampak | Perbaikan |
-|---|---|---|---|
-| M1 | Memakai `train_test_split(test_size=0.2, stratify=y)` per baris | Data bocor antar baris saudara. Skor AUC 0,92–0,98 terlalu optimis | Ganti ke `StratifiedGroupKFold` dengan grup `seed` (D4, D5) |
-| M2 | `Customer_Value` dipakai sebagai fitur | Turunan eksak dari fitur lain | Hapus (D2) |
-| M3 | Membaca CSV mentah dan menulis ulang dedup serta rename sendiri | Tidak konsisten dengan data bersih. `Call__Failure` (dua underscore) | Baca `program/artifacts/Customer_Churn_clean.csv` |
-| M4 | Fitur dipilih lewat "MI tinggi" dari EDA v1 | EDA v1 punya klaim keliru | Ikuti `feature_spec.json` |
-| M5 | SMOTE tanpa memperhatikan klaster | Skor bisa menggelembung | Terapkan di dalam fold, bandingkan dengan `class_weight` (D11) |
-| M6 | Tracking URI tidak konsisten: `file:///.../mlruns`, output menampilkan `file:./mlruns`, sedangkan ada `mlflow.db` | Run tersebar di dua tempat | Satukan ke `sqlite:///mlflow.db` (bagian 9) |
-| M7 | Path absolut `A:\project_iranian_churn\...` di-hardcode | Tidak portabel, tidak bisa dijalankan di komputer lain atau layanan deploy | Pakai `pathlib` relatif terhadap root proyek |
-| M8 | Tidak ada baseline, tidak ada ketidakpastian | Angka tidak bisa ditafsirkan | Tambah `DummyClassifier`, baseline 3 fitur, bootstrap per profil |
-| M9 | Run lama (10 run) bercampur dengan hasil bocor | Membingungkan | Beri tag `legacy_leaky` atau pindah ke experiment baru |
-| M10 | Notebook dipakai sebagai satu-satunya tempat logika | Sulit di-deploy dan di-test | Pindahkan logika ke modul `src/` (Fase 3) |
+Belum ada.
 
 ---
 
 ## 8. Roadmap dan Definition of Done
 
-Kerjakan **berurutan**. Jangan lanjut ke fase berikutnya sebelum fase sekarang memenuhi DoD.
+Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 
 ### Fase 0: Housekeeping
-- [x] `requirements.txt` tahap EDA (Python 3.10, 8 library). Bertambah per fase, lihat bagian 9
-- [ ] `git init`, buat `.gitignore` (`mlruns/`, `*.db`, `.env`, `__pycache__/`)
-- [ ] Susun folder target (bagian 10)
-- [x] Red flag label `Churn`: dokumentasi UCI dibaca dan diuji ke data, hasil di bagian 3 poin 6 dan Log Keputusan
+- [x] Environment dan `requirements.txt` (bertahap, lihat bagian 9)
+- [x] `git init`, `.gitignore`, repo GitHub privat
+- [ ] Struktur folder (bagian 10)
+- [x] Baca dokumentasi sumber data dan catat apa yang tidak dijelaskan (bagian 2)
 
-**DoD:** environment bisa dibuat ulang dari file, repo bersih, red flag terdokumentasi.
+**DoD:** environment bisa dibuat ulang dari file, repo bersih, dokumentasi sumber sudah dibaca.
 
-### Fase 1: EDA dan Data Preparation (sebagian besar selesai)
-- [ ] Verifikasi ulang angka kunci di bagian 3 langsung dari CSV
-- [ ] Pastikan `Customer_Churn_clean.csv` bisa dibuat ulang dengan script (`src/data/prepare.py`), bukan hanya dari notebook
-- [ ] Tandai `EDA_Project_Churn.ipynb` sebagai usang di sel pertama
+### Fase 1: EDA dan data preparation
+- [ ] Periksa kualitas data: tipe, missing value, duplikat, rentang nilai, logika antar kolom
+- [ ] Periksa **independensi baris** dan struktur data sebelum memilih strategi validasi
+- [ ] Univariat, hubungan fitur dengan target, hubungan antar fitur
+- [ ] Setiap keputusan pembersihan dicatat di bagian 4 beserta alasannya
+- [ ] Proses pembersihan dapat dijalankan ulang dengan script, bukan hanya dari notebook
 
-**DoD:** satu perintah menghasilkan data bersih dan `feature_spec.json` yang identik.
+**DoD:** satu perintah menghasilkan data bersih yang sama, dan semua keputusan tercatat.
 
-### Fase 2: Modeling (perbaikan `model.ipynb`)
-- [ ] Buat notebook baru `program/model_v2.ipynb` (jangan timpa v1)
-- [ ] Baca data bersih, buang kolom bantu dari fitur
-- [ ] Bangun **kerangka evaluasi** satu fungsi: `StratifiedGroupKFold` × 3 ulangan, hitung PR-AUC, ROC-AUC, recall@top-K, bootstrap per profil
-- [ ] Baseline: `DummyClassifier` → Logistic Regression 3 fitur (target AUC ≈ 0,828)
-- [ ] Kandidat: Logistic Regression, Random Forest, HistGradientBoosting, (opsional) XGBoost/LightGBM
-- [ ] Tiga skenario fitur wajib: (a) semua fitur sah, (b) tanpa `Complains`, (c) tanpa `Status` dan `Complains`
-- [ ] Penanganan imbalance: `none` vs `class_weight` vs SMOTE di dalam fold
-- [ ] Tuning dengan nested/grouped CV, **bukan** menyetel di test fold yang sama
-- [ ] Pilih model dengan alasan tertulis. Jika selisih antar model masih dalam rentang ketidakpastian, pilih yang paling sederhana
+### Fase 2: Modeling
+- [ ] Strategi validasi dipilih berdasarkan struktur data, disetujui pengguna
+- [ ] Baseline sederhana dan model kandidat
+- [ ] Penanganan ketidakseimbangan kelas (jika relevan), dibandingkan
+- [ ] Scaler, encoder, dan resampling di dalam fold
+- [ ] Pilih model dengan alasan tertulis. Jika selisih masih dalam rentang ketidakpastian, pilih yang paling sederhana
 
-**DoD:** tabel perbandingan model dengan rentang ketidakpastian, tidak ada pelanggaran D4/D5/D10, dan satu model terpilih dengan alasan.
+**DoD:** tabel perbandingan model dengan ketidakpastian dan satu model terpilih dengan alasan.
 
-### Fase 3: Evaluasi, Interpretasi, dan Refactor
-- [ ] Pilih threshold berdasarkan skenario biaya (biaya kontak, peluang retensi berhasil, nilai pelanggan). Tandai sebagai **asumsi**, bukan data
-- [ ] Kurva PR, lift/gain, calibration
-- [ ] Interpretasi: koefisien (LR), permutation importance, SHAP. Bahasa asosiatif (D7)
-- [ ] Analisis error: profil mana yang salah diprediksi
-- [ ] Pindahkan logika ke `src/` (`data`, `features`, `train`, `evaluate`, `predict`) dengan test sederhana (`pytest`)
-- [ ] Simpan model final sebagai **satu Pipeline sklearn** (preprocessing + model)
+### Fase 3: Evaluasi, interpretasi, dan refactor
+- [ ] Pilih threshold berdasarkan skenario biaya (tandai asumsi)
+- [ ] Interpretasi model dengan bahasa asosiatif, bukan kausal
+- [ ] Analisis error
+- [ ] Pindahkan logika ke `src/`, tambah test sederhana
+- [ ] Simpan model final sebagai satu Pipeline
 
-**DoD:** `python -m src.train` melatih ulang dan mencatat ke MLflow. Pipeline bisa dimuat dan memprediksi satu baris contoh.
+**DoD:** pelatihan ulang dapat dijalankan dengan satu perintah.
 
-### Fase 4: Experiment Tracking (MLflow)
-- [ ] Tracking URI tunggal: `sqlite:///mlflow.db`, artifact di `./mlartifacts`
-- [ ] Satu experiment: `iranian_churn_v2`
-- [ ] Setiap run mencatat: params (model, fitur, handling, seed), metrik (mean ± std per metrik), artifact (feature_spec, plot, confusion matrix), tag (`stage`, `leakage_scenario`, `data_version`)
-- [ ] Hash data (`sha256` dari CSV bersih) dicatat sebagai tag
-- [ ] Daftarkan model terbaik di **Model Registry**, alias `champion`
-- [ ] Beri tag `legacy_leaky` pada run lama
+### Fase 4: Experiment tracking
+- [ ] Satu tracking URI dan satu nama experiment
+- [ ] Catat params, metrik (dengan ketidakpastian), artefak, tag versi data
+- [ ] Daftarkan model terbaik di registry
 
-**DoD:** `mlflow ui --backend-store-uri sqlite:///mlflow.db` menampilkan run baru yang bisa dibandingkan, dan model `champion` bisa dimuat dengan `models:/iranian_churn@champion`.
+**DoD:** run dapat dibandingkan di UI tracking dan model terbaik dapat dimuat.
 
-### Fase 5: Deployment
-- [ ] API FastAPI: `POST /predict` (satu pelanggan), `POST /predict/batch`, `GET /health`, `GET /model-info`
-- [ ] Skema input/output dengan **Pydantic** (rentang valid sesuai data dictionary)
-- [ ] Memuat model dari MLflow Registry atau file artefak
-- [ ] Lingkungan terkunci dengan `venv` dan `requirements.txt` (versi dipatok), tanpa Docker untuk saat ini
-- [ ] Test API (`pytest` + `TestClient`)
-- [ ] CI GitHub Actions: lint (`ruff`) dan `pytest`
-- [ ] Deploy demo ke layanan gratis tanpa Docker: **Render** (API FastAPI) dan/atau **Hugging Face Spaces** (antarmuka Streamlit/Gradio yang memanggil model)
+### Fase 5: Deployment (tanpa Docker untuk saat ini)
+- [ ] API atau aplikasi demo dengan skema input/output yang divalidasi
+- [ ] Lingkungan dikunci dengan `venv` dan `requirements.txt`
+- [ ] Test, lint, dan CI
+- [ ] Deploy demo ke layanan gratis (Render, Hugging Face Spaces, atau Streamlit Cloud)
 
-**DoD:** `uvicorn api.main:app` di lingkungan bersih lalu `curl` ke `/predict` mengembalikan probabilitas churn, dan demo publik bisa diakses lewat URL. CI hijau.
-
-> Docker bisa ditambahkan nanti sebagai peningkatan opsional, bukan syarat.
+**DoD:** demo publik bisa diakses lewat URL dan CI hijau.
 
 ### Fase 6: Monitoring
-- [ ] Log setiap prediksi (input, skor, versi model, timestamp)
-- [ ] Laporan **data drift** (Evidently atau PSI/KS buatan sendiri) terhadap data referensi
-- [ ] Simulasi drift pada data sintetis untuk demo
-- [ ] Aturan retraining (pemicu, siapa yang menyetujui) dan prosedur rollback ditulis di README
-- [ ] Catatan keterbatasan: label churn baru diketahui belakangan, jadi monitoring performa bergantung pada feedback tertunda
+- [ ] Log prediksi, laporan drift terhadap data referensi
+- [ ] Aturan retraining dan prosedur rollback
+- [ ] Catatan keterbatasan monitoring (label sering datang terlambat)
 
-**DoD:** satu perintah menghasilkan laporan drift HTML, dan dokumen retraining tersedia.
+**DoD:** laporan drift dapat dihasilkan dengan satu perintah.
 
-### Fase 7: Dokumentasi Portofolio
-- [ ] `README.md`: masalah, temuan, cara menjalankan, hasil, **keterbatasan** (struktur klaster, sampel efektif ≈ 54, risiko leakage)
-- [ ] Diagram arsitektur
-- [ ] Ringkasan 1 halaman untuk non-teknis, termasuk temuan bahwa churner bernilai rendah
-- [ ] Tabel "kesalahan yang saya temukan dan perbaiki" (EDA v1 → v2, model v1 → v2). Ini nilai jual portofolio
+### Fase 7: Dokumentasi portofolio
+- [ ] `README.md` dari template portofolio, termasuk keterbatasan
+- [ ] Tabel "kesalahan yang saya temukan dan perbaiki"
+- [ ] Ringkasan satu halaman untuk non-teknis
 
-**DoD:** orang lain bisa mengklon repo, menjalankan, dan memahami hasilnya tanpa bertanya.
+**DoD:** orang lain dapat mengklon, menjalankan, dan memahami hasilnya tanpa bertanya.
 
 ---
 
 ## 9. Konvensi Teknis
 
-**Kode**
-- Python 3.10, `pathlib` untuk semua path, tidak ada path absolut
-- Seed global `SEED = 42` dari satu tempat (`src/config.py`)
-- Fungsi punya type hint dan docstring singkat
-- Satu notebook = satu tujuan. Logika yang dipakai ulang pindah ke `src/`
-- Jangan pernah menimpa `dataset/` dan `program/artifacts/` secara diam-diam. Hasil baru diberi versi (`..._v2`)
-
-**MLflow**
-```python
-mlflow.set_tracking_uri("sqlite:///mlflow.db")
-mlflow.set_experiment("iranian_churn_v2")
-```
-Penamaan run: `{model}__{skenario_fitur}__{handling}`, contoh `hgb__no_status_complains__class_weight`.
-
-**Penamaan fitur:** `snake_case` satu underscore: `Seconds_of_Use`, bukan `Seconds__of__Use`.
+**Kode:** Python 3.10, `pathlib` tanpa path absolut, satu seed global di satu tempat, `snake_case`, satu notebook satu tujuan, logika yang dipakai ulang pindah ke `src/`, jangan menimpa data mentah.
 
 **Requirements bertahap**
-- `requirements.txt` hanya berisi library yang dipakai **sekarang**. Library baru masuk di commit yang sama dengan notebook/kode yang memakainya, versi dipatok (`==`).
-- Verifikasi setiap penambahan: `pip install --dry-run -r requirements.txt` (0 paket baru) dan `pip check`.
-- Peta fase ke library (nama saja, versi dipatok saat dipakai):
+- `requirements.txt` hanya berisi library yang dipakai **sekarang**. Library baru masuk di commit yang sama dengan kode yang memakainya, versi dipatok (`==`).
+- Verifikasi: `pip install --dry-run -r requirements.txt` (0 paket baru) dan `pip check`.
 
-| Fase | Library yang ditambahkan |
+| Fase | Library yang biasanya ditambahkan |
 |---|---|
-| 1 EDA (sekarang) | pandas, numpy, scipy, statsmodels, scikit-learn, matplotlib, seaborn, ipykernel |
-| 2 Modeling | `imbalanced-learn` (jika SMOTE dipakai), opsional `xgboost`/`lightgbm` |
+| 1 EDA (sekarang) | pandas, numpy, scipy, statsmodels, scikit-learn, catboost, matplotlib, seaborn, ipykernel (sesuai import `EDA_Project_Churn.ipynb`) |
+| 2 Modeling | `imbalanced-learn` (jika resampling dipakai), opsional `xgboost` / `lightgbm` |
 | 3 Evaluasi dan refactor | `shap`; dev: `pytest`, `ruff` |
 | 4 Tracking | `mlflow` |
-| 5 Deployment | `fastapi`, `uvicorn`, `pydantic`, `streamlit` atau `gradio` (pilih salah satu). Pecah ke `requirements.txt` (runtime) dan `requirements-dev.txt`, karena Render dan Hugging Face Spaces membaca `requirements.txt` di root |
+| 5 Deployment | `fastapi`, `uvicorn`, `pydantic`, `streamlit` atau `gradio`. Pecah ke `requirements.txt` (runtime) dan `requirements-dev.txt` karena layanan deploy membaca `requirements.txt` di root |
 | 6 Monitoring | opsional `evidently` |
 
-- `model.ipynb` v1 membutuhkan `mlflow` dan `imbalanced-learn`, yang sengaja belum ada di file sampai Fase 2 dan 4.
-
-**Git:** commit kecil per langkah. Pesan: `fase2: tambah group-CV evaluator`.
+**Git:** commit kecil per langkah, pesan Bahasa Indonesia dengan awalan fase (`fase1: ...`).
 
 ---
 
@@ -292,24 +202,16 @@ Penamaan run: `{model}__{skenario_fitur}__{handling}`, contoh `hgb__no_status_co
 ```
 project_iranian_churn/
 ├── PROJECT_GUIDE.md
+├── CLAUDE.md
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
-├── dataset/                 # mentah, read-only
-├── program/                 # notebook eksplorasi
-│   ├── Real_EDA.ipynb
-│   ├── model_v2.ipynb
-│   └── artifacts/
-├── src/
-│   ├── config.py
-│   ├── data/prepare.py
-│   ├── features/build.py
-│   ├── models/train.py, evaluate.py, predict.py
-│   └── monitoring/drift.py
-├── api/main.py, schemas.py
+├── dataset/          # data mentah, read-only (dilacak, CC BY 4.0)
+├── jurnal/           # referensi, diabaikan Git
+├── program/          # notebook eksplorasi
+├── src/              # logika yang dipakai ulang
 ├── tests/
-├── .github/workflows/ci.yml
-└── docs/                    # diagram, ringkasan, keputusan
+└── docs/             # decision log, laporan
 ```
 
 ---
@@ -318,40 +220,27 @@ project_iranian_churn/
 
 | Tanggal | Keputusan / Pertanyaan | Status |
 |---|---|---|
-| 2026-11-04 | Tujuan: portofolio. Cakupan: EDA sampai monitoring. Lanjutkan pekerjaan lama | Diputuskan |
-| 2026-11-04 | Metrik utama: PR-AUC + recall@top-K (usulan, lihat bagian 5) | **Menunggu persetujuan** |
-| 2026-11-04 | Definisi label `Churn` di UCI tidak menjelaskan pola "pemakaian tinggi = 0% churn". Penyebabnya struktur klaster (hanya 9 sampai 16 profil di balik tiap ambang), bukan aturan label. `Status` bukan salinan label | Diputuskan |
-| 2026-11-04 | Lisensi dataset CC BY 4.0, jadi `dataset/` disertakan di repo (dihapus dari `.gitignore`) dengan atribusi di README | Diputuskan |
-| 2026-11-04 | Kapan `Status` diukur, dan mengapa data "acak" berstruktur 50 profil digandakan? Tidak ada jawaban di sumber manapun. Dicatat sebagai keterbatasan di README | **Terbuka** |
-| 2026-11-04 | Apakah model dengan `Status`/`Complains` boleh jadi model final, atau model "tanpa keduanya" yang dideploy? | **Terbuka** |
-| 2026-11-04 | Nilai K untuk recall@top-K (10%, 20%, atau 40%)? | **Terbuka** |
-| 2026-11-04 | Docker **tidak dipakai untuk saat ini**; deploy lewat `venv` + layanan gratis (Render / Hugging Face Spaces) | Diputuskan |
-| 2026-11-04 | Pilih Render, Hugging Face Spaces, atau keduanya untuk demo? | **Terbuka** |
+| 2026-11-04 | Restart dari nol. Hanya `EDA_Project_Churn.ipynb` dan dataset yang dipertahankan. Pekerjaan sebelumnya diarsipkan di tag Git `arsip-v1` dan **tidak dipakai** | Diputuskan |
+| 2026-11-04 | Tujuan portofolio, cakupan EDA sampai monitoring, bahasa Indonesia, notebook lalu `src/` | Diputuskan |
+| 2026-11-04 | Tanpa Docker untuk saat ini, deploy lewat `venv` dan layanan gratis | Diputuskan |
+| 2026-11-04 | Dataset dilacak di Git (lisensi CC BY 4.0 mengizinkan redistribusi dengan atribusi) | Diputuskan |
+| | Penanganan duplikat dan outlier | **Terbuka** |
+| | Strategi validasi (setelah memeriksa independensi baris) | **Terbuka** |
+| | Metrik evaluasi utama | **Terbuka** |
+| | Fitur yang dipakai dan yang dibuang | **Terbuka** |
+| | Model kandidat dan penanganan ketidakseimbangan kelas | **Terbuka** |
+| | Arti kolom yang belum dijelaskan UCI (bagian 2) | **Terbuka** |
+| | Platform demo (Render, Hugging Face Spaces, atau Streamlit Cloud) | **Terbuka** |
 
 ---
 
-## 12. Aturan untuk AI Asisten
+## 12. Aturan Khusus Project Ini
 
-**Wajib**
-1. Baca file ini sebelum mengerjakan apa pun. Jika permintaan bertentangan dengan bagian 4, **beri tahu saya dulu**.
-2. Jelaskan asumsi sebelum menulis kode, kerjakan **satu langkah kecil** per permintaan.
-3. Setelah setiap langkah data, tampilkan pengecekan: jumlah baris, distribusi `Churn`, bentuk fitur.
-4. Laporkan hasil apa adanya. Kalau skor terlihat terlalu bagus (misal AUC > 0,9), **curigai leakage lebih dulu**.
-5. Setiap angka di narasi harus dihitung dari kode, bukan disalin tangan.
-6. Tulis ringkasan keputusan baru ke bagian 11 setelah disetujui.
+> Prinsip umum sudah dimuat dari `~/.claude/CLAUDE.md`.
 
-**Dilarang**
-- Memakai `seed`, `seed_churn`, `orig_pos`, `fold_*`, `Age`, `Customer_Value` sebagai fitur
-- Random split per baris, atau `fit` scaler/SMOTE di seluruh data sebelum split
-- Menimpa file di `dataset/` atau artefak lama tanpa konfirmasi
-- Klaim kausal ("menyebabkan", "intervensi paling efektif")
-- Menginstal library baru tanpa memberi tahu saya
-- Menyimpan kredensial atau path absolut di kode
+**Wajib:**
+- Semua keputusan analisis (pembersihan, fitur, validasi, metrik, model) **ditanyakan ke pengguna dulu**. AI mengusulkan, pengguna memutuskan.
+- Temuan hanya ditulis di bagian 3 setelah dihitung dari kode.
 
-**Template prompt per fase**
-```
-Baca PROJECT_GUIDE.md. Kita sedang di Fase [N], langkah: [checklist item].
-Input: [file]. Keluaran yang diharapkan: [file/tabel].
-Sebelum menulis kode, sebutkan asumsimu dan risiko leakage yang relevan.
-Setelah selesai, tunjukkan cara saya memverifikasi hasilnya.
-```
+**Dilarang:**
+- Memakai atau mengutip hasil dari tag Git `arsip-v1` kecuali pengguna memintanya.

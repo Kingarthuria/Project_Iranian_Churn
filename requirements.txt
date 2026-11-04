@@ -1,8 +1,8 @@
 # Tahap: EDA (Fase 1). Python 3.10 (diuji dengan 3.10.20, environment conda "ds_env").
+# Isi: library yang di-import program/EDA_Project_Churn.ipynb.
 #
 # Aturan: library baru ditambahkan di commit yang SAMA dengan notebook/kode yang
-# memakainya, versi dipatok (==). Peta fase ke library ada di PROJECT_GUIDE.md
-# bagian 9 "Requirements bertahap".
+# memakainya, versi dipatok (==). Peta fase ke library ada di PROJECT_GUIDE.md bagian 9.
 
 # Data dan numerik
 pandas==2.3.3
@@ -10,8 +10,9 @@ numpy==2.2.6
 scipy==1.15.3
 statsmodels==0.14.6
 
-# Modeling (dipakai Real_EDA untuk diagnostik: StratifiedGroupKFold, HistGradientBoosting)
+# Modeling
 scikit-learn==1.7.2
+catboost==1.2.10
 
 # Visualisasi
 matplotlib==3.10.9
