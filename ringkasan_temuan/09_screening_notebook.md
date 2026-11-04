@@ -57,11 +57,15 @@ Nilai ini adalah penilaian, bukan hasil perhitungan.
 
 Screening awal menyebut kode Pearson tidak ada di notebook. Itu **keliru**, karena pencariannya memakai kata "pearson", padahal heatmap Pearson memakai bawaan `df.corr()`. Saat memeriksa gambar, kesalahan ini ditemukan. Judul metode, judul heatmap, dan kesimpulan sudah dibetulkan.
 
+## Pembersihan riwayat Git
+
+Metadata Colab dihapus dari semua versi notebook, dan email pada data penulis commit diganti alamat noreply GitHub. `main` dan tag `arsip-v1` di GitHub diperbarui dengan force push, sehingga semua hash commit berubah. Sebelum push, 27 commit dibandingkan satu per satu: pesan, tanggal, nama penulis, dan file selain notebook tidak berubah, dan isi notebook identik selain metadata tersebut.
+
+Commit lama masih bisa tersimpan sementara di cache GitHub.
+
 ## Sisa keterbatasan
 
 - Tiga sel masih panjang (151–160 baris), karena satu perulangan grafik atau beberapa fungsi berada dalam satu sel. Sel-sel ini tidak dipecah supaya alurnya tetap utuh.
 - Teks tertentu di output kode masih berbahasa Inggris, misalnya "Boxplot" dan "Point-Biserial".
-- Beberapa p-value di tabel output masih tertulis `0.0000`, karena nilainya tetap dipakai sebagai angka.
-- Ukuran notebook sekitar 6 MB. Keputusan strip output ditunda sampai sebelum repo dipublikasikan.
-- Label KW pada panel `Subscription_Length` sedikit menimpa garis.
+- Ukuran notebook sekitar 6 MB. Output tetap disimpan, dan resolusi gambar dikurangi sekali saat notebook final.
 - Notebook ini sengaja tidak membahas pola berulang, jadi README dan laporan model wajib memuat kalimat keterbatasan.

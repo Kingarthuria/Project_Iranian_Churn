@@ -106,6 +106,7 @@ Belum ada.
 | 18 | Bagian Value at Risk di notebook EDA diganti dengan Pertanyaan Bisnis. Analisis risiko × nilai ditunda ke Fase 3 | Nama lama kurang tepat dan `Customer_Value` tidak punya satuan. Pertanyaan bisnis lebih tepat dijawab dengan besar efek dan rentangnya | 2026-11-04 |
 | 19 | Dataset bersih disimpan di folder baru `dataset_clean/`, terpisah dari `dataset/`. Script dan folder dibuat saat pengguna memberi aba-aba | Data mentah tetap read-only | 2026-11-04 |
 | 20 | Notebook EDA v2 diperbaiki menyeluruh setelah screening: cek kualitas data, grafik, konsistensi, dan kerapian kode | Keputusan pengguna, supaya notebook layak sebelum tahap cleaning. Rincian di `ringkasan_temuan/09_screening_notebook.md` | 2026-11-04 |
+| 21 | Metadata Colab pada notebook asli ikut dihapus saat membersihkan riwayat Git. Sel dan outputnya tidak berubah. Email commit memakai alamat noreply GitHub | Keputusan pengguna, sebagai pengecualian dari aturan tidak mengubah notebook lama, untuk melindungi data pribadi | 2026-11-04 |
 
 ---
 
@@ -281,7 +282,8 @@ project_iranian_churn/
 | 2026-11-04 | Klaim lama seperti "pelanggan baru" dan "loyal" dihapus dari notebook EDA v2. Sel validasi disederhanakan dan Value at Risk memakai 3 sinyal (bagian 4) | Diputuskan |
 | 2026-11-04 | Value at Risk diganti dengan Pertanyaan Bisnis, dan dataset bersih nanti di `dataset_clean/` (bagian 4) | Diputuskan |
 | 2026-11-04 | Screening dan perbaikan menyeluruh notebook EDA v2 selesai (bagian 4). Strip output ditunda sampai sebelum repo dipublikasikan | Diputuskan |
-| | Riwayat Git masih memuat nama tampilan dan `userId` Google dari metadata Colab. Dibersihkan sebelum repo dipublikasikan | **Terbuka** |
+| 2026-11-04 | Riwayat Git dibersihkan dari metadata Colab dan email pribadi, lalu `main` dan `arsip-v1` di GitHub diperbarui dengan force push. Commit lama masih bisa tersimpan sementara di cache GitHub | Diputuskan |
+| | Ukuran notebook EDA v2 (sekitar 6 MB): output tetap disimpan, dan resolusi gambar dikurangi sekali saat notebook final | **Terbuka** |
 | | Strategi validasi (setelah memeriksa independensi baris) | **Terbuka** |
 | | Metrik evaluasi utama | **Terbuka** |
 | | Fitur yang dipakai dan yang dibuang | **Terbuka** |
