@@ -1,0 +1,35 @@
+# Rahasia
+.env
+.env.*
+*.key
+*.pem
+
+# Lingkungan virtual
+.venv/
+venv/
+
+# MLflow (database dan artefak lokal)
+mlflow.db
+mlruns/
+mlartifacts/
+
+# Data (lisensi redistribusi belum diverifikasi, bisa dibuat ulang dari sumber UCI)
+dataset/
+program/artifacts/*.csv
+
+# Python / Jupyter
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# File sementara Office / editor
+~$*
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Jurnal/artikel referensi (hak cipta, cukup dicatat sitasinya di README)
+jurnal/
