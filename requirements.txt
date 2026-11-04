@@ -1,0 +1,21 @@
+# Tahap: EDA (Fase 1). Python 3.10 (diuji dengan 3.10.20, environment conda "ds_env").
+#
+# Aturan: library baru ditambahkan di commit yang SAMA dengan notebook/kode yang
+# memakainya, versi dipatok (==). Peta fase ke library ada di PROJECT_GUIDE.md
+# bagian 9 "Requirements bertahap".
+
+# Data dan numerik
+pandas==2.3.3
+numpy==2.2.6
+scipy==1.15.3
+statsmodels==0.14.6
+
+# Modeling (dipakai Real_EDA untuk diagnostik: StratifiedGroupKFold, HistGradientBoosting)
+scikit-learn==1.7.2
+
+# Visualisasi
+matplotlib==3.10.9
+seaborn==0.13.2
+
+# Menjalankan notebook
+ipykernel==7.2.0

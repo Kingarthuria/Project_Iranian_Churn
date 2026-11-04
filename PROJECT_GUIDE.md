@@ -162,7 +162,7 @@ A:\project_iranian_churn\
 Kerjakan **berurutan**. Jangan lanjut ke fase berikutnya sebelum fase sekarang memenuhi DoD.
 
 ### Fase 0: Housekeeping
-- [ ] Buat `requirements.txt` / `environment.yml` (Python 3.10, mlflow 3.11, scikit-learn 1.7.2, imbalanced-learn 0.14.1)
+- [x] `requirements.txt` tahap EDA (Python 3.10, 8 library). Bertambah per fase, lihat bagian 9
 - [ ] `git init`, buat `.gitignore` (`mlruns/`, `*.db`, `.env`, `__pycache__/`)
 - [ ] Susun folder target (bagian 10)
 - [ ] Selesaikan red flag label `Churn`: baca dokumentasi UCI, tulis hasilnya di Log Keputusan
@@ -258,6 +258,22 @@ mlflow.set_experiment("iranian_churn_v2")
 Penamaan run: `{model}__{skenario_fitur}__{handling}`, contoh `hgb__no_status_complains__class_weight`.
 
 **Penamaan fitur:** `snake_case` satu underscore: `Seconds_of_Use`, bukan `Seconds__of__Use`.
+
+**Requirements bertahap**
+- `requirements.txt` hanya berisi library yang dipakai **sekarang**. Library baru masuk di commit yang sama dengan notebook/kode yang memakainya, versi dipatok (`==`).
+- Verifikasi setiap penambahan: `pip install --dry-run -r requirements.txt` (0 paket baru) dan `pip check`.
+- Peta fase ke library (nama saja, versi dipatok saat dipakai):
+
+| Fase | Library yang ditambahkan |
+|---|---|
+| 1 EDA (sekarang) | pandas, numpy, scipy, statsmodels, scikit-learn, matplotlib, seaborn, ipykernel |
+| 2 Modeling | `imbalanced-learn` (jika SMOTE dipakai), opsional `xgboost`/`lightgbm` |
+| 3 Evaluasi dan refactor | `shap`; dev: `pytest`, `ruff` |
+| 4 Tracking | `mlflow` |
+| 5 Deployment | `fastapi`, `uvicorn`, `pydantic`, `streamlit` atau `gradio` (pilih salah satu). Pecah ke `requirements.txt` (runtime) dan `requirements-dev.txt`, karena Render dan Hugging Face Spaces membaca `requirements.txt` di root |
+| 6 Monitoring | opsional `evidently` |
+
+- `model.ipynb` v1 membutuhkan `mlflow` dan `imbalanced-learn`, yang sengaja belum ada di file sampai Fase 2 dan 4.
 
 **Git:** commit kecil per langkah. Pesan: `fase2: tambah group-CV evaluator`.
 
