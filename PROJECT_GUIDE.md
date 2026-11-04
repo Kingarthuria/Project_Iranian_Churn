@@ -73,9 +73,9 @@ Belum ada.
 | 6 | Semua 59 baris churn dengan `Subscription_Length` di bawah 15,5 berasal dari kelompok audit 49. Tanpa kelompok itu, churn rate grup ini 0,0%, dan baris lainnya 14,6% | `program/analisis_duplikat_v2.ipynb` | 2026-11-04 |
 | 7 | Rata-rata MI dari 10 seed: `Seconds_of_Use` 0,1156 (0,1103–0,1192), `Status` 0,1040, `Complains` 0,1023. Urutan `Frequency_of_use` dan `Customer_Value` tidak stabil | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
 | 8 | `Customer_Value` sangat bisa dijelaskan oleh `Seconds_of_Use` dan `Frequency_of_SMS` (R-kuadrat 0,957) | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
+| 9 | Baris dengan komplain dan berstatus non-aktif punya churn rate 89,3% (133 dari 149). Menurut UCI, kedua kolom berasal dari 9 bulan pertama. Cara `Status` ditentukan dan definisi churn tidak dijelaskan, jadi hubungan ini perlu dibaca hati-hati | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
 | 10 | Baris churn hanya memegang 4,4% total `Customer_Value` (median 102,6 berbanding 271,5). Dibaca sebagai porsi relatif, bukan uang | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
 | 11 | Gabungan `Complains=1`, `Status=2`, dan `Seconds_of_Use` Rendah mencakup 992 baris (34,8%) dan 90,8% baris churn. Deskriptif, karena sinyal dipilih setelah melihat churn | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
-| 9 | Baris dengan komplain dan berstatus non-aktif punya churn rate 89,3% (133 dari 149). Menurut UCI, kedua kolom berasal dari 9 bulan pertama. Cara `Status` ditentukan dan definisi churn tidak dijelaskan, jadi hubungan ini perlu dibaca hati-hati | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
 
 ---
 
@@ -99,9 +99,9 @@ Belum ada.
 | 12 | Rencana flag dari sel kesimpulan outlier dibatalkan untuk sekarang. Bisa dibahas lagi saat feature engineering, dengan batas dihitung di dalam fold | Batasnya dipilih setelah melihat churn pada seluruh data, dan flag merah pada dasarnya menandai satu kelompok audit | 2026-11-04 |
 | 13 | `program/EDA_Project_Churn_v2.ipynb` berdiri sendiri: tidak merujuk file lain dan tidak memuat analisis kelompok posisi. Rujukan UCI dipertahankan. README dan laporan model tetap memuat kalimat keterbatasan (bagian 7) | Keputusan pengguna, mengikuti kesepakatan bahwa tiap baris adalah satu pelanggan. UCI adalah sumber data dan atribusinya diwajibkan lisensi. Keterbatasan: pembaca notebook EDA tidak melihat bukti pola berulang | 2026-11-04 |
 | 14 | Pertahankan hampir-duplikat (75 baris beraktivitas dengan pasangan yang berbeda di satu kolom) | Sesuai asumsi kerja, tidak ada dasar untuk menyebutnya duplikat. Keterbatasan: baris sangat mirip masih bisa terpisah ke train dan test | 2026-11-04 |
+| 15 | Modeling membandingkan hasil dengan dan tanpa `Status` serta `Complains`. Fitur selain `Age_Binning` dan `Age_Group` belum diputuskan dan diuji saat modeling | Perbandingan ini melihat seberapa besar skor bergantung pada kedua kolom, bukan menguji leakage, karena menurut UCI keduanya mendahului label. Keputusan fitur butuh pengujian performa | 2026-11-04 |
 | 16 | Sel validasi kombinasi disederhanakan menjadi saringan eksploratif: minimal 50 baris, minimal 1% data, dan stabil di 20 split | Sel lama punya dua masalah kode, dan p-value-nya tidak menguji kombinasi | 2026-11-04 |
 | 17 | Value at Risk memakai 3 sinyal, tanpa `Subscription_Length`. Rekomendasi bisnis ditulis sebagai hipotesis yang perlu diuji | Sesuai keputusan tidak membuat klaim pelanggan baru, dan temuannya hanya asosiasi | 2026-11-04 |
-| 15 | Modeling membandingkan hasil dengan dan tanpa `Status` serta `Complains`. Fitur selain `Age_Binning` dan `Age_Group` belum diputuskan dan diuji saat modeling | Perbandingan ini melihat seberapa besar skor bergantung pada kedua kolom, bukan menguji leakage, karena menurut UCI keduanya mendahului label. Keputusan fitur butuh pengujian performa | 2026-11-04 |
 
 ---
 
