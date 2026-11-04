@@ -41,7 +41,7 @@
 | `Call  Failure` | belum ada deskripsi, tanyakan ke pengguna |
 | `Complains` | biner: 0 = tidak ada komplain, 1 = ada komplain |
 | `Subscription  Length` | belum ada deskripsi, tanyakan ke pengguna |
-| `Charge  Amount` | ordinal: 0 = jumlah terendah, 9 = tertinggi |
+| `Charge  Amount` | ordinal: 0 = jumlah terendah, 9 = tertinggi. Data memuat nilai sampai 10 (lihat bagian 4) |
 | `Seconds of Use` | total detik panggilan |
 | `Frequency of use` | belum ada deskripsi, tanyakan ke pengguna |
 | `Frequency of SMS` | belum ada deskripsi, tanyakan ke pengguna |
@@ -83,6 +83,12 @@ Belum ada.
 | 2 | README dan laporan model wajib memuat kalimat keterbatasan di bagian 7, tanpa skor pembanding. Narasi tidak boleh menyebut baris terbukti independen, atau menyebut skor CV acak sebagai performa pada pelanggan baru | Keputusan pengguna, agar asumsi tetap terbuka | 2026-11-04 |
 | 3 | Audit disimpan di repo sebagai simpanan (`program/analisis_duplikat_v2.ipynb` dan `ringkasan_temuan/`), bukan fokus project | Keputusan pengguna | 2026-11-04 |
 | 4 | Hapus 300 duplikat persis (`keep='first'`), sisa 2.850 baris. Diterapkan di `program/EDA_Project_Churn_v2.ipynb` | Baris identik bisa terpisah ke train dan test, dan menghindari pembobotan ganda. Keterbatasan: hanya menangani duplikat persis, dan 47 baris beraktivitas nol mungkin pelanggan sah | 2026-11-04 |
+| 5 | Pertahankan 14 grup dengan fitur identik tetapi label `Churn` berbeda | Sesuai asumsi kerja, baris ini dibaca sebagai pelanggan berbeda dengan hasil berbeda, dan tidak ada dasar untuk memilih label. Keterbatasan: ada sedikit noise pada label | 2026-11-04 |
+| 6 | Pertahankan nilai `Charge Amount` = 10 (7 baris setelah deduplikasi), walau dokumentasi UCI menyebut 0–9 | Tidak ada bukti barisnya salah, dan korelasi Spearman dengan `Churn` nyaris sama tanpa baris itu (−0,2478 vs −0,2470). Keterbatasan: kolom ini tidak persis sesuai dokumentasi | 2026-11-04 |
+| 7 | Pertahankan 111 baris dengan `Distinct Called Numbers` > `Frequency of use`. Narasi tidak boleh menganggap yang pertama pasti lebih kecil | Arti kedua kolom belum jelas, dan menghapusnya membuang baris dengan churn lebih tinggi (21,6% vs 15,4%). Keterbatasan: sebagian baris mungkin memang tidak konsisten | 2026-11-04 |
+| 8 | Pertahankan 85 baris dengan semua aktivitas nol. Penanda `is_zero_activity` bisa dibahas saat feature engineering | Tidak ada bukti barisnya salah, dan churn rate-nya tinggi (51,8% vs 14,5%). Keterbatasan: 26 baris berstatus aktif tanpa aktivitas | 2026-11-04 |
+| 9 | Pertahankan 54 baris dengan `Subscription Length` di bawah 9. Tidak ada klaim tentang pelanggan baru, dan fitur per bulan tidak boleh menganggap semua baris mencakup 9 bulan penuh | Satuan kolom belum pasti, nilainya naik bertahap, dan baris ini hampir seluruhnya berasal dari dua kelompok dengan hasil berlawanan | 2026-11-04 |
+| 10 | Pakai `Age Group` untuk modeling. `Age` tidak masuk fitur model, tetapi tetap ada di data dan EDA | Keduanya berpasangan satu-satu, dan kode `Age Group` didokumentasikan UCI, sedangkan arti `Age` belum dijelaskan | 2026-11-04 |
 
 ---
 
@@ -97,7 +103,7 @@ Belum diputuskan. Akan dibahas dengan pengguna setelah EDA.
 | Fase | Status |
 |---|---|
 | 0 Housekeeping | **Selesai.** `requirements.txt`, Git, GitHub privat, dan struktur folder sudah ada. Environment `ds_env` terverifikasi (dry-run 0 paket baru, `pip check` bersih) |
-| 1 EDA dan data preparation | **Berjalan.** Audit duplikat dan struktur data selesai dan disimpan. Bagian duplikat diperbaiki di `program/EDA_Project_Churn_v2.ipynb`. Catatan sel 0–25 lainnya dan sel berikutnya belum ditinjau |
+| 1 EDA dan data preparation | **Berjalan.** Audit duplikat dan struktur data selesai dan disimpan. Catatan sel 0–25 selesai dan diterapkan di `program/EDA_Project_Churn_v2.ipynb`. Bagian univariat dan sel berikutnya belum ditinjau |
 | 2 Modeling | Belum dimulai |
 | 3 Evaluasi dan refactor | Belum dimulai |
 | 4 Experiment tracking | Belum dimulai |
@@ -197,8 +203,8 @@ Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 
 | Fase | Library yang biasanya ditambahkan |
 |---|---|
-| 1 EDA (sekarang) | pandas, numpy, scipy, statsmodels, scikit-learn, catboost, matplotlib, seaborn, ipykernel (sesuai import `EDA_Project_Churn.ipynb`) |
-| 2 Modeling | `imbalanced-learn` (jika resampling dipakai), opsional `xgboost` / `lightgbm` |
+| 1 EDA (sekarang) | pandas, numpy, scipy, statsmodels, scikit-learn, matplotlib, seaborn, ipykernel (sesuai import `EDA_Project_Churn_v2.ipynb`) |
+| 2 Modeling | `imbalanced-learn` (jika resampling dipakai), opsional `xgboost` / `lightgbm` / `catboost` |
 | 3 Evaluasi dan refactor | `shap`; dev: `pytest`, `ruff` |
 | 4 Tracking | `mlflow` |
 | 5 Deployment | `fastapi`, `uvicorn`, `pydantic`, `streamlit` atau `gradio`. Pecah ke `requirements.txt` (runtime) dan `requirements-dev.txt` karena layanan deploy membaca `requirements.txt` di root |
@@ -240,7 +246,12 @@ project_iranian_churn/
 | 2026-11-04 | `program/EDA_Project_Churn.ipynb` (5,9 MB karena output tersimpan) tidak diubah di Fase 0. Keputusan strip output ditunda ke Fase 1 | Diputuskan |
 | 2026-11-04 | Lanjut dengan asumsi tiap baris adalah satu pelanggan, dengan kalimat keterbatasan di hasil akhir. Audit disimpan di repo (bagian 4) | Diputuskan |
 | 2026-11-04 | Hapus 300 duplikat persis. Analisis duplikat diperbaiki di notebook v2, notebook asli tidak diubah (bagian 4) | Diputuskan |
-| | 14 grup dengan fitur identik tetapi label `Churn` berbeda | **Terbuka** |
+| 2026-11-04 | 14 grup dengan fitur identik tetapi label `Churn` berbeda dipertahankan (bagian 4) | Diputuskan |
+| 2026-11-04 | Nilai `Charge Amount` = 10 dipertahankan (bagian 4) | Diputuskan |
+| 2026-11-04 | 111 baris dengan `Distinct Called Numbers` > `Frequency of use` dipertahankan (bagian 4) | Diputuskan |
+| 2026-11-04 | 85 baris dengan semua aktivitas nol dipertahankan (bagian 4) | Diputuskan |
+| 2026-11-04 | 54 baris dengan `Subscription Length` di bawah 9 dipertahankan (bagian 4) | Diputuskan |
+| 2026-11-04 | `Age Group` dipakai untuk modeling, `Age` tidak masuk fitur model (bagian 4). Fitur lain belum diputuskan | Diputuskan |
 | | Penanganan outlier | **Terbuka** |
 | | Strategi validasi (setelah memeriksa independensi baris) | **Terbuka** |
 | | Metrik evaluasi utama | **Terbuka** |
