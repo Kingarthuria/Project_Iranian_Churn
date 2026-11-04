@@ -19,8 +19,9 @@
 |---|---|
 | `Customer_Value` dan `Frequency_of_SMS` berkorelasi 0,92 | Pearson 0,923, Spearman 0,776 |
 | `Age_Group` dan `Age_Binning` "korelasi sempurna 0,96" | Spearman 1,000, Pearson 0,961 |
-| Heatmap memakai Spearman dan Pearson | Hanya Spearman yang ada di kode |
 | `Call_Failure` punya MI 0,000000, "noise mutlak" | Rata-rata 10 seed 0,0015 (0,0000–0,0084) |
+
+**Koreksi:** catatan awal menyebut kode Pearson tidak ada. Itu keliru, karena heatmap Pearson memang ada dan memakai bawaan `df.corr()`. Yang tepat, narasi lama mengutip angka Pearson tanpa menyebut jenis korelasinya.
 
 Narasi lama juga merujuk "FASE 5", "clustering korelasi terpisah", "notebook selanjutnya", dan "draft sebelumnya", yang tidak ada di notebook.
 

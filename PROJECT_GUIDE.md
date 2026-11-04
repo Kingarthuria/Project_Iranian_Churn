@@ -105,6 +105,7 @@ Belum ada.
 | 17 | Value at Risk memakai 3 sinyal, tanpa `Subscription_Length`. Rekomendasi bisnis ditulis sebagai hipotesis yang perlu diuji | Sesuai keputusan tidak membuat klaim pelanggan baru, dan temuannya hanya asosiasi | 2026-11-04 |
 | 18 | Bagian Value at Risk di notebook EDA diganti dengan Pertanyaan Bisnis. Analisis risiko × nilai ditunda ke Fase 3 | Nama lama kurang tepat dan `Customer_Value` tidak punya satuan. Pertanyaan bisnis lebih tepat dijawab dengan besar efek dan rentangnya | 2026-11-04 |
 | 19 | Dataset bersih disimpan di folder baru `dataset_clean/`, terpisah dari `dataset/`. Script dan folder dibuat saat pengguna memberi aba-aba | Data mentah tetap read-only | 2026-11-04 |
+| 20 | Notebook EDA v2 diperbaiki menyeluruh setelah screening: cek kualitas data, grafik, konsistensi, dan kerapian kode | Keputusan pengguna, supaya notebook layak sebelum tahap cleaning. Rincian di `ringkasan_temuan/09_screening_notebook.md` | 2026-11-04 |
 
 ---
 
@@ -119,7 +120,7 @@ Belum diputuskan. Akan dibahas dengan pengguna setelah EDA.
 | Fase | Status |
 |---|---|
 | 0 Housekeeping | **Selesai.** `requirements.txt`, Git, GitHub privat, dan struktur folder sudah ada. Environment `ds_env` terverifikasi (dry-run 0 paket baru, `pip check` bersih) |
-| 1 EDA dan data preparation | **Berjalan.** Audit duplikat dan struktur data selesai dan disimpan. Peninjauan seluruh `program/EDA_Project_Churn_v2.ipynb` selesai. Script pembersihan satu perintah belum dibuat, jadi DoD Fase 1 belum terpenuhi |
+| 1 EDA dan data preparation | **Berjalan.** Audit duplikat dan struktur data selesai dan disimpan. Peninjauan, screening, dan perbaikan `program/EDA_Project_Churn_v2.ipynb` selesai. Script pembersihan satu perintah belum dibuat, jadi DoD Fase 1 belum terpenuhi |
 | 2 Modeling | Belum dimulai |
 | 3 Evaluasi dan refactor | Belum dimulai |
 | 4 Experiment tracking | Belum dimulai |
@@ -279,6 +280,7 @@ project_iranian_churn/
 | 2026-11-04 | Koreksi: `Status` dan `Complains` tidak disebut risiko leakage, karena menurut UCI semua fitur berasal dari 9 bulan pertama. Perbandingan dengan dan tanpa keduanya tetap dilakukan untuk melihat ketergantungan skor (bagian 4) | Diputuskan |
 | 2026-11-04 | Klaim lama seperti "pelanggan baru" dan "loyal" dihapus dari notebook EDA v2. Sel validasi disederhanakan dan Value at Risk memakai 3 sinyal (bagian 4) | Diputuskan |
 | 2026-11-04 | Value at Risk diganti dengan Pertanyaan Bisnis, dan dataset bersih nanti di `dataset_clean/` (bagian 4) | Diputuskan |
+| 2026-11-04 | Screening dan perbaikan menyeluruh notebook EDA v2 selesai (bagian 4). Strip output ditunda sampai sebelum repo dipublikasikan | Diputuskan |
 | | Riwayat Git masih memuat nama tampilan dan `userId` Google dari metadata Colab. Dibersihkan sebelum repo dipublikasikan | **Terbuka** |
 | | Strategi validasi (setelah memeriksa independensi baris) | **Terbuka** |
 | | Metrik evaluasi utama | **Terbuka** |
