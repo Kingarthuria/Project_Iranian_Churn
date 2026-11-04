@@ -71,6 +71,9 @@ Belum ada.
 | 4 | Semua 365 pasangan kembar beraktivitas berada di kelompok sisa bagi 50 yang sama | `program/analisis_duplikat_v2.ipynb` | 2026-11-04 |
 | 5 | ROC-AUC CV acak vs grup per kelompok (audit, bukan skor final): Logistic Regression 0,932 vs 0,841 (0,607–1,000), RandomForest 0,984 vs 0,790 (0,369–0,998) | `program/analisis_duplikat_v2.ipynb` | 2026-11-04 |
 | 6 | Semua 59 baris churn dengan `Subscription_Length` di bawah 15,5 berasal dari kelompok audit 49. Tanpa kelompok itu, churn rate grup ini 0,0%, dan baris lainnya 14,6% | `program/analisis_duplikat_v2.ipynb` | 2026-11-04 |
+| 7 | Rata-rata MI dari 10 seed: `Seconds_of_Use` 0,1156 (0,1103–0,1192), `Status` 0,1040, `Complains` 0,1023. Urutan `Frequency_of_use` dan `Customer_Value` tidak stabil | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
+| 8 | `Customer_Value` sangat bisa dijelaskan oleh `Seconds_of_Use` dan `Frequency_of_SMS` (R-kuadrat 0,957) | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
+| 9 | Baris dengan komplain dan berstatus non-aktif punya churn rate 89,3% (133 dari 149). Waktu pengukuran kedua kolom tidak dijelaskan UCI, jadi ada risiko leakage yang belum terbukti | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
 
 ---
 
@@ -94,6 +97,7 @@ Belum ada.
 | 12 | Rencana flag dari sel kesimpulan outlier dibatalkan untuk sekarang. Bisa dibahas lagi saat feature engineering, dengan batas dihitung di dalam fold | Batasnya dipilih setelah melihat churn pada seluruh data, dan flag merah pada dasarnya menandai satu kelompok audit | 2026-11-04 |
 | 13 | `program/EDA_Project_Churn_v2.ipynb` berdiri sendiri: tidak merujuk file lain dan tidak memuat analisis kelompok posisi. Rujukan UCI dipertahankan. README dan laporan model tetap memuat kalimat keterbatasan (bagian 7) | Keputusan pengguna, mengikuti kesepakatan bahwa tiap baris adalah satu pelanggan. UCI adalah sumber data dan atribusinya diwajibkan lisensi. Keterbatasan: pembaca notebook EDA tidak melihat bukti pola berulang | 2026-11-04 |
 | 14 | Pertahankan hampir-duplikat (75 baris beraktivitas dengan pasangan yang berbeda di satu kolom) | Sesuai asumsi kerja, tidak ada dasar untuk menyebutnya duplikat. Keterbatasan: baris sangat mirip masih bisa terpisah ke train dan test | 2026-11-04 |
+| 15 | Modeling membandingkan hasil dengan dan tanpa `Status` serta `Complains`. Fitur selain `Age_Binning` dan `Age_Group` belum diputuskan dan diuji saat modeling | Waktu pengukuran kedua kolom tidak dijelaskan UCI, dan keputusan fitur butuh pengujian performa | 2026-11-04 |
 
 ---
 
@@ -108,7 +112,7 @@ Belum diputuskan. Akan dibahas dengan pengguna setelah EDA.
 | Fase | Status |
 |---|---|
 | 0 Housekeeping | **Selesai.** `requirements.txt`, Git, GitHub privat, dan struktur folder sudah ada. Environment `ds_env` terverifikasi (dry-run 0 paket baru, `pip check` bersih) |
-| 1 EDA dan data preparation | **Berjalan.** Audit duplikat dan struktur data selesai dan disimpan. Bagian persiapan, duplikat, kualitas kolom, univariat, dan outlier selesai ditinjau dan diterapkan di `program/EDA_Project_Churn_v2.ipynb`. Bagian hubungan fitur dan seterusnya belum ditinjau |
+| 1 EDA dan data preparation | **Berjalan.** Audit duplikat dan struktur data selesai dan disimpan. Bagian persiapan, duplikat, kualitas kolom, univariat, outlier, dan hubungan fitur selesai ditinjau dan diterapkan di `program/EDA_Project_Churn_v2.ipynb`. Bagian segmentasi dan executive summary belum ditinjau |
 | 2 Modeling | Belum dimulai |
 | 3 Evaluasi dan refactor | Belum dimulai |
 | 4 Experiment tracking | Belum dimulai |
@@ -262,6 +266,7 @@ project_iranian_churn/
 | 2026-11-04 | Sitasi empat paper di `jurnal/` ditambahkan ke sel 4 notebook EDA v2 sebagai bacaan terkait, bukan dasar analisis | Diputuskan |
 | 2026-11-04 | Sitasi Jafari-Marandi dkk. (2020) dihapus dari notebook EDA v2, karena halaman UCI tidak mencantumkan nama pembuat. Sumber dataset memakai sitasi resmi UCI | Diputuskan |
 | 2026-11-04 | Hampir-duplikat dipertahankan (bagian 4) | Diputuskan |
+| 2026-11-04 | MI dilaporkan dengan rata-rata 10 seed dan rentang. Risiko leakage `Status` dan `Complains` diuji saat modeling (bagian 4) | Diputuskan |
 | | Klaim lama seperti "pelanggan baru" dan "loyal" di sel notebook EDA v2 yang belum ditinjau. Diperbaiki saat bagiannya ditinjau | **Terbuka** |
 | | Riwayat Git masih memuat nama tampilan dan `userId` Google dari metadata Colab. Dibersihkan sebelum repo dipublikasikan | **Terbuka** |
 | | Strategi validasi (setelah memeriksa independensi baris) | **Terbuka** |
