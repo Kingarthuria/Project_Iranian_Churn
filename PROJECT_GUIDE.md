@@ -2,7 +2,7 @@
 
 > File ini adalah **sumber kebenaran** project. Isi hanya fakta yang sudah pasti. Bagian yang belum diketahui dibiarkan kosong.
 > Berikan ke AI di awal setiap sesi ("baca PROJECT_GUIDE.md dulu"). Perbarui **Status** dan **Log Keputusan** setiap selesai satu langkah.
-> Terakhir diperbarui: 2026-11-05 (koreksi dokumentasi UCI, Fase 1 berjalan)
+> Terakhir diperbarui: 2026-11-05 (script pembersihan dibuat, Fase 1 selesai)
 
 ---
 
@@ -122,7 +122,7 @@ Belum diputuskan. Akan dibahas dengan pengguna setelah EDA.
 | Fase | Status |
 |---|---|
 | 0 Housekeeping | **Selesai.** `requirements.txt`, Git, GitHub privat, dan struktur folder sudah ada. Environment `ds_env` terverifikasi (dry-run 0 paket baru, `pip check` bersih) |
-| 1 EDA dan data preparation | **Berjalan.** Audit duplikat dan struktur data selesai dan disimpan. Peninjauan, screening, dan perbaikan `program/EDA_Project_Churn_v2.ipynb` selesai. Script pembersihan satu perintah belum dibuat, jadi DoD Fase 1 belum terpenuhi |
+| 1 EDA dan data preparation | **Selesai.** Audit duplikat dan struktur data disimpan, dan `program/EDA_Project_Churn_v2.ipynb` sudah diperbaiki. `python -X utf8 src/clean_data.py` menghasilkan `dataset_clean/customer_churn_clean.csv` (2.850 baris, 14 kolom). Dua kali jalan menghasilkan hash yang sama |
 | 2 Modeling | Belum dimulai |
 | 3 Evaluasi dan refactor | Belum dimulai |
 | 4 Experiment tracking | Belum dimulai |
@@ -155,11 +155,11 @@ Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 **DoD:** environment bisa dibuat ulang dari file, repo bersih, dokumentasi sumber sudah dibaca.
 
 ### Fase 1: EDA dan data preparation
-- [ ] Periksa kualitas data: tipe, missing value, duplikat, rentang nilai, logika antar kolom
-- [ ] Periksa **independensi baris** dan struktur data sebelum memilih strategi validasi
-- [ ] Univariat, hubungan fitur dengan target, hubungan antar fitur
-- [ ] Setiap keputusan pembersihan dicatat di bagian 4 beserta alasannya
-- [ ] Proses pembersihan dapat dijalankan ulang dengan script, bukan hanya dari notebook
+- [x] Periksa kualitas data: tipe, missing value, duplikat, rentang nilai, logika antar kolom
+- [x] Periksa **independensi baris** dan struktur data sebelum memilih strategi validasi
+- [x] Univariat, hubungan fitur dengan target, hubungan antar fitur
+- [x] Setiap keputusan pembersihan dicatat di bagian 4 beserta alasannya
+- [x] Proses pembersihan dapat dijalankan ulang dengan script, bukan hanya dari notebook
 
 **DoD:** satu perintah menghasilkan data bersih yang sama, dan semua keputusan tercatat.
 
@@ -244,7 +244,7 @@ project_iranian_churn/
 ├── requirements.txt
 ├── .gitignore
 ├── dataset/          # data mentah, read-only (dilacak, CC BY 4.0)
-├── dataset_clean/    # data bersih, dibuat ulang dari script (belum dibuat)
+├── dataset_clean/    # data bersih, dibuat ulang dari script (tidak dilacak Git)
 ├── jurnal/           # referensi, diabaikan Git
 ├── program/          # notebook eksplorasi
 ├── ringkasan_temuan/ # ringkasan temuan bernomor (.md)
@@ -286,6 +286,7 @@ project_iranian_churn/
 | 2026-11-04 | Riwayat Git dibersihkan dari metadata Colab dan email pribadi, lalu `main` dan `arsip-v1` di GitHub diperbarui dengan force push. Commit lama masih bisa tersimpan sementara di cache GitHub | Diputuskan |
 | 2026-11-05 | Data dictionary dikoreksi dari bagian *Additional Information* di halaman UCI, dan alasan keputusan 7 dan 9 diperbarui, tanpa perubahan baris. Keempat jurnal di `jurnal/` tidak menunjukkan bukti konkret tentang arti kolom, dan sebagian tafsirannya bertentangan | Diputuskan |
 | 2026-11-05 | `program/EDA_Project_Churn_v2.ipynb` dan `ringkasan_temuan/03_kualitas_kolom.md` diselaraskan dengan dokumentasi UCI. Hanya teks markdown yang berubah | Diputuskan |
+| 2026-11-05 | `src/clean_data.py` dibuat: menghapus 300 duplikat persis dan merapikan nama kolom, sama dengan langkah notebook EDA v2. Kolom `Age` bernama `Age_Binning` di file bersih. `dataset_clean/` tidak dilacak Git | Diputuskan |
 | | Ukuran notebook EDA v2 (sekitar 6 MB): output tetap disimpan, dan resolusi gambar dikurangi sekali saat notebook final | **Terbuka** |
 | | Strategi validasi (setelah memeriksa independensi baris) | **Terbuka** |
 | | Metrik evaluasi utama | **Terbuka** |
