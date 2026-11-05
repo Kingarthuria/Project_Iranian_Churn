@@ -2,7 +2,7 @@
 
 > File ini adalah **sumber kebenaran** project. Isi hanya fakta yang sudah pasti. Bagian yang belum diketahui dibiarkan kosong.
 > Berikan ke AI di awal setiap sesi ("baca PROJECT_GUIDE.md dulu"). Perbarui **Status** dan **Log Keputusan** setiap selesai satu langkah.
-> Terakhir diperbarui: 2026-11-05 (strategi validasi dan metrik diputuskan, Fase 2 berjalan)
+> Terakhir diperbarui: 2026-11-05 (putaran pertama perbandingan model selesai, Fase 2 berjalan)
 
 ---
 
@@ -80,6 +80,10 @@
 | 10 | Baris churn hanya memegang 4,4% total `Customer_Value` (median 102,6 berbanding 271,5). Dibaca sebagai porsi relatif, bukan uang | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
 | 11 | Gabungan `Complains=1`, `Status=2`, dan `Seconds_of_Use` Rendah mencakup 992 baris (34,8%) dan 90,8% baris churn. Deskriptif, karena sinyal dipilih setelah melihat churn | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
 | 12 | Selisih churn rate, IK 95%: komplain 72,8 poin (67,3 sampai 77,3), non-aktif 41,9 poin (38,1 sampai 45,8), `Seconds_of_Use` kuartil terendah 25,3 poin (21,7 sampai 29,1). Eksploratif | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
+| 13 | PR-AUC CV acak pada 2.280 baris latih, parameter default, 12 fitur: XGBoost 0,931 (0,920–0,939), RandomForest 0,914 (0,908–0,919), Logistic Regression 0,773 (0,768–0,776), `DummyClassifier` 0,157. Bukan performa pada pelanggan baru, dan skor setinggi ini dicurigai | `program/Modeling_Project_Churn.ipynb` | 2026-11-05 |
+| 14 | Cek internal CV grup, dengan model dan fitur yang sama: Logistic Regression 0,625 (0,484–0,771), RandomForest 0,504 (0,400–0,635), XGBoost 0,474 (0,323–0,588), `DummyClassifier` 0,161. Rentangnya lebar dan bertumpuk | `program/Modeling_Project_Churn.ipynb` | 2026-11-05 |
+| 15 | Tanpa `Status` dan `Complains`, PR-AUC XGBoost turun 0,045 pada CV acak dan 0,243 pada CV grup, sedangkan Logistic Regression turun 0,225 dan 0,256 | `program/Modeling_Project_Churn.ipynb` | 2026-11-05 |
+| 16 | Pembobotan kelas hampir tidak mengubah PR-AUC CV acak XGBoost: 0,932 (0,927–0,941) dengan bobot, dan 0,931 (0,920–0,939) tanpa bobot | `program/Modeling_Project_Churn.ipynb` | 2026-11-05 |
 
 ---
 
@@ -110,8 +114,13 @@
 | 19 | Dataset bersih disimpan di folder baru `dataset_clean/`, terpisah dari `dataset/`. Script dan folder dibuat saat pengguna memberi aba-aba | Data mentah tetap read-only | 2026-11-04 |
 | 20 | Notebook EDA v2 diperbaiki menyeluruh setelah screening: cek kualitas data, grafik, konsistensi, dan kerapian kode | Keputusan pengguna, supaya notebook layak sebelum tahap cleaning. Rincian di `ringkasan_temuan/09_screening_notebook.md` | 2026-11-04 |
 | 21 | Metadata Colab pada notebook asli ikut dihapus saat membersihkan riwayat Git. Sel dan outputnya tidak berubah. Email commit memakai alamat noreply GitHub | Keputusan pengguna, sebagai pengecualian dari aturan tidak mengubah notebook lama, untuk melindungi data pribadi | 2026-11-04 |
-| 22 | Model dipilih dengan CV acak berstrata berulang (`RepeatedStratifiedKFold`). CV grup per `audit_group` hanya menjadi cek internal, dan skornya dihitung per ulangan dari gabungan prediksi out-of-fold. Keputusan 1 dan 2 tetap berlaku: skor CV acak tidak boleh disebut performa pada pelanggan baru, dan README tidak memuat skor pembanding | Keputusan pengguna setelah meninjau keempat jurnal, yang semuanya membagi data per baris, dan sejalan dengan keputusan 1. Keterbatasan: audit menunjukkan skor CV acak bisa jauh lebih tinggi daripada CV grup, dan tidak ada jurnal yang membahas pola per 50 baris, jadi kesamaan cara dengan jurnal bukan bukti cara ini tepat untuk data ini. Model yang dipilih bisa cenderung menghafal pola | 2026-11-05 |
+| 22 | Model dipilih dengan CV acak berstrata berulang (`RepeatedStratifiedKFold`). CV grup per `audit_group` hanya menjadi cek internal. Pada kedua CV, skor dihitung per fold lalu dirata-ratakan per ulangan, dan fold tanpa churn dilewati. Keputusan 1 dan 2 tetap berlaku: skor CV acak tidak boleh disebut performa pada pelanggan baru, dan README tidak memuat skor pembanding | Keputusan pengguna setelah meninjau keempat jurnal, yang semuanya membagi data per baris, dan sejalan dengan keputusan 1. Keterbatasan: audit menunjukkan skor CV acak bisa jauh lebih tinggi daripada CV grup, dan tidak ada jurnal yang membahas pola per 50 baris, jadi kesamaan cara dengan jurnal bukan bukti cara ini tepat untuk data ini. Model yang dipilih bisa cenderung menghafal pola. Skor gabungan out-of-fold ditolak, karena ROC-AUC `DummyClassifier` pada CV grup menjadi 0,301 | 2026-11-05 |
 | 23 | Metrik utama PR-AUC, dengan baseline churn rate 0,157. ROC-AUC menjadi pendukung. Precision, recall, dan F1 dilaporkan setelah threshold dipilih di Fase 3 | Keputusan pengguna. Churn hanya 15,65%, dan PR-AUC berfokus pada kelas churn tanpa bergantung threshold | 2026-11-05 |
+| 24 | Pisahkan 20% data uji acak berstrata di awal, dan pakai sekali di akhir. CV berjalan pada 80% sisanya | Keputusan pengguna, sama dengan keempat jurnal. Keterbatasan: data uji memuat pola yang sama dengan data latih, jadi skornya tidak mewakili pelanggan baru | 2026-11-05 |
+| 25 | Kandidat: Logistic Regression, Decision Tree, KNN, SVM RBF, RandomForest, dan XGBoost. `DummyClassifier` menjadi batas bawah | Keputusan pengguna. XGBoost dipilih karena paling dikenal dan dipakai dua jurnal, bukan karena terbukti lebih baik pada data ini | 2026-11-05 |
+| 26 | Pembeda utama project: produk jadi (Fase 4–6), perbandingan dengan dan tanpa `Status` serta `Complains`, dan threshold berbasis skenario biaya. Rentang skor, bahasa asosiatif, dan repo yang bisa dijalankan ulang menjadi standar kerja. Keputusan 2 dan 3 dipertahankan | Keputusan pengguna. Biaya adalah asumsi, bukan data. Klaim dibatasi pada keempat jurnal yang ditinjau, dan peran semua fitur dilihat dengan *permutation importance* di Fase 3 | 2026-11-05 |
+| 27 | Ketidakseimbangan kelas: bandingkan tanpa penanganan dan pembobotan kelas (`class_weight`, atau `scale_pos_weight` per fold pada XGBoost). KNN hanya tanpa penanganan. SMOTE belum dipakai | Keputusan pengguna. Tidak membuat baris sintetis dan tidak butuh library baru. SMOTE bisa memperkuat pola berulang | 2026-11-05 |
+| 28 | Fitur putaran pertama: 12 fitur tanpa `Age_Binning`, dengan dan tanpa `Status` serta `Complains`. Semua fitur tetap berupa angka untuk semua model. CV 5-fold, 10 kali ulang | Keputusan pengguna. Keterbatasan: Logistic Regression sulit menangkap pola naik lalu turun pada `Subscription_Length` dan `Age_Group`, jadi bisa terlihat lebih lemah dari kemampuan sebenarnya | 2026-11-05 |
 
 ---
 
@@ -133,7 +142,7 @@ Accuracy tidak dipakai sebagai metrik utama. Lihat keputusan 22 dan 23 di bagian
 |---|---|
 | 0 Housekeeping | **Selesai.** `requirements.txt`, Git, GitHub privat, dan struktur folder sudah ada. Environment `ds_env` terverifikasi (dry-run 0 paket baru, `pip check` bersih) |
 | 1 EDA dan data preparation | **Selesai.** Audit duplikat dan struktur data disimpan, dan `program/EDA_Project_Churn_v2.ipynb` sudah diperbaiki. `python -X utf8 src/clean_data.py` menghasilkan `dataset_clean/customer_churn_clean.csv` (2.850 baris, 14 kolom). Dua kali jalan menghasilkan hash yang sama |
-| 2 Modeling | **Berjalan.** Strategi validasi dan metrik sudah diputuskan, dan kelompok validasi sudah dibuat. Belum ada model yang dilatih |
+| 2 Modeling | **Berjalan.** Strategi validasi, metrik, data uji, dan model kandidat sudah diputuskan. Putaran pertama perbandingan ada di `program/Modeling_Project_Churn.ipynb`. Model belum dipilih, dan data uji belum dipakai |
 | 3 Evaluasi dan refactor | Belum dimulai |
 | 4 Experiment tracking | Belum dimulai |
 | 5 Deployment | Belum dimulai |
@@ -298,10 +307,12 @@ project_iranian_churn/
 | 2026-11-05 | `program/EDA_Project_Churn_v2.ipynb` dan `ringkasan_temuan/03_kualitas_kolom.md` diselaraskan dengan dokumentasi UCI. Hanya teks markdown yang berubah | Diputuskan |
 | 2026-11-05 | `src/clean_data.py` dibuat: menghapus 300 duplikat persis dan merapikan nama kolom, sama dengan langkah notebook EDA v2. Kolom `Age` bernama `Age_Binning` di file bersih. `dataset_clean/` tidak dilacak Git | Diputuskan |
 | 2026-11-05 | Strategi validasi: CV acak berstrata berulang sebagai pemilih model, dan CV grup per `audit_group` sebagai cek internal. Pilihan awal CV grup diganti setelah meninjau keempat jurnal. Metrik utama: PR-AUC (bagian 4 dan 5). `src/clean_data.py` kini juga menulis `dataset_clean/validation_groups.csv` | Diputuskan |
+| 2026-11-05 | Data uji 20%, enam model kandidat, dan pembeda utama project diputuskan (keputusan 24, 25, dan 26). XGBoost 3.2.0 diinstal di `ds_env`, dan masuk `requirements.txt` bersama kode yang memakainya | Diputuskan |
+| 2026-11-05 | Ketidakseimbangan kelas, fitur putaran pertama, dan ulangan CV diputuskan (keputusan 27 dan 28). Kode putaran pertama ditulis di notebook baru, dan dipindah ke `src/` di Fase 3 | Diputuskan |
+| 2026-11-05 | Koreksi keputusan 22: skor dihitung per fold untuk kedua CV, setelah pemeriksaan batas bawah menunjukkan skor gabungan tidak layak untuk CV grup | Diputuskan |
 | | Ukuran notebook EDA v2 (sekitar 6 MB): output tetap disimpan, dan resolusi gambar dikurangi sekali saat notebook final | **Terbuka** |
-| | Jumlah ulangan CV dan perlu tidaknya hold-out | **Terbuka** |
-| | Fitur yang dipakai dan yang dibuang | **Terbuka** |
-| | Model kandidat dan penanganan ketidakseimbangan kelas | **Terbuka** |
+| | Fitur putaran berikutnya dan fitur final | **Terbuka** |
+| | Model terpilih dan penyetelannya | **Terbuka** |
 | | Hal yang belum dijelaskan UCI: definisi operasional churn, cara `Status` ditentukan, rumus `Customer Value`, arti `Age`, dan detail hitungan `Call  Failure`, `Frequency of use`, `Frequency of SMS`, serta `Distinct Called Numbers` (bagian 2) | **Terbuka** || | Platform demo (Render, Hugging Face Spaces, atau Streamlit Cloud) | **Terbuka** |
 
 ---
