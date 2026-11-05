@@ -84,6 +84,7 @@
 | 14 | Cek internal CV grup, dengan model dan fitur yang sama: Logistic Regression 0,625 (0,484–0,771), RandomForest 0,504 (0,400–0,635), XGBoost 0,474 (0,323–0,588), `DummyClassifier` 0,161. Rentangnya lebar dan bertumpuk | `program/Modeling_Project_Churn.ipynb` | 2026-11-05 |
 | 15 | Tanpa `Status` dan `Complains`, PR-AUC XGBoost turun 0,045 pada CV acak dan 0,243 pada CV grup, sedangkan Logistic Regression turun 0,225 dan 0,256 | `program/Modeling_Project_Churn.ipynb` | 2026-11-05 |
 | 16 | Pembobotan kelas hampir tidak mengubah PR-AUC CV acak XGBoost: 0,932 (0,927–0,941) dengan bobot, dan 0,931 (0,920–0,939) tanpa bobot | `program/Modeling_Project_Churn.ipynb` | 2026-11-05 |
+| 17 | Penyetelan 60 kombinasi tidak jelas lebih baik dari default. Pada 12 fitur dan CV acak, PR-AUC default 0,934 (0,926–0,939) dan disetel 0,935 (0,929–0,942), dengan selisih per ulangan rata-rata +0,0015. Skor saat pencarian 0,941 | `program/Tuning_XGBoost.ipynb` | 2026-11-05 |
 
 ---
 
@@ -121,6 +122,8 @@
 | 26 | Pembeda utama project: produk jadi (Fase 4–6), perbandingan dengan dan tanpa `Status` serta `Complains`, dan threshold berbasis skenario biaya. Rentang skor, bahasa asosiatif, dan repo yang bisa dijalankan ulang menjadi standar kerja. Keputusan 2 dan 3 dipertahankan | Keputusan pengguna. Biaya adalah asumsi, bukan data. Klaim dibatasi pada keempat jurnal yang ditinjau, dan peran semua fitur dilihat dengan *permutation importance* di Fase 3 | 2026-11-05 |
 | 27 | Ketidakseimbangan kelas: bandingkan tanpa penanganan dan pembobotan kelas (`class_weight`, atau `scale_pos_weight` per fold pada XGBoost). KNN hanya tanpa penanganan. SMOTE belum dipakai | Keputusan pengguna. Tidak membuat baris sintetis dan tidak butuh library baru. SMOTE bisa memperkuat pola berulang | 2026-11-05 |
 | 28 | Fitur putaran pertama: 12 fitur tanpa `Age_Binning`, dengan dan tanpa `Status` serta `Complains`. Semua fitur tetap berupa angka untuk semua model. CV 5-fold, 10 kali ulang | Keputusan pengguna. Keterbatasan: Logistic Regression sulit menangkap pola naik lalu turun pada `Subscription_Length` dan `Age_Group`, jadi bisa terlihat lebih lemah dari kemampuan sebenarnya | 2026-11-05 |
+| 29 | 12 fitur menjadi model utama. 10 fitur tanpa `Status` dan `Complains` dilaporkan sebagai pembanding | Keputusan pengguna. Tidak ada bukti keduanya leakage. Keterbatasan: cara `Status` ditentukan tidak dijelaskan UCI, jadi skor 12 fitur bisa terlalu tinggi | 2026-11-05 |
+| 30 | Penyetelan XGBoost memakai `RandomizedSearchCV` 60 kombinasi dengan PR-AUC pada data latih. Kombinasi terbaik dinilai ulang dengan CV 10 kali ulang memakai seed lain. Hasilnya hanya dipakai kalau rentangnya tidak bertumpuk dengan default pada fold yang sama, dan lebih tinggi | Keputusan pengguna. Tanpa library baru, dan jangkauan nilainya luas. Keterbatasan: penilaian ulang masih memakai data latih yang sama, dan CV acak bisa mendorong model menghafal pola | 2026-11-05 |
 
 ---
 
@@ -310,6 +313,7 @@ project_iranian_churn/
 | 2026-11-05 | Data uji 20%, enam model kandidat, dan pembeda utama project diputuskan (keputusan 24, 25, dan 26). XGBoost 3.2.0 diinstal di `ds_env`, dan masuk `requirements.txt` bersama kode yang memakainya | Diputuskan |
 | 2026-11-05 | Ketidakseimbangan kelas, fitur putaran pertama, dan ulangan CV diputuskan (keputusan 27 dan 28). Kode putaran pertama ditulis di notebook baru, dan dipindah ke `src/` di Fase 3 | Diputuskan |
 | 2026-11-05 | Koreksi keputusan 22: skor dihitung per fold untuk kedua CV, setelah pemeriksaan batas bawah menunjukkan skor gabungan tidak layak untuk CV grup | Diputuskan |
+| 2026-11-05 | 12 fitur menjadi model utama, dan XGBoost disetel dengan random search 60 kombinasi di `program/Tuning_XGBoost.ipynb` (keputusan 29 dan 30) | Diputuskan |
 | | Ukuran notebook EDA v2 (sekitar 6 MB): output tetap disimpan, dan resolusi gambar dikurangi sekali saat notebook final | **Terbuka** |
 | | Fitur putaran berikutnya dan fitur final | **Terbuka** |
 | | Model terpilih dan penyetelannya | **Terbuka** |
