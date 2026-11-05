@@ -10,4 +10,4 @@ Jalankan dari root project:
 python -X utf8 src/clean_data.py
 ```
 
-Hasilnya `dataset_clean/customer_churn_clean.csv`. File ini tidak dilacak Git.
+Hasilnya `dataset_clean/customer_churn_clean.csv` dan `dataset_clean/validation_groups.csv`. Kolom di file kedua hanya untuk cek CV grup, bukan fitur model. Kedua file tidak dilacak Git.

@@ -2,7 +2,7 @@
 
 > File ini adalah **sumber kebenaran** project. Isi hanya fakta yang sudah pasti. Bagian yang belum diketahui dibiarkan kosong.
 > Berikan ke AI di awal setiap sesi ("baca PROJECT_GUIDE.md dulu"). Perbarui **Status** dan **Log Keputusan** setiap selesai satu langkah.
-> Terakhir diperbarui: 2026-11-05 (script pembersihan dibuat, Fase 1 selesai)
+> Terakhir diperbarui: 2026-11-05 (strategi validasi dan metrik diputuskan, Fase 2 berjalan)
 
 ---
 
@@ -56,7 +56,9 @@
 
 ### Kolom bantu (BUKAN fitur)
 
-Belum ada.
+| Kolom | Letak | Arti |
+|---|---|---|
+| `audit_group` | `dataset_clean/validation_groups.csv`, sejajar per baris dengan file bersih | Sisa bagi 50 dari posisi baris pada data mentah. Hanya untuk cek CV grup (keputusan 22), dan tidak boleh masuk fitur model |
 
 ---
 
@@ -108,12 +110,20 @@ Belum ada.
 | 19 | Dataset bersih disimpan di folder baru `dataset_clean/`, terpisah dari `dataset/`. Script dan folder dibuat saat pengguna memberi aba-aba | Data mentah tetap read-only | 2026-11-04 |
 | 20 | Notebook EDA v2 diperbaiki menyeluruh setelah screening: cek kualitas data, grafik, konsistensi, dan kerapian kode | Keputusan pengguna, supaya notebook layak sebelum tahap cleaning. Rincian di `ringkasan_temuan/09_screening_notebook.md` | 2026-11-04 |
 | 21 | Metadata Colab pada notebook asli ikut dihapus saat membersihkan riwayat Git. Sel dan outputnya tidak berubah. Email commit memakai alamat noreply GitHub | Keputusan pengguna, sebagai pengecualian dari aturan tidak mengubah notebook lama, untuk melindungi data pribadi | 2026-11-04 |
+| 22 | Model dipilih dengan CV acak berstrata berulang (`RepeatedStratifiedKFold`). CV grup per `audit_group` hanya menjadi cek internal, dan skornya dihitung per ulangan dari gabungan prediksi out-of-fold. Keputusan 1 dan 2 tetap berlaku: skor CV acak tidak boleh disebut performa pada pelanggan baru, dan README tidak memuat skor pembanding | Keputusan pengguna setelah meninjau keempat jurnal, yang semuanya membagi data per baris, dan sejalan dengan keputusan 1. Keterbatasan: audit menunjukkan skor CV acak bisa jauh lebih tinggi daripada CV grup, dan tidak ada jurnal yang membahas pola per 50 baris, jadi kesamaan cara dengan jurnal bukan bukti cara ini tepat untuk data ini. Model yang dipilih bisa cenderung menghafal pola | 2026-11-05 |
+| 23 | Metrik utama PR-AUC, dengan baseline churn rate 0,157. ROC-AUC menjadi pendukung. Precision, recall, dan F1 dilaporkan setelah threshold dipilih di Fase 3 | Keputusan pengguna. Churn hanya 15,65%, dan PR-AUC berfokus pada kelas churn tanpa bergantung threshold | 2026-11-05 |
 
 ---
 
 ## 5. Metrik Evaluasi
 
-Belum diputuskan. Akan dibahas dengan pengguna setelah EDA.
+| Peran | Metrik |
+|---|---|
+| Utama | PR-AUC, dengan baseline churn rate 0,157 |
+| Pendukung | ROC-AUC |
+| Setelah threshold dipilih di Fase 3 | Precision, recall, dan F1 kelas churn |
+
+Accuracy tidak dipakai sebagai metrik utama. Lihat keputusan 22 dan 23 di bagian 4.
 
 ---
 
@@ -123,7 +133,7 @@ Belum diputuskan. Akan dibahas dengan pengguna setelah EDA.
 |---|---|
 | 0 Housekeeping | **Selesai.** `requirements.txt`, Git, GitHub privat, dan struktur folder sudah ada. Environment `ds_env` terverifikasi (dry-run 0 paket baru, `pip check` bersih) |
 | 1 EDA dan data preparation | **Selesai.** Audit duplikat dan struktur data disimpan, dan `program/EDA_Project_Churn_v2.ipynb` sudah diperbaiki. `python -X utf8 src/clean_data.py` menghasilkan `dataset_clean/customer_churn_clean.csv` (2.850 baris, 14 kolom). Dua kali jalan menghasilkan hash yang sama |
-| 2 Modeling | Belum dimulai |
+| 2 Modeling | **Berjalan.** Strategi validasi dan metrik sudah diputuskan, dan kelompok validasi sudah dibuat. Belum ada model yang dilatih |
 | 3 Evaluasi dan refactor | Belum dimulai |
 | 4 Experiment tracking | Belum dimulai |
 | 5 Deployment | Belum dimulai |
@@ -164,7 +174,7 @@ Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 **DoD:** satu perintah menghasilkan data bersih yang sama, dan semua keputusan tercatat.
 
 ### Fase 2: Modeling
-- [ ] Strategi validasi dipilih berdasarkan struktur data, disetujui pengguna
+- [x] Strategi validasi dipilih berdasarkan struktur data, disetujui pengguna
 - [ ] Baseline sederhana dan model kandidat
 - [ ] Penanganan ketidakseimbangan kelas (jika relevan), dibandingkan
 - [ ] Scaler, encoder, dan resampling di dalam fold
@@ -287,9 +297,9 @@ project_iranian_churn/
 | 2026-11-05 | Data dictionary dikoreksi dari bagian *Additional Information* di halaman UCI, dan alasan keputusan 7 dan 9 diperbarui, tanpa perubahan baris. Keempat jurnal di `jurnal/` tidak menunjukkan bukti konkret tentang arti kolom, dan sebagian tafsirannya bertentangan | Diputuskan |
 | 2026-11-05 | `program/EDA_Project_Churn_v2.ipynb` dan `ringkasan_temuan/03_kualitas_kolom.md` diselaraskan dengan dokumentasi UCI. Hanya teks markdown yang berubah | Diputuskan |
 | 2026-11-05 | `src/clean_data.py` dibuat: menghapus 300 duplikat persis dan merapikan nama kolom, sama dengan langkah notebook EDA v2. Kolom `Age` bernama `Age_Binning` di file bersih. `dataset_clean/` tidak dilacak Git | Diputuskan |
+| 2026-11-05 | Strategi validasi: CV acak berstrata berulang sebagai pemilih model, dan CV grup per `audit_group` sebagai cek internal. Pilihan awal CV grup diganti setelah meninjau keempat jurnal. Metrik utama: PR-AUC (bagian 4 dan 5). `src/clean_data.py` kini juga menulis `dataset_clean/validation_groups.csv` | Diputuskan |
 | | Ukuran notebook EDA v2 (sekitar 6 MB): output tetap disimpan, dan resolusi gambar dikurangi sekali saat notebook final | **Terbuka** |
-| | Strategi validasi (setelah memeriksa independensi baris) | **Terbuka** |
-| | Metrik evaluasi utama | **Terbuka** |
+| | Jumlah ulangan CV dan perlu tidaknya hold-out | **Terbuka** |
 | | Fitur yang dipakai dan yang dibuang | **Terbuka** |
 | | Model kandidat dan penanganan ketidakseimbangan kelas | **Terbuka** |
 | | Hal yang belum dijelaskan UCI: definisi operasional churn, cara `Status` ditentukan, rumus `Customer Value`, arti `Age`, dan detail hitungan `Call  Failure`, `Frequency of use`, `Frequency of SMS`, serta `Distinct Called Numbers` (bagian 2) | **Terbuka** || | Platform demo (Render, Hugging Face Spaces, atau Streamlit Cloud) | **Terbuka** |
