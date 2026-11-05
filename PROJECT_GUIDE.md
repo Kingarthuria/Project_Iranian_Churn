@@ -319,6 +319,7 @@ project_iranian_churn/
 | 2026-11-05 | 12 fitur menjadi model utama, dan XGBoost disetel dengan random search 60 kombinasi di `program/Tuning_XGBoost.ipynb` (keputusan 29 dan 30) | Diputuskan |
 | 2026-11-05 | Model dikunci sebelum data uji dibuka: XGBoost default, tanpa pembobotan, 12 fitur (keputusan 31) | Diputuskan |
 | 2026-11-05 | Data uji dinilai sekali di `program/Evaluasi_Data_Uji.ipynb` (temuan 18), dan Fase 2 memenuhi DoD. Skor yang lebih tinggi dari CV acak masih dibaca dengan curiga | Diputuskan |
+| 2026-11-05 | Baris co-author dihapus dari 30 commit, lalu semua branch dan tag `arsip-v1` diperbarui dengan force push. Isi file tidak berubah. Commit lama masih bisa tersimpan sementara di cache GitHub | Diputuskan |
 | | Ukuran notebook EDA v2 (sekitar 6 MB): output tetap disimpan, dan resolusi gambar dikurangi sekali saat notebook final | **Terbuka** |
 | | Fitur putaran berikutnya dan fitur final | **Terbuka** |
 | | Hal yang belum dijelaskan UCI: definisi operasional churn, cara `Status` ditentukan, rumus `Customer Value`, arti `Age`, dan detail hitungan `Call  Failure`, `Frequency of use`, `Frequency of SMS`, serta `Distinct Called Numbers` (bagian 2) | **Terbuka** || | Platform demo (Render, Hugging Face Spaces, atau Streamlit Cloud) | **Terbuka** |
