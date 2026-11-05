@@ -16,6 +16,9 @@ mlartifacts/
 # Jurnal/artikel referensi (hak cipta, cukup dicatat sitasinya di README)
 jurnal/
 
+# Data bersih, dibuat ulang dengan src/clean_data.py
+dataset_clean/
+
 # Python / Jupyter
 __pycache__/
 *.pyc
