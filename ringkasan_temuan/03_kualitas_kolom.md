@@ -2,6 +2,7 @@
 
 - **Tanggal:** 2026-11-04
 - **Status:** berjalan, catatan baru ditambahkan di file ini setelah diputuskan
+- **Koreksi 2026-11-05:** bagian 2, 4, dan 5 diperbaiki setelah membaca bagian *Additional Information* di halaman UCI. Keputusan dan jumlah baris tidak berubah.
 - **Data:** 2.850 baris setelah 300 duplikat persis dihapus
 - **Asal angka:** `program/analisis_duplikat_v2.ipynb`, bagian "Bukti Kualitas Kolom" dan "Ringkasan dampak pada baris"
 - **Kelompok:** kelompok audit, yaitu sisa bagi 50 dari posisi baris (lihat `02_verifikasi_50_kelompok.md`)
@@ -31,11 +32,11 @@ Paper diperiksa lewat pencarian kata kunci dan tabel variabel, bukan dibaca penu
 **Keputusan: dipertahankan dan dicatat.** Narasi tidak boleh menganggap `Distinct Called Numbers` pasti lebih kecil dari `Frequency of use`.
 
 - **Temuan:** ada 111 baris (3,89%). Selisihnya 1 sampai 44, dengan median 18.
-- **Arti kolom belum jelas:** UCI tidak menjelaskan kedua kolom ini di data dictionary kita, dan definisi di paper berbeda-beda.
+- **Arti kolom menurut UCI:** `Frequency of use` adalah total jumlah panggilan, dan `Distinct Called Numbers` adalah *total number of distinct phone calls*. Kalau keduanya menghitung panggilan yang sama, nilai kedua seharusnya tidak melebihi nilai pertama, jadi 111 baris ini terlihat janggal. Redaksi UCI belum memastikan hal itu, dan definisi di paper berbeda-beda.
 
 | Paper | `Frequency of use` | `Distinct Called Numbers` |
 |---|---|---|
-| `3757110.3757152.pdf` | Total jumlah panggilan | Jumlah nomor berbeda yang dipanggil |
+| `3757110.3757152.pdf` | Total jumlah panggilan | Jumlah panggilan berbeda (*distinct call count*) |
 | `information-17-00680-v2.pdf` | Berapa kali pelanggan menelepon | Nomor unik yang dihubungi sejak mulai berlangganan |
 | `journal.pone.0303881.pdf` | Jumlah panggilan diterima | Nomor berbeda yang dihubungi |
 | `102601.pdf` | Frekuensi penggunaan layanan | Nomor berbeda yang dihubungi |
@@ -82,7 +83,7 @@ Hubungan ini asosiatif, bukan kausal.
 
 - **Temuan:** ada 54 baris (1,89%) dengan nilai 3 sampai 8. Pada data mentah jumlahnya 57.
 - **Sebaran:** nilainya naik bertahap tanpa lompatan di angka 9.
-- **Satuan belum pasti:** UCI tidak menjelaskan kolom ini di data dictionary kita. `3757110.3757152.pdf` dan `information-17-00680-v2.pdf` membacanya sebagai bulan.
+- **Satuan menurut UCI:** total bulan berlangganan. `3757110.3757152.pdf`, `information-17-00680-v2.pdf`, dan `102601.pdf` juga membacanya sebagai bulan.
 - **Asal baris:** 26 baris dari kelompok 49 (churn 100%), 25 baris dari kelompok 48 (churn 0%), dan 3 baris dari kelompok 46 serta 47 (churn 0%).
 - **Churn rate:** 48,1% berbanding 15,0% pada baris lainnya, tetapi angka ini hampir seluruhnya ditentukan oleh kelompok 49.
 - **Dampak:** korelasi Spearman dengan `Churn` adalah −0,0331, dan −0,0038 tanpa 54 baris ini.
@@ -92,7 +93,7 @@ Hubungan ini asosiatif, bukan kausal.
 **Keputusan: `Age Group` dipakai untuk modeling dan `Age` tidak masuk fitur model.** Kolom `Age` tetap ada di data dan EDA.
 
 - **Temuan:** pasangannya tepat satu-satu pada 2.850 baris (15→1, 25→2, 30→3, 45→4, 55→5). Korelasi Spearman 1,0 dan Pearson 0,9609.
-- **Arti `Age`:** hanya punya 5 nilai, jadi bukan usia sebenarnya. UCI tidak menjelaskan kolom ini di data dictionary kita.
+- **Arti `Age`:** hanya punya 5 nilai, jadi lebih mirip kode kelompok daripada usia sebenarnya. Kolom ini tidak tercantum di dokumentasi UCI.
 - **Jurnal:** `3757110.3757152.pdf` dan `information-17-00680-v2.pdf` membuang `Age`. `102601.pdf` tampaknya memakai keduanya.
 - **Cara membaca:** korelasi Spearman `Age Group` dengan `Churn` hanya 0,0049, tetapi hubungannya tidak searah, jadi angka itu tidak berarti usia tidak berhubungan dengan churn.
 

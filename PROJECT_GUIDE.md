@@ -2,7 +2,7 @@
 
 > File ini adalah **sumber kebenaran** project. Isi hanya fakta yang sudah pasti. Bagian yang belum diketahui dibiarkan kosong.
 > Berikan ke AI di awal setiap sesi ("baca PROJECT_GUIDE.md dulu"). Perbarui **Status** dan **Log Keputusan** setiap selesai satu langkah.
-> Terakhir diperbarui: 2026-11-04 (audit struktur data disimpan, Fase 1 berjalan)
+> Terakhir diperbarui: 2026-11-05 (koreksi dokumentasi UCI, Fase 1 berjalan)
 
 ---
 
@@ -29,27 +29,28 @@
   Sitasi: *Iranian Churn [Dataset]. (2020). UCI Machine Learning Repository. https://doi.org/10.24432/C5JW3Z*
 - **Ukuran menurut UCI:** 3.150 baris, masing-masing mewakili satu pelanggan. UCI menyebut data "dikumpulkan secara acak" dari basis data sebuah perusahaan telekomunikasi Iran selama 12 bulan.
 - **Definisi label menurut UCI (ditinjau 2026-11-04):** semua atribut kecuali `Churn` adalah agregat **9 bulan pertama**. `Churn` adalah **status pelanggan di akhir bulan ke-12**. Tiga bulan di antaranya adalah *planning gap*.
-- **Yang tidak dijelaskan UCI:** arti operasional "churn" (berhenti berlangganan, pindah operator, atau tidak aktif), cara `Status` ditentukan, bulan persis pencatatan dalam 9 bulan pertama, cara menghitung `Customer Value`, cara pengambilan sampel acak, dan siapa pembuat datanya.
+- **Yang tidak dijelaskan UCI:** arti operasional "churn" (berhenti berlangganan, pindah operator, atau tidak aktif), cara `Status` ditentukan, bulan persis pencatatan dalam 9 bulan pertama, cara menghitung `Customer Value`, cara pengambilan sampel acak, siapa pembuat datanya, arti `Age`, dan detail hitungan kolom yang dicatat pada data dictionary.
+- **Kolom ID:** UCI mencantumkan `Anonymous Customer ID`, tetapi file kita tidak memuatnya (14 kolom). Jadi kita tidak bisa memastikan apakah baris identik berasal dari pelanggan yang sama.
 - Jurnal referensi yang sudah dikumpulkan ada di `jurnal/` (diabaikan Git).
 
 ### Data dictionary
 
-> Nama kolom persis seperti header file. Kolom yang artinya belum ada: tanyakan ke pengguna.
+> Nama kolom persis seperti header file. Isi mengikuti bagian *Additional Information* di halaman UCI (ditinjau 2026-11-05). Hal yang tidak dijelaskan UCI ditulis apa adanya, bukan diisi dengan tafsiran.
 
 | Kolom | Arti menurut UCI |
 |---|---|
-| `Call  Failure` | belum ada deskripsi, tanyakan ke pengguna |
+| `Call  Failure` | jumlah kegagalan panggilan. Yang dihitung sebagai gagal tidak dijelaskan |
 | `Complains` | biner: 0 = tidak ada komplain, 1 = ada komplain |
-| `Subscription  Length` | belum ada deskripsi, tanyakan ke pengguna |
+| `Subscription  Length` | total bulan berlangganan |
 | `Charge  Amount` | ordinal: 0 = jumlah terendah, 9 = tertinggi. Data memuat nilai sampai 10 (lihat bagian 4) |
 | `Seconds of Use` | total detik panggilan |
-| `Frequency of use` | belum ada deskripsi, tanyakan ke pengguna |
-| `Frequency of SMS` | belum ada deskripsi, tanyakan ke pengguna |
-| `Distinct Called Numbers` | belum ada deskripsi, tanyakan ke pengguna |
+| `Frequency of use` | total jumlah panggilan. Tidak dijelaskan apakah panggilan dibuat atau diterima |
+| `Frequency of SMS` | total jumlah pesan teks. Tidak dijelaskan apakah SMS dikirim atau diterima |
+| `Distinct Called Numbers` | UCI menulis "total number of distinct phone calls". Redaksinya menyebut panggilan, sedangkan nama kolomnya menyebut nomor |
 | `Age Group` | ordinal: 1 = lebih muda, 5 = lebih tua |
 | `Tariff Plan` | biner: 1 = pay as you go, 2 = kontrak |
 | `Status` | biner: 1 = aktif, 2 = non-aktif |
-| `Age` | belum ada deskripsi, tanyakan ke pengguna |
+| `Age` | tidak tercantum di dokumentasi UCI. Data hanya memuat 5 nilai (15, 25, 30, 45, 55) yang berpasangan satu-satu dengan `Age Group` |
 | `Customer Value` | "nilai pelanggan yang dihitung" (tanpa rumus) |
 | `Churn` | **target**: biner, 1 = churn, 0 = non-churn |
 
@@ -92,9 +93,9 @@ Belum ada.
 | 4 | Hapus 300 duplikat persis (`keep='first'`), sisa 2.850 baris. Diterapkan di `program/EDA_Project_Churn_v2.ipynb` | Baris identik bisa terpisah ke train dan test, dan menghindari pembobotan ganda. Keterbatasan: hanya menangani duplikat persis, dan 47 baris beraktivitas nol mungkin pelanggan sah | 2026-11-04 |
 | 5 | Pertahankan 14 grup dengan fitur identik tetapi label `Churn` berbeda | Sesuai asumsi kerja, baris ini dibaca sebagai pelanggan berbeda dengan hasil berbeda, dan tidak ada dasar untuk memilih label. Keterbatasan: ada sedikit noise pada label | 2026-11-04 |
 | 6 | Pertahankan nilai `Charge Amount` = 10 (7 baris setelah deduplikasi), walau dokumentasi UCI menyebut 0–9 | Tidak ada bukti barisnya salah, dan korelasi Spearman dengan `Churn` nyaris sama tanpa baris itu (−0,2478 vs −0,2470). Keterbatasan: kolom ini tidak persis sesuai dokumentasi | 2026-11-04 |
-| 7 | Pertahankan 111 baris dengan `Distinct Called Numbers` > `Frequency of use`. Narasi tidak boleh menganggap yang pertama pasti lebih kecil | Arti kedua kolom belum jelas, dan menghapusnya membuang baris dengan churn lebih tinggi (21,6% vs 15,4%). Keterbatasan: sebagian baris mungkin memang tidak konsisten | 2026-11-04 |
+| 7 | Pertahankan 111 baris dengan `Distinct Called Numbers` > `Frequency of use`. Narasi tidak boleh menganggap yang pertama pasti lebih kecil | Menurut UCI, `Frequency of use` adalah total panggilan dan `Distinct Called Numbers` adalah "total number of distinct phone calls". Kalau keduanya menghitung panggilan yang sama, nilai kedua seharusnya tidak melebihi nilai pertama, tetapi redaksi UCI belum memastikan hal itu. Menghapusnya membuang baris dengan churn lebih tinggi (21,6% vs 15,4%). Keterbatasan: 111 baris ini terlihat janggal dan sebagian mungkin memang tidak konsisten | 2026-11-04, alasan diperbarui 2026-11-05 |
 | 8 | Pertahankan 85 baris dengan semua aktivitas nol. Penanda `is_zero_activity` bisa dibahas saat feature engineering | Tidak ada bukti barisnya salah, dan churn rate-nya tinggi (51,8% vs 14,5%). Keterbatasan: 26 baris berstatus aktif tanpa aktivitas | 2026-11-04 |
-| 9 | Pertahankan 54 baris dengan `Subscription Length` di bawah 9. Tidak ada klaim tentang pelanggan baru, dan fitur per bulan tidak boleh menganggap semua baris mencakup 9 bulan penuh | Satuan kolom belum pasti, nilainya naik bertahap, dan baris ini hampir seluruhnya berasal dari dua kelompok dengan hasil berlawanan | 2026-11-04 |
+| 9 | Pertahankan 54 baris dengan `Subscription Length` di bawah 9. Tidak ada klaim tentang pelanggan baru, dan fitur per bulan tidak boleh menganggap semua baris mencakup 9 bulan penuh | Menurut UCI satuannya bulan, tetapi nilainya naik bertahap dan baris ini hampir seluruhnya berasal dari dua kelompok dengan hasil berlawanan | 2026-11-04, alasan diperbarui 2026-11-05 |
 | 10 | Pakai `Age Group` untuk modeling. `Age` tidak masuk fitur model, tetapi tetap ada di data dan EDA | Keduanya berpasangan satu-satu, dan kode `Age Group` didokumentasikan UCI, sedangkan arti `Age` belum dijelaskan | 2026-11-04 |
 | 11 | Semua outlier dipertahankan, tidak ada baris yang dihapus atau nilai yang dipotong | Tidak ada bukti bahwa nilainya salah | 2026-11-04 |
 | 12 | Rencana flag dari sel kesimpulan outlier dibatalkan untuk sekarang. Bisa dibahas lagi saat feature engineering, dengan batas dihitung di dalam fold | Batasnya dipilih setelah melihat churn pada seluruh data, dan flag merah pada dasarnya menandai satu kelompok audit | 2026-11-04 |
@@ -283,13 +284,14 @@ project_iranian_churn/
 | 2026-11-04 | Value at Risk diganti dengan Pertanyaan Bisnis, dan dataset bersih nanti di `dataset_clean/` (bagian 4) | Diputuskan |
 | 2026-11-04 | Screening dan perbaikan menyeluruh notebook EDA v2 selesai (bagian 4). Strip output ditunda sampai sebelum repo dipublikasikan | Diputuskan |
 | 2026-11-04 | Riwayat Git dibersihkan dari metadata Colab dan email pribadi, lalu `main` dan `arsip-v1` di GitHub diperbarui dengan force push. Commit lama masih bisa tersimpan sementara di cache GitHub | Diputuskan |
+| 2026-11-05 | Data dictionary dikoreksi dari bagian *Additional Information* di halaman UCI, dan alasan keputusan 7 dan 9 diperbarui, tanpa perubahan baris. Keempat jurnal di `jurnal/` tidak menunjukkan bukti konkret tentang arti kolom, dan sebagian tafsirannya bertentangan | Diputuskan |
+| 2026-11-05 | `program/EDA_Project_Churn_v2.ipynb` dan `ringkasan_temuan/03_kualitas_kolom.md` diselaraskan dengan dokumentasi UCI. Hanya teks markdown yang berubah | Diputuskan |
 | | Ukuran notebook EDA v2 (sekitar 6 MB): output tetap disimpan, dan resolusi gambar dikurangi sekali saat notebook final | **Terbuka** |
 | | Strategi validasi (setelah memeriksa independensi baris) | **Terbuka** |
 | | Metrik evaluasi utama | **Terbuka** |
 | | Fitur yang dipakai dan yang dibuang | **Terbuka** |
 | | Model kandidat dan penanganan ketidakseimbangan kelas | **Terbuka** |
-| | Arti kolom yang belum dijelaskan UCI (bagian 2) | **Terbuka** |
-| | Platform demo (Render, Hugging Face Spaces, atau Streamlit Cloud) | **Terbuka** |
+| | Hal yang belum dijelaskan UCI: definisi operasional churn, cara `Status` ditentukan, rumus `Customer Value`, arti `Age`, dan detail hitungan `Call  Failure`, `Frequency of use`, `Frequency of SMS`, serta `Distinct Called Numbers` (bagian 2) | **Terbuka** || | Platform demo (Render, Hugging Face Spaces, atau Streamlit Cloud) | **Terbuka** |
 
 ---
 
