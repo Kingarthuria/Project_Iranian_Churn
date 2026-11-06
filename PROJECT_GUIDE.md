@@ -2,7 +2,7 @@
 
 > File ini adalah **sumber kebenaran** project. Isi hanya fakta yang sudah pasti. Bagian yang belum diketahui dibiarkan kosong.
 > Berikan ke AI di awal setiap sesi ("baca PROJECT_GUIDE.md dulu"). Perbarui **Status** dan **Log Keputusan** setiap selesai satu langkah.
-> Terakhir diperbarui: 2026-11-05 (threshold skenario biaya selesai, Fase 3 berjalan)
+> Terakhir diperbarui: 2026-11-06 (analisis risiko × nilai selesai, Fase 3 berjalan)
 
 ---
 
@@ -88,6 +88,7 @@
 | 18 | Data uji, dinilai sekali (570 baris, 89 churn): XGBoost 12 fitur PR-AUC 0,958 (bootstrap 0,927–0,979) dan ROC-AUC 0,991, XGBoost 10 fitur PR-AUC 0,940 (0,900–0,972), `DummyClassifier` 0,156. Skornya lebih tinggi dari CV acak (0,934 dan 0,885), jadi dibaca dengan curiga dan bukan performa pada pelanggan baru | `program/Evaluasi_Data_Uji.ipynb` | 2026-11-05 |
 | 19 | Pemeriksaan selisih skor: dari 1.824 ke 2.166 baris latih per fold, PR-AUC 12 fitur naik dari 0,935 ke 0,941 dan 10 fitur dari 0,892 ke 0,904. Pada 10 pembagian 80:20 di dalam data latih, rentangnya 0,917–0,942 dan 0,863–0,933. Baris yang beda maksimal 1 kolom dari tetangga terdekatnya di data latih: 3,5% di data uji dan 3,3% di validasi. Penyebab pasti belum terbukti | `program/Evaluasi_Data_Uji.ipynb` | 2026-11-05 |
 | 20 | Threshold dari prediksi out-of-fold data latih: 1:2 = 0,23 (0,12–0,35), 1:5 = 0,06 (0,05–0,14), 1:10 = 0,045 (0,02–0,08). Pada data uji (89 churn), berurutan: precision 0,853, 0,744, dan 0,696, recall 0,910, 0,978, dan 0,978, dengan 95, 117, dan 125 pelanggan dihubungi. 1:5 dan 1:10 sama-sama menangkap 87 churn, tetapi 1:10 menambah 8 salah hubungi. Threshold 0,50: precision 0,918 dan recall 0,753. Rasio adalah asumsi, dan hasilnya bukan performa pada pelanggan baru | `program/Threshold_Biaya.ipynb` | 2026-11-05 |
+| 21 | Risiko × nilai pada 2.280 baris latih, dengan threshold 1:5 dan batas nilai median 232,7: korelasi Spearman skor dengan nilai −0,612, dan baris churn memegang 4,3% total nilai. Prioritas I (risiko tinggi, nilai tinggi) berisi 63 pelanggan (rentang antarulangan 59–69) dengan 54 churn, dan memegang 39,7% nilai baris churn. Prioritas III (risiko tinggi, nilai rendah) berisi 401 pelanggan dengan 287 churn. Jika 228 pelanggan dihubungi, urutan skor menangkap 220,7 churn dan 60,0% nilai churn, sedangkan urutan skor × nilai menangkap 203,4 churn dan 81,3% nilai churn. Sebanyak 76% pelanggan Prioritas I berasal dari 3 kelompok audit. Nilai terhitung bukan uang, dan hubungannya asosiatif | `program/Risiko_Nilai.ipynb` | 2026-11-06 |
 
 ---
 
@@ -129,6 +130,7 @@
 | 30 | Penyetelan XGBoost memakai `RandomizedSearchCV` 60 kombinasi dengan PR-AUC pada data latih. Kombinasi terbaik dinilai ulang dengan CV 10 kali ulang memakai seed lain. Hasilnya hanya dipakai kalau rentangnya tidak bertumpuk dengan default pada fold yang sama, dan lebih tinggi | Keputusan pengguna. Tanpa library baru, dan jangkauan nilainya luas. Keterbatasan: penilaian ulang masih memakai data latih yang sama, dan CV acak bisa mendorong model menghafal pola | 2026-11-05 |
 | 31 | Model terpilih: XGBoost, parameter default, tanpa pembobotan, 12 fitur. Model tidak diubah berdasarkan hasil data uji | Keputusan pengguna. PR-AUC CV acak tertinggi, rentangnya tidak bertumpuk dengan RandomForest, pembobotan dan penyetelan tidak jelas lebih baik. Keterbatasan: pada cek grup, Logistic Regression lebih tinggi dengan rentang bertumpuk, dan CV acak bisa menguntungkan model yang menghafal pola | 2026-11-05 |
 | 32 | Threshold disediakan sebagai pilihan rasio biaya 1:2, 1:5, dan 1:10, dengan default 1:5. Threshold tiap rasio adalah median threshold berbiaya terendah dari 10 ulangan prediksi out-of-fold data latih. Threshold tidak diubah setelah melihat data uji | Keputusan pengguna, supaya perusahaan atau pembaca repo bisa memilih rasio sesuai biaya mereka tanpa melatih ulang model. Biaya adalah asumsi, bukan data. Keterbatasan: rumus biaya tidak menghitung biaya promo untuk pelanggan yang berisiko churn dan mengabaikan keberhasilan menahan pelanggan, skor belum terkalibrasi, threshold tidak stabil antarulangan, dan threshold berasal dari model yang dilatih pada 80% data latih | 2026-11-05 |
+| 33 | Analisis risiko × nilai memakai matriks 4 segmen sebagai hasil utama, dengan urutan skor × nilai sebagai pembanding. Risiko adalah skor out-of-fold data latih dengan threshold default 1:5, dan pelanggan disebut berisiko tinggi jika skornya mencapai threshold di lebih dari separuh dari 10 ulangan. Nilai adalah `Customer_Value` dengan batas median data latih. Data uji tidak dipakai. `Customer_Value` disebut **nilai terhitung**, bukan uang. Pemusatan segmen pada kelompok audit dirinci di notebook sebagai cek internal, dan README cukup memuat satu kalimat umum | Keputusan pengguna. UCI hanya menyebut *"the calculated value of customer"*, tanpa rumus dan satuan, dan dataset tidak punya kolom pendapatan. Caranya mirip Damuri dkk. (2026), dan kemiripan ini ditulis terbuka. Keterbatasan: arti pasti `Customer_Value` tidak diketahui dan nilainya sangat bisa dijelaskan oleh penggunaan telepon dan SMS (temuan 8), nilai berasal dari 9 bulan pertama, `Customer_Value` juga fitur model, segmen prioritas kecil dan terpusat pada beberapa kelompok audit, dan tindakan per segmen adalah hipotesis | 2026-11-06 |
 
 ---
 
@@ -151,7 +153,7 @@ Accuracy tidak dipakai sebagai metrik utama. Lihat keputusan 22 dan 23 di bagian
 | 0 Housekeeping | **Selesai.** `requirements.txt`, Git, GitHub privat, dan struktur folder sudah ada. Environment `ds_env` terverifikasi (dry-run 0 paket baru, `pip check` bersih) |
 | 1 EDA dan data preparation | **Selesai.** Audit duplikat dan struktur data disimpan, dan `program/EDA_Project_Churn_v2.ipynb` sudah diperbaiki. `python -X utf8 src/clean_data.py` menghasilkan `dataset_clean/customer_churn_clean.csv` (2.850 baris, 14 kolom). Dua kali jalan menghasilkan hash yang sama |
 | 2 Modeling | **Selesai.** Perbandingan ada di `program/Modeling_Project_Churn.ipynb`, penyetelan di `program/Tuning_XGBoost.ipynb`, dan data uji di `program/Evaluasi_Data_Uji.ipynb`. Model terpilih: XGBoost default, tanpa pembobotan, 12 fitur (keputusan 31). Data uji sudah dipakai, jadi model tidak diubah berdasarkan hasilnya |
-| 3 Evaluasi dan refactor | **Berjalan.** Threshold skenario biaya selesai di `program/Threshold_Biaya.ipynb` dan tersimpan di `docs/threshold_skenario.csv` (keputusan 32). Sisanya belum dimulai |
+| 3 Evaluasi dan refactor | **Berjalan.** Threshold skenario biaya selesai di `program/Threshold_Biaya.ipynb` dan tersimpan di `docs/threshold_skenario.csv` (keputusan 32). Analisis risiko × nilai selesai di `program/Risiko_Nilai.ipynb` (keputusan 33). Sisanya belum dimulai |
 | 4 Experiment tracking | Belum dimulai |
 | 5 Deployment | Belum dimulai |
 | 6 Monitoring | Belum dimulai |
@@ -201,7 +203,7 @@ Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 
 ### Fase 3: Evaluasi, interpretasi, dan refactor
 - [x] Pilih threshold berdasarkan skenario biaya (tandai asumsi)
-- [ ] Analisis risiko × nilai: peluang churn dari prediksi di luar data latih × `Customer_Value`
+- [x] Analisis risiko × nilai: peluang churn dari prediksi di luar data latih × `Customer_Value`
 - [ ] Interpretasi model dengan bahasa asosiatif, bukan kausal
 - [ ] Analisis error
 - [ ] Pindahkan logika ke `src/`, tambah test sederhana
@@ -323,6 +325,7 @@ project_iranian_churn/
 | 2026-11-05 | Data uji dinilai sekali di `program/Evaluasi_Data_Uji.ipynb` (temuan 18), dan Fase 2 memenuhi DoD. Skor yang lebih tinggi dari CV acak masih dibaca dengan curiga | Diputuskan |
 | 2026-11-05 | Baris co-author dihapus dari 30 commit, lalu semua branch dan tag `arsip-v1` diperbarui dengan force push. Isi file tidak berubah. Commit lama masih bisa tersimpan sementara di cache GitHub | Diputuskan |
 | 2026-11-05 | Threshold disediakan sebagai pilihan rasio 1:2, 1:5, dan 1:10, dengan default 1:5 (keputusan 32). Tampilan pilihan di demo dibuat di Fase 5 | Diputuskan |
+| 2026-11-06 | Analisis risiko × nilai memakai matriks 4 segmen dan `Customer_Value` sebagai nilai terhitung, bukan uang (keputusan 33). UCI dan keempat jurnal tidak menjelaskan rumus kolom ini | Diputuskan |
 | | Ukuran notebook EDA v2 (sekitar 6 MB): output tetap disimpan, dan resolusi gambar dikurangi sekali saat notebook final | **Terbuka** |
 | | Fitur putaran berikutnya dan fitur final | **Terbuka** |
 | | Hal yang belum dijelaskan UCI: definisi operasional churn, cara `Status` ditentukan, rumus `Customer Value`, arti `Age`, dan detail hitungan `Call  Failure`, `Frequency of use`, `Frequency of SMS`, serta `Distinct Called Numbers` (bagian 2) | **Terbuka** |
