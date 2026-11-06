@@ -2,7 +2,7 @@
 
 > File ini adalah **sumber kebenaran** project. Isi hanya fakta yang sudah pasti. Bagian yang belum diketahui dibiarkan kosong.
 > Berikan ke AI di awal setiap sesi ("baca PROJECT_GUIDE.md dulu"). Perbarui **Status** dan **Log Keputusan** setiap selesai satu langkah.
-> Terakhir diperbarui: 2026-11-06 (pelatihan ulang satu perintah, Fase 3 selesai)
+> Terakhir diperbarui: 2026-11-06 (experiment tracking MLflow, Fase 4 selesai)
 
 ---
 
@@ -136,6 +136,7 @@
 | 34 | Interpretasi model memakai *permutation importance* (turunnya PR-AUC) dan SHAP bawaan XGBoost (`pred_contribs`), dihitung pada fold validasi data latih. Data uji tidak dipakai. Kepentingan dilaporkan per fitur dan per kelompok pemakaian (`Seconds_of_Use`, `Frequency_of_use`, `Frequency_of_SMS`, `Distinct_Called_Numbers`, `Customer_Value`). Arah hubungan ditampilkan untuk 4 fitur teratas. CV grup per `audit_group` menjadi cek internal. Penjelasan per pelanggan, kalibrasi, dan interpretasi model 10 fitur belum dikerjakan | Keputusan pengguna. `shap` 0.49.1 sempat dipasang, tetapi gagal membaca model XGBoost 3.2.0 (`base_score` berformat baru), jadi tidak masuk requirements dan SHAP dihitung dengan fungsi bawaan XGBoost. Keterbatasan: kepentingan fitur bukan sebab-akibat, fitur yang saling berkorelasi berbagi kepentingan, cara `Status` ditentukan tidak dijelaskan UCI (keputusan 29), dan CV acak bisa menonjolkan pola berulang | 2026-11-06 |
 | 35 | Analisis error memakai prediksi out-of-fold data latih dengan threshold 1:5 dan suara mayoritas, seperti keputusan 33. Data uji tidak dipakai. Isinya: ringkasan churn terlewat (FN) dan salah hubungi (FP), sebaran skor kesalahan, profil kesalahan, kaitan dengan baris janggal Fase 1 (keputusan 5–9), cek internal kelompok audit, dan 3 contoh churn terlewat yang dijelaskan dengan SHAP bawaan XGBoost. Model dan threshold tidak diubah, dan temuan dicatat sebagai keterbatasan serta bahan pemantauan Fase 6 | Keputusan pengguna. Keterbatasan: hanya data latih dengan CV acak, penanda baris janggal mengikuti definisi Fase 1, baris dengan fitur identik tetapi label berbeda adalah kesalahan yang tidak bisa dihindari, dan penjelasan SHAP menggambarkan cara model bekerja, bukan sebab churn | 2026-11-06 |
 | 36 | Logika yang dipakai ulang dipindah ke `src/`: `config.py` (satu sumber `SEED`, path, dan fitur), `data.py`, `model.py`, `threshold.py`, lalu `train.py` untuk pelatihan ulang dengan satu perintah. Model final dilatih pada 2.280 baris latih, sama dengan model yang dinilai. Notebook di `program/` tidak diubah, dan test di `tests/` membuktikan `src/` menghasilkan angka yang sama. File model disimpan di `models/` dan tidak dilacak Git. `pytest` 9.2.0 dan `ruff` 0.17.4 dicatat di `requirements-dev.txt` | Keputusan pengguna (pilihan A). Semua angka yang sudah dilaporkan (data uji dan threshold) tetap berlaku untuk model ini. Keterbatasan: model tidak memakai 570 baris uji untuk belajar, dan cara penyimpanan model untuk demo diputuskan lagi di Fase 4 atau 5 | 2026-11-06 |
+| 37 | Experiment tracking memakai MLflow 3.18.0 lokal: `mlflow.db` (SQLite) dan `mlartifacts/`, keduanya tidak dilacak Git, dengan experiment `iranian-churn`. Dicatat 4 run inti: XGBoost 12 fitur (final), XGBoost 10 fitur (tanpa `Status` dan `Complains`), Logistic Regression 12 fitur, dan `DummyClassifier`. Tiap run memuat parameter, PR-AUC dan ROC-AUC CV acak (rata-rata, minimum, maksimum per ulangan, dihitung per fold), metrik CV grup berawalan `cek_grup_`, serta tag hash data, commit, keputusan, dan keterbatasan. Data uji tidak dipakai, dan run final hanya memberi tag rujukan ke temuan 18. Pipeline final didaftarkan sebagai `iranian-churn-xgboost` dengan alias `champion`. Semua dijalankan dengan `python -X utf8 -m src.track`. `mlflow` masuk `requirements-dev.txt` | Keputusan pengguna. Empat run cukup untuk perbandingan bermakna di UI tanpa memindah semua kandidat Fase 2 ke `src/`. Demo Fase 5 tidak bisa membaca registry lokal, jadi `requirements.txt` tetap ringan. Keterbatasan: tracking hanya lokal, setiap kali perintah dijalankan run dan versi model bertambah, dan skor CV acak bukan performa pada pelanggan baru | 2026-11-06 |
 
 ---
 
@@ -159,7 +160,7 @@ Accuracy tidak dipakai sebagai metrik utama. Lihat keputusan 22 dan 23 di bagian
 | 1 EDA dan data preparation | **Selesai.** Audit duplikat dan struktur data disimpan, dan `program/EDA_Project_Churn_v2.ipynb` sudah diperbaiki. `python -X utf8 src/clean_data.py` menghasilkan `dataset_clean/customer_churn_clean.csv` (2.850 baris, 14 kolom). Dua kali jalan menghasilkan hash yang sama |
 | 2 Modeling | **Selesai.** Perbandingan ada di `program/Modeling_Project_Churn.ipynb`, penyetelan di `program/Tuning_XGBoost.ipynb`, dan data uji di `program/Evaluasi_Data_Uji.ipynb`. Model terpilih: XGBoost default, tanpa pembobotan, 12 fitur (keputusan 31). Data uji sudah dipakai, jadi model tidak diubah berdasarkan hasilnya |
 | 3 Evaluasi dan refactor | **Selesai.** Threshold skenario biaya (`program/Threshold_Biaya.ipynb`, `docs/threshold_skenario.csv`, keputusan 32), risiko × nilai (`program/Risiko_Nilai.ipynb`, keputusan 33), interpretasi model (`program/Interpretasi_Model.ipynb`, keputusan 34), dan analisis error (`program/Analisis_Error.ipynb`, keputusan 35). Logika dipindah ke `src/` dengan 19 test, dan `python -X utf8 -m src.train` melatih ulang Pipeline final pada 2.280 baris latih serta menyimpannya ke `models/` (keputusan 36). Dua kali jalan menghasilkan hash model yang sama |
-| 4 Experiment tracking | Belum dimulai |
+| 4 Experiment tracking | **Selesai.** `python -X utf8 -m src.track` mencatat 4 run ke MLflow lokal (`mlflow.db`, experiment `iranian-churn`) dan mendaftarkan Pipeline final sebagai `iranian-churn-xgboost@champion` (keputusan 37). Metrik di MLflow sama dengan temuan 13–15, model dari registry memberi skor sama dengan `models/churn_pipeline.joblib`, dan UI (`mlflow ui --backend-store-uri sqlite:///mlflow.db`) menampilkan keempat run. Ada 26 test |
 | 5 Deployment | Belum dimulai |
 | 6 Monitoring | Belum dimulai |
 | 7 Dokumentasi portofolio | Belum dimulai |
@@ -217,9 +218,9 @@ Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 **DoD:** pelatihan ulang dapat dijalankan dengan satu perintah.
 
 ### Fase 4: Experiment tracking
-- [ ] Satu tracking URI dan satu nama experiment
-- [ ] Catat params, metrik (dengan ketidakpastian), artefak, tag versi data
-- [ ] Daftarkan model terbaik di registry
+- [x] Satu tracking URI dan satu nama experiment
+- [x] Catat params, metrik (dengan ketidakpastian), artefak, tag versi data
+- [x] Daftarkan model terbaik di registry
 
 **DoD:** run dapat dibandingkan di UI tracking dan model terbaik dapat dimuat.
 
@@ -260,7 +261,7 @@ Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 | 1 EDA | pandas, numpy, scipy, statsmodels, scikit-learn, matplotlib, seaborn, ipykernel (sesuai import `EDA_Project_Churn_v2.ipynb`) |
 | 2 Modeling | `imbalanced-learn` (jika resampling dipakai), opsional `xgboost` / `lightgbm` / `catboost` |
 | 3 Evaluasi dan refactor | `joblib` (runtime). Dev di `requirements-dev.txt`: `pytest`, `ruff`, `nbconvert`, `jupyter_core`. `shap` tidak dipakai (keputusan 34) |
-| 4 Tracking | `mlflow` |
+| 4 Tracking | `mlflow==3.18.0` di `requirements-dev.txt` (keputusan 37) |
 | 5 Deployment | `fastapi`, `uvicorn`, `pydantic`, `streamlit` atau `gradio`. `requirements.txt` (runtime) dan `requirements-dev.txt` sudah dipisah sejak Fase 3, karena layanan deploy membaca `requirements.txt` di root |
 | 6 Monitoring | opsional `evidently` |
 
@@ -348,6 +349,8 @@ project_iranian_churn/
 | | Bahan tabel pembeda README Fase 7, dari pencarian kata kunci dan bagian prapemrosesan keempat jurnal. Kelima penanda baris janggal (keputusan 5–9) tidak dibahas secara eksplisit oleh jurnal mana pun. Damuri dkk. mempertahankan 314 baris berfitur identik, yang pada data mentah terdiri atas 300 duplikat persis dan 14 baris konflik label. Wang dkk. menghapus 300 duplikat dan mengklaim tidak ada outlier Tukey, padahal dengan rumus yang sama data bersih kita punya 44–333 baris di luar batas per kolom numerik. Information mengganti outlier dengan rata-rata data latih dan menganggap `Charge Amount` 0–10. PLOS ONE tidak membahas pembersihan data. Angka-angka ini dihitung ulang dengan kode sebelum masuk README | **Terbuka** |
 | 2026-11-06 | Logika yang dipakai ulang dipindah ke `src/` (`config`, `data`, `model`, `threshold`) dengan test di `tests/`. Model final dilatih pada 2.280 baris latih. `pytest` dan `ruff` dipasang (keputusan 36) | Diputuskan |
 | 2026-11-06 | `src/train.py` melatih ulang Pipeline final dengan satu perintah, memeriksa threshold terhadap `docs/threshold_skenario.csv` tanpa menimpanya, lalu menyimpan model dan metadata ke `models/` (tidak dilacak Git). `joblib==1.5.3` masuk `requirements.txt`. Fase 3 memenuhi DoD | Diputuskan |
+| 2026-11-06 | Fase 3 di-merge ke `main` lewat PR #2. Fase 4 memakai MLflow lokal dengan 4 run inti dan registry (keputusan 37) | Diputuskan |
+| 2026-11-06 | `src/evaluate.py` dan `src/track.py` dibuat. MLflow 3.18 menyimpan model dengan `skops` dan menolak tipe XGBoost, jadi hanya `xgboost.core.Booster` dan `xgboost.sklearn.XGBClassifier` yang ditandai tepercaya (`skops_trusted_types`), bukan beralih ke `cloudpickle`. Fase 4 memenuhi DoD | Diputuskan |
 
 ---
 

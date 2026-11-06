@@ -13,8 +13,9 @@ GROUPS_PATH = ROOT / "dataset_clean" / "validation_groups.csv"
 THRESHOLD_PATH = ROOT / "docs" / "threshold_skenario.csv"
 MODEL_DIR = ROOT / "models"
 
-# Satu seed global. Skor out-of-fold memakai SEED + 1, sama dengan notebook Fase 3
+# Satu seed global. CV pemilihan model memakai SEED (Fase 2), dan skor out-of-fold memakai SEED + 1 (Fase 3)
 SEED = 180915
+MODEL_SELECTION_SEED = SEED
 OOF_SEED = SEED + 1
 
 # Pembagian data uji (keputusan 24)
@@ -38,6 +39,15 @@ FEATURES = [
     "Customer_Value",
 ]
 EXCLUDED_COLUMNS = ("Age_Binning", "audit_group")
+# Pembanding 10 fitur tanpa Status dan Complains (keputusan 15 dan 29)
+REDUCED_FEATURES = [col for col in FEATURES if col not in ("Status", "Complains")]
+
+# Experiment tracking lokal (keputusan 37). Keduanya tidak dilacak Git
+MLFLOW_DB_PATH = ROOT / "mlflow.db"
+MLFLOW_ARTIFACT_DIR = ROOT / "mlartifacts"
+EXPERIMENT_NAME = "iranian-churn"
+REGISTERED_MODEL_NAME = "iranian-churn-xgboost"
+MODEL_ALIAS = "champion"
 
 # CV acak berulang untuk skor out-of-fold (keputusan 22 dan 32)
 N_SPLITS = 5
