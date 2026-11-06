@@ -1,6 +1,13 @@
-# Library pengembangan: test, lint, dan menjalankan notebook dari terminal.
+# Pengembangan: notebook, test, lint, dan experiment tracking.
 # Pasang dengan: pip install -r requirements-dev.txt
 -r requirements.txt
+
+# Notebook di program/ (EDA, modeling, dan Fase 3)
+scipy==1.15.3
+statsmodels==0.14.6
+matplotlib==3.10.9
+seaborn==0.13.2
+ipykernel==7.2.0
 
 # Test dan lint (keputusan 36)
 pytest==9.2.0

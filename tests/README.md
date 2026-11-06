@@ -9,5 +9,9 @@ Test sederhana (pytest) untuk kode di `src/`. Jalankan dari root project dengan 
 | `test_threshold.py` | Fungsi biaya dan threshold pada contoh kecil. Skor out-of-fold, threshold, dan suara mayoritas sama dengan notebook Fase 3 dan `docs/threshold_skenario.csv` |
 | `test_model.py` | Pipeline final sama dengan XGBoost biasa, membuang kolom berlebih, tidak terpengaruh urutan kolom, dan menolak data yang kehilangan fitur |
 | `test_train.py` | Pelatihan ulang menulis model dan metadata, metadata sesuai keputusan yang dikunci, model yang dimuat ulang sama dengan model baru, dan proses berhenti jika threshold berbeda dari file yang dikunci |
+| `test_track.py` | Experiment tracking ke folder sementara: 4 run selesai, metrik sama dengan Fase 2 (temuan 13–15), data uji tidak dipakai, dan model `@champion` bisa dimuat dengan skor sama |
+| `test_schema.py` | Skema input menerima data valid, menolak nilai di luar rentang, kode tidak valid, kolom hilang, dan kolom berlebih, serta batasnya sama dengan data latih |
+| `test_predict.py` | Skor demo sama dengan Pipeline, threshold dan keputusan sesuai CSV, segmen sesuai median nilai, dan penjelasan SHAP konsisten dengan skor |
+| `test_app.py` | Uji asap aplikasi Streamlit: berjalan tanpa error, kotak keterbatasan terlihat, rasio default 1:5, dan formulir menampilkan hasil |
 
 Data uji hanya dipakai untuk memeriksa jumlah baris dan memastikan tidak tumpang tindih dengan data latih. Skornya tidak dihitung.

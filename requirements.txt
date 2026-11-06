@@ -1,16 +1,13 @@
-# Tahap: Evaluasi dan refactor (Fase 3). Python 3.10 (diuji dengan 3.10.20, environment conda "ds_env").
-# Isi: library yang di-import program/EDA_Project_Churn_v2.ipynb, notebook Fase 2
-# (Modeling_Project_Churn, Tuning_XGBoost, Evaluasi_Data_Uji), dan notebook Fase 3
-# (Threshold_Biaya, Risiko_Nilai), semuanya di program/.
+# Runtime: library yang dibutuhkan demo (streamlit_app.py) dan src/ (keputusan 38).
+# Dibaca Streamlit Community Cloud. Diuji dengan Python 3.12 (env conda ds_env312) dan 3.10 (ds_env).
+# Library notebook dan alat pengembangan ada di requirements-dev.txt.
 #
-# Aturan: library baru ditambahkan di commit yang SAMA dengan notebook/kode yang
-# memakainya, versi dipatok (==). Peta fase ke library ada di PROJECT_GUIDE.md bagian 9.
+# Aturan: library baru ditambahkan di commit yang SAMA dengan kode yang memakainya,
+# versi dipatok (==). Peta fase ke library ada di PROJECT_GUIDE.md bagian 9.
 
 # Data dan numerik
 pandas==2.3.3
 numpy==2.2.6
-scipy==1.15.3
-statsmodels==0.14.6
 
 # Modeling
 scikit-learn==1.7.2
@@ -18,9 +15,6 @@ xgboost==3.2.0
 # Menyimpan dan memuat Pipeline (src/train.py)
 joblib==1.5.3
 
-# Visualisasi
-matplotlib==3.10.9
-seaborn==0.13.2
-
-# Menjalankan notebook
-ipykernel==7.2.0
+# Demo dan validasi input
+streamlit==1.65.0
+pydantic==2.13.3

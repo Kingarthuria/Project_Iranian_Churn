@@ -12,6 +12,32 @@ Logika yang dipakai ulang dan dipindah dari notebook di `program/` (keputusan 36
 | `train.py` | Pelatihan ulang model final dengan satu perintah |
 | `evaluate.py` | Penilaian dengan CV acak dan cek CV grup, sama dengan notebook Fase 2 |
 | `track.py` | Experiment tracking dan registry dengan MLflow lokal |
+| `schema.py` | Skema input dan output demo, divalidasi dengan pydantic |
+| `predict.py` | Skor, keputusan hubungi, segmen, dan penjelasan satu pelanggan untuk demo |
+
+## Lingkungan
+
+Project memakai env conda **`ds_env312`** (Python 3.12, keputusan 38 dan 39), karena Python 3.10 sudah tidak menerima pembaruan keamanan dan tidak didukung Streamlit Community Cloud. Buat env ini dari root project:
+
+```
+conda create -n ds_env312 python=3.12
+conda activate ds_env312
+pip install -r requirements-dev.txt
+```
+
+`requirements.txt` hanya berisi library demo, dan `requirements-dev.txt` menambah library notebook, test, lint, dan MLflow. Notebook lama di `program/` dibuat dengan Python 3.10 (`ds_env`), dan test menunjukkan hasil model sama di kedua versi.
+
+## Menjalankan demo
+
+Jalankan dari root project:
+
+```
+streamlit run streamlit_app.py --server.address 127.0.0.1
+```
+
+Opsi `--server.address 127.0.0.1` membuat demo hanya bisa dibuka dari komputer sendiri di `http://127.0.0.1:8501`. Tanpa opsi ini, Streamlit menerima koneksi dari semua jaringan, dan Windows Firewall akan meminta izin. Pilih **Cancel** jika peringatan itu muncul, karena demo lokal tidak membutuhkan akses jaringan. Opsi ini tidak dipakai di Streamlit Community Cloud, yang mengatur alamatnya sendiri. Matikan demo dengan `Ctrl + C`.
+
+Saat pertama dinyalakan, aplikasi melatih model dari dataset dalam beberapa detik. Pengguna bisa memilih rasio biaya, mengisi 12 fitur pelanggan, lalu melihat skor risiko, keputusan hubungi, segmen risiko × nilai, dan 5 fitur yang paling mendorong skor. Input divalidasi dengan `src/schema.py` dan tidak disimpan.
 
 ## Melatih ulang model
 
@@ -60,5 +86,5 @@ Pasang library pengembangan dulu dengan `pip install -r requirements-dev.txt`, l
 
 ```
 python -X utf8 -m pytest
-python -m ruff check src tests
+python -m ruff check src tests streamlit_app.py
 ```
