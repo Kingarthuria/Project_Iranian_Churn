@@ -2,7 +2,7 @@
 
 > File ini adalah **sumber kebenaran** project. Isi hanya fakta yang sudah pasti. Bagian yang belum diketahui dibiarkan kosong.
 > Berikan ke AI di awal setiap sesi ("baca PROJECT_GUIDE.md dulu"). Perbarui **Status** dan **Log Keputusan** setiap selesai satu langkah.
-> Terakhir diperbarui: 2026-11-06 (demo Streamlit dan lingkungan Python 3.12, Fase 5 berjalan)
+> Terakhir diperbarui: 2026-11-06 (CI GitHub Actions hijau, Fase 5 berjalan)
 
 ---
 
@@ -164,7 +164,7 @@ Accuracy tidak dipakai sebagai metrik utama. Lihat keputusan 22 dan 23 di bagian
 | 2 Modeling | **Selesai.** Perbandingan ada di `program/Modeling_Project_Churn.ipynb`, penyetelan di `program/Tuning_XGBoost.ipynb`, dan data uji di `program/Evaluasi_Data_Uji.ipynb`. Model terpilih: XGBoost default, tanpa pembobotan, 12 fitur (keputusan 31). Data uji sudah dipakai, jadi model tidak diubah berdasarkan hasilnya |
 | 3 Evaluasi dan refactor | **Selesai.** Threshold skenario biaya (`program/Threshold_Biaya.ipynb`, `docs/threshold_skenario.csv`, keputusan 32), risiko × nilai (`program/Risiko_Nilai.ipynb`, keputusan 33), interpretasi model (`program/Interpretasi_Model.ipynb`, keputusan 34), dan analisis error (`program/Analisis_Error.ipynb`, keputusan 35). Logika dipindah ke `src/` dengan 19 test, dan `python -X utf8 -m src.train` melatih ulang Pipeline final pada 2.280 baris latih serta menyimpannya ke `models/` (keputusan 36). Dua kali jalan menghasilkan hash model yang sama |
 | 4 Experiment tracking | **Selesai.** `python -X utf8 -m src.track` mencatat 4 run ke MLflow lokal (`mlflow.db`, experiment `iranian-churn`) dan mendaftarkan Pipeline final sebagai `iranian-churn-xgboost@champion` (keputusan 37). Metrik di MLflow sama dengan temuan 13–15, model dari registry memberi skor sama dengan `models/churn_pipeline.joblib`, dan UI (`mlflow ui --backend-store-uri sqlite:///mlflow.db`) menampilkan keempat run. Ada 26 test |
-| 5 Deployment | **Berjalan.** `streamlit_app.py` dengan skema input `src/schema.py` dan prediksi `src/predict.py` sudah berjalan lokal. Env conda `ds_env312` (Python 3.12.16) dibuat dari `requirements-dev.txt`, dan 46 test lulus di `ds_env312` maupun `ds_env` dengan skor model identik (keputusan 39). CI dan deploy belum (keputusan 38) |
+| 5 Deployment | **Berjalan.** `streamlit_app.py` dengan skema input `src/schema.py` dan prediksi `src/predict.py` sudah berjalan lokal. Env conda `ds_env312` (Python 3.12.16) dibuat dari `requirements-dev.txt`, dan 46 test lulus di `ds_env312` maupun `ds_env` dengan skor model identik (keputusan 39). CI GitHub Actions hijau di Linux dengan Python 3.12 (keputusan 40). Perbaikan tampilan demo dan deploy belum (keputusan 38) |
 | 6 Monitoring | Belum dimulai |
 | 7 Dokumentasi portofolio | Belum dimulai |
 
@@ -230,7 +230,7 @@ Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 ### Fase 5: Deployment (tanpa Docker untuk saat ini)
 - [x] API atau aplikasi demo dengan skema input/output yang divalidasi
 - [x] Lingkungan dikunci dengan `venv` dan `requirements.txt` (env conda `ds_env312` dari `requirements-dev.txt`, keputusan 39)
-- [ ] Test, lint, dan CI
+- [x] Test, lint, dan CI
 - [ ] Deploy demo ke layanan gratis (Render, Hugging Face Spaces, atau Streamlit Cloud)
 
 **DoD:** demo publik bisa diakses lewat URL dan CI hijau.
@@ -361,6 +361,7 @@ project_iranian_churn/
 | 2026-11-06 | Env conda `ds_env312` (Python 3.12.16) dibuat dan diisi dari `requirements-dev.txt`. 46 test lulus dan skor model identik dengan `ds_env`. Folder `.venv` (dari Python 3.12 sistem) dihapus (keputusan 39) | Diputuskan |
 | 2026-11-06 | `.gitattributes` ditambahkan dengan `docs/*.csv text eol=lf`. Sebelumnya `core.autocrlf=true` mengubah `docs/threshold_skenario.csv` ke CRLF saat pindah branch, sehingga hash-nya di Windows (`1697bccd...`) berbeda dari isi repo (`38f68339...`), walaupun isinya sama. `dataset/` sengaja tidak diatur supaya data mentah tidak tersentuh | Diputuskan |
 | 2026-11-06 | Langkah 5b: CI GitHub Actions dibuat di `.github/workflows/ci.yml` (keputusan 40). Perbaikan tampilan demo dibahas setelah CI, sebelum deploy | Diputuskan |
+| 2026-11-06 | Run CI pertama (commit `20818d2`) hijau dalam sekitar 2 menit: `pip check` bersih, `ruff` lulus, dan 46 test lulus di Linux dengan Python 3.12. Angka test sama dengan hasil di Windows | Diputuskan |
 
 ---
 
