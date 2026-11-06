@@ -88,3 +88,7 @@ Pasang library pengembangan dulu dengan `pip install -r requirements-dev.txt`, l
 python -X utf8 -m pytest
 python -m ruff check src tests streamlit_app.py
 ```
+
+## CI
+
+GitHub Actions (`.github/workflows/ci.yml`) menjalankan kedua perintah di atas secara otomatis setiap ada push ke branch mana pun dan setiap pull request ke `main`, di Linux dengan Python 3.12. Hasilnya bisa dilihat di tab **Actions** repo GitHub. Tanda hijau berarti semua test dan lint lulus. Workflow hanya membaca kode dan tidak memakai rahasia atau token.
