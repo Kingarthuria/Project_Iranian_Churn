@@ -358,6 +358,7 @@ project_iranian_churn/
 | 2026-11-06 | Requirements dipisah: `requirements.txt` hanya untuk demo, dan library notebook pindah ke `requirements-dev.txt`. `.venv` Python 3.12.7 dibuat dari `requirements-dev.txt`. Ditambahkan `src/schema.py`, `src/predict.py`, `streamlit_app.py`, dan 20 test. Skor model untuk 200 baris latih identik di Python 3.10 dan 3.12 | Diputuskan |
 | 2026-11-06 | Demo lokal dijalankan hanya untuk komputer sendiri (`--server.address 127.0.0.1`). Saat uji pertama, Streamlit menerima koneksi dari semua jaringan sehingga Windows Firewall meminta izin, dan dua aturan masuk untuk Python 3.12 pada profil Public yang terbentuk dari peringatan itu sudah dihapus atas persetujuan pengguna | Diputuskan |
 | 2026-11-06 | Env conda `ds_env312` (Python 3.12.16) dibuat dan diisi dari `requirements-dev.txt`. 46 test lulus dan skor model identik dengan `ds_env`. Folder `.venv` (dari Python 3.12 sistem) dihapus (keputusan 39) | Diputuskan |
+| 2026-11-06 | `.gitattributes` ditambahkan dengan `docs/*.csv text eol=lf`. Sebelumnya `core.autocrlf=true` mengubah `docs/threshold_skenario.csv` ke CRLF saat pindah branch, sehingga hash-nya di Windows (`1697bccd...`) berbeda dari isi repo (`38f68339...`), walaupun isinya sama. `dataset/` sengaja tidak diatur supaya data mentah tidak tersentuh | Diputuskan |
 
 ---
 
