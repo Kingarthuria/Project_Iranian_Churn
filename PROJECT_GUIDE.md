@@ -2,7 +2,7 @@
 
 > File ini adalah **sumber kebenaran** project. Isi hanya fakta yang sudah pasti. Bagian yang belum diketahui dibiarkan kosong.
 > Berikan ke AI di awal setiap sesi ("baca PROJECT_GUIDE.md dulu"). Perbarui **Status** dan **Log Keputusan** setiap selesai satu langkah.
-> Terakhir diperbarui: 2026-11-06 (analisis error selesai, Fase 3 berjalan)
+> Terakhir diperbarui: 2026-11-06 (pelatihan ulang satu perintah, Fase 3 selesai)
 
 ---
 
@@ -158,7 +158,7 @@ Accuracy tidak dipakai sebagai metrik utama. Lihat keputusan 22 dan 23 di bagian
 | 0 Housekeeping | **Selesai.** `requirements.txt`, Git, GitHub privat, dan struktur folder sudah ada. Environment `ds_env` terverifikasi (dry-run 0 paket baru, `pip check` bersih) |
 | 1 EDA dan data preparation | **Selesai.** Audit duplikat dan struktur data disimpan, dan `program/EDA_Project_Churn_v2.ipynb` sudah diperbaiki. `python -X utf8 src/clean_data.py` menghasilkan `dataset_clean/customer_churn_clean.csv` (2.850 baris, 14 kolom). Dua kali jalan menghasilkan hash yang sama |
 | 2 Modeling | **Selesai.** Perbandingan ada di `program/Modeling_Project_Churn.ipynb`, penyetelan di `program/Tuning_XGBoost.ipynb`, dan data uji di `program/Evaluasi_Data_Uji.ipynb`. Model terpilih: XGBoost default, tanpa pembobotan, 12 fitur (keputusan 31). Data uji sudah dipakai, jadi model tidak diubah berdasarkan hasilnya |
-| 3 Evaluasi dan refactor | **Berjalan.** Threshold skenario biaya selesai di `program/Threshold_Biaya.ipynb` dan tersimpan di `docs/threshold_skenario.csv` (keputusan 32). Analisis risiko × nilai selesai di `program/Risiko_Nilai.ipynb` (keputusan 33). Interpretasi model selesai di `program/Interpretasi_Model.ipynb` (keputusan 34). Analisis error selesai di `program/Analisis_Error.ipynb` (keputusan 35). Sisanya (pemindahan ke `src/`, test, dan Pipeline) belum dimulai |
+| 3 Evaluasi dan refactor | **Selesai.** Threshold skenario biaya (`program/Threshold_Biaya.ipynb`, `docs/threshold_skenario.csv`, keputusan 32), risiko × nilai (`program/Risiko_Nilai.ipynb`, keputusan 33), interpretasi model (`program/Interpretasi_Model.ipynb`, keputusan 34), dan analisis error (`program/Analisis_Error.ipynb`, keputusan 35). Logika dipindah ke `src/` dengan 19 test, dan `python -X utf8 -m src.train` melatih ulang Pipeline final pada 2.280 baris latih serta menyimpannya ke `models/` (keputusan 36). Dua kali jalan menghasilkan hash model yang sama |
 | 4 Experiment tracking | Belum dimulai |
 | 5 Deployment | Belum dimulai |
 | 6 Monitoring | Belum dimulai |
@@ -211,8 +211,8 @@ Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 - [x] Analisis risiko × nilai: skor churn dari prediksi di luar data latih × `Customer_Value` (nilai terhitung)
 - [x] Interpretasi model dengan bahasa asosiatif, bukan kausal
 - [x] Analisis error
-- [ ] Pindahkan logika ke `src/`, tambah test sederhana
-- [ ] Simpan model final sebagai satu Pipeline
+- [x] Pindahkan logika ke `src/`, tambah test sederhana
+- [x] Simpan model final sebagai satu Pipeline
 
 **DoD:** pelatihan ulang dapat dijalankan dengan satu perintah.
 
@@ -259,9 +259,9 @@ Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 |---|---|
 | 1 EDA | pandas, numpy, scipy, statsmodels, scikit-learn, matplotlib, seaborn, ipykernel (sesuai import `EDA_Project_Churn_v2.ipynb`) |
 | 2 Modeling | `imbalanced-learn` (jika resampling dipakai), opsional `xgboost` / `lightgbm` / `catboost` |
-| 3 Evaluasi dan refactor | `shap`; dev: `pytest`, `ruff` |
+| 3 Evaluasi dan refactor | `joblib` (runtime). Dev di `requirements-dev.txt`: `pytest`, `ruff`, `nbconvert`, `jupyter_core`. `shap` tidak dipakai (keputusan 34) |
 | 4 Tracking | `mlflow` |
-| 5 Deployment | `fastapi`, `uvicorn`, `pydantic`, `streamlit` atau `gradio`. Pecah ke `requirements.txt` (runtime) dan `requirements-dev.txt` karena layanan deploy membaca `requirements.txt` di root |
+| 5 Deployment | `fastapi`, `uvicorn`, `pydantic`, `streamlit` atau `gradio`. `requirements.txt` (runtime) dan `requirements-dev.txt` sudah dipisah sejak Fase 3, karena layanan deploy membaca `requirements.txt` di root |
 | 6 Monitoring | opsional `evidently` |
 
 **Git:** commit kecil per langkah, pesan Bahasa Indonesia dengan awalan fase (`fase1: ...`).
@@ -275,16 +275,19 @@ project_iranian_churn/
 ├── PROJECT_GUIDE.md
 ├── CLAUDE.md
 ├── README.md
-├── requirements.txt
+├── requirements.txt      # library runtime
+├── requirements-dev.txt  # library pengembangan (test, lint, notebook)
+├── pyproject.toml        # pengaturan pytest dan ruff
 ├── .gitignore
 ├── dataset/          # data mentah, read-only (dilacak, CC BY 4.0)
 ├── dataset_clean/    # data bersih, dibuat ulang dari script (tidak dilacak Git)
+├── models/           # Pipeline terlatih dan metadata, dibuat ulang dengan src.train (tidak dilacak Git)
 ├── jurnal/           # referensi, diabaikan Git
-├── program/          # notebook eksplorasi
+├── program/          # notebook eksplorasi (peta di program/README.md)
 ├── ringkasan_temuan/ # ringkasan temuan bernomor (.md)
 ├── src/              # logika yang dipakai ulang
-├── tests/
-└── docs/             # decision log, laporan
+├── tests/            # test pytest untuk src/
+└── docs/             # decision log, laporan, threshold_skenario.csv
 ```
 
 ---
@@ -344,6 +347,7 @@ project_iranian_churn/
 | 2026-11-06 | Analisis error memakai data latih, threshold 1:5, dan suara mayoritas, tanpa mengubah model (keputusan 35) | Diputuskan |
 | | Bahan tabel pembeda README Fase 7, dari pencarian kata kunci dan bagian prapemrosesan keempat jurnal. Kelima penanda baris janggal (keputusan 5–9) tidak dibahas secara eksplisit oleh jurnal mana pun. Damuri dkk. mempertahankan 314 baris berfitur identik, yang pada data mentah terdiri atas 300 duplikat persis dan 14 baris konflik label. Wang dkk. menghapus 300 duplikat dan mengklaim tidak ada outlier Tukey, padahal dengan rumus yang sama data bersih kita punya 44–333 baris di luar batas per kolom numerik. Information mengganti outlier dengan rata-rata data latih dan menganggap `Charge Amount` 0–10. PLOS ONE tidak membahas pembersihan data. Angka-angka ini dihitung ulang dengan kode sebelum masuk README | **Terbuka** |
 | 2026-11-06 | Logika yang dipakai ulang dipindah ke `src/` (`config`, `data`, `model`, `threshold`) dengan test di `tests/`. Model final dilatih pada 2.280 baris latih. `pytest` dan `ruff` dipasang (keputusan 36) | Diputuskan |
+| 2026-11-06 | `src/train.py` melatih ulang Pipeline final dengan satu perintah, memeriksa threshold terhadap `docs/threshold_skenario.csv` tanpa menimpanya, lalu menyimpan model dan metadata ke `models/` (tidak dilacak Git). `joblib==1.5.3` masuk `requirements.txt`. Fase 3 memenuhi DoD | Diputuskan |
 
 ---
 

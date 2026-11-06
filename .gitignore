@@ -19,6 +19,9 @@ jurnal/
 # Data bersih, dibuat ulang dengan src/clean_data.py
 dataset_clean/
 
+# Model terlatih, dibuat ulang dengan python -X utf8 -m src.train (keputusan 36)
+models/
+
 # Python / Jupyter
 __pycache__/
 *.pyc

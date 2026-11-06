@@ -15,6 +15,8 @@ statsmodels==0.14.6
 # Modeling
 scikit-learn==1.7.2
 xgboost==3.2.0
+# Menyimpan dan memuat Pipeline (src/train.py)
+joblib==1.5.3
 
 # Visualisasi
 matplotlib==3.10.9
