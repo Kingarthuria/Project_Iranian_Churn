@@ -2,7 +2,7 @@
 
 > File ini adalah **sumber kebenaran** project. Isi hanya fakta yang sudah pasti. Bagian yang belum diketahui dibiarkan kosong.
 > Berikan ke AI di awal setiap sesi ("baca PROJECT_GUIDE.md dulu"). Perbarui **Status** dan **Log Keputusan** setiap selesai satu langkah.
-> Terakhir diperbarui: 2026-11-05 (model dikunci dan data uji dinilai, Fase 2 selesai)
+> Terakhir diperbarui: 2026-11-06 (pelatihan ulang satu perintah, Fase 3 selesai)
 
 ---
 
@@ -87,6 +87,10 @@
 | 17 | Penyetelan 60 kombinasi tidak jelas lebih baik dari default. Pada 12 fitur dan CV acak, PR-AUC default 0,934 (0,926–0,939) dan disetel 0,935 (0,929–0,942), dengan selisih per ulangan rata-rata +0,0015. Skor saat pencarian 0,941 | `program/Tuning_XGBoost.ipynb` | 2026-11-05 |
 | 18 | Data uji, dinilai sekali (570 baris, 89 churn): XGBoost 12 fitur PR-AUC 0,958 (bootstrap 0,927–0,979) dan ROC-AUC 0,991, XGBoost 10 fitur PR-AUC 0,940 (0,900–0,972), `DummyClassifier` 0,156. Skornya lebih tinggi dari CV acak (0,934 dan 0,885), jadi dibaca dengan curiga dan bukan performa pada pelanggan baru | `program/Evaluasi_Data_Uji.ipynb` | 2026-11-05 |
 | 19 | Pemeriksaan selisih skor: dari 1.824 ke 2.166 baris latih per fold, PR-AUC 12 fitur naik dari 0,935 ke 0,941 dan 10 fitur dari 0,892 ke 0,904. Pada 10 pembagian 80:20 di dalam data latih, rentangnya 0,917–0,942 dan 0,863–0,933. Baris yang beda maksimal 1 kolom dari tetangga terdekatnya di data latih: 3,5% di data uji dan 3,3% di validasi. Penyebab pasti belum terbukti | `program/Evaluasi_Data_Uji.ipynb` | 2026-11-05 |
+| 20 | Threshold dari prediksi out-of-fold data latih: 1:2 = 0,23 (0,12–0,35), 1:5 = 0,06 (0,05–0,14), 1:10 = 0,045 (0,02–0,08). Pada data uji (89 churn), berurutan: precision 0,853, 0,744, dan 0,696, recall 0,910, 0,978, dan 0,978, dengan 95, 117, dan 125 pelanggan dihubungi. 1:5 dan 1:10 sama-sama menangkap 87 churn, tetapi 1:10 menambah 8 salah hubungi. Threshold 0,50: precision 0,918 dan recall 0,753. Rasio adalah asumsi, dan hasilnya bukan performa pada pelanggan baru | `program/Threshold_Biaya.ipynb` | 2026-11-05 |
+| 21 | Risiko × nilai pada 2.280 baris latih, dengan threshold 1:5 dan batas nilai median 232,7: korelasi Spearman skor dengan nilai −0,612, dan baris churn memegang 4,3% total nilai di data latih (temuan 10 menyebut 4,4% karena dihitung dari seluruh 2.850 baris). Prioritas I (risiko tinggi, nilai tinggi) berisi 63 pelanggan (rentang antarulangan 59–69) dengan 54 churn, dan memegang 39,7% nilai baris churn. Prioritas III (risiko tinggi, nilai rendah) berisi 401 pelanggan dengan 287 churn. Jika 228 pelanggan dihubungi, urutan skor menangkap 220,7 churn dan 60,0% nilai churn, sedangkan urutan skor × nilai menangkap 203,4 churn dan 81,3% nilai churn. Sebanyak 76% pelanggan Prioritas I berasal dari 3 kelompok audit. Nilai terhitung bukan uang, dan hubungannya asosiatif | `program/Risiko_Nilai.ipynb` | 2026-11-06 |
+| 22 | Permutation importance (turun PR-AUC) pada CV acak data latih: kelompok pemakaian 0,446 (0,427–0,463), `Complains` 0,224, `Frequency_of_use` 0,167, `Subscription_Length` 0,127, `Status` 0,099, `Call_Failure` 0,096. `Tariff_Plan` dan `Charge_Amount` mendekati 0. Urutan SHAP bawaan XGBoost: `Frequency_of_use` 1,768, `Status` 1,502, `Call_Failure` 1,106, `Complains` 0,915, dengan kesamaan urutan kedua cara 0,87. Pada cek CV grup, kelompok pemakaian, `Complains`, `Frequency_of_use`, dan `Status` tetap di lima besar, sedangkan `Subscription_Length` turun dari urutan 4 ke 8, dan kesamaan urutan CV acak dengan CV grup 0,61. Kepentingan fitur bukan sebab churn | `program/Interpretasi_Model.ipynb` | 2026-11-06 |
+| 23 | Analisis error pada 2.280 baris latih dengan threshold 1:5: TP 341, FN (churn terlewat) 16, FP (salah hubungi) 123, TN 1.800. Sebanyak 8 churn dan 56 non-churn salah di semua 10 ulangan. Skor median FN 0,012, dan 13 dari 16 FN di bawah separuh threshold. Tidak ada FN yang pernah komplain. Baris dengan konflik label salah 62,5% dan baris aktivitas nol salah 25,0% (semuanya FP), dibanding sekitar 5,5% pada baris lain, dan baris berpenanda Fase 1 menyumbang 32 dari 139 kesalahan. Lima kelompok audit menyumbang 84 dari 123 FP, dan pelanggannya 92,7–98,0% non-aktif dengan churn rate 0,0–2,4%. Model tidak diubah | `program/Analisis_Error.ipynb` | 2026-11-06 |
 
 ---
 
@@ -119,7 +123,7 @@
 | 21 | Metadata Colab pada notebook asli ikut dihapus saat membersihkan riwayat Git. Sel dan outputnya tidak berubah. Email commit memakai alamat noreply GitHub | Keputusan pengguna, sebagai pengecualian dari aturan tidak mengubah notebook lama, untuk melindungi data pribadi | 2026-11-04 |
 | 22 | Model dipilih dengan CV acak berstrata berulang (`RepeatedStratifiedKFold`). CV grup per `audit_group` hanya menjadi cek internal. Pada kedua CV, skor dihitung per fold lalu dirata-ratakan per ulangan, dan fold tanpa churn dilewati. Keputusan 1 dan 2 tetap berlaku: skor CV acak tidak boleh disebut performa pada pelanggan baru, dan README tidak memuat skor pembanding | Keputusan pengguna setelah meninjau keempat jurnal, yang semuanya membagi data per baris, dan sejalan dengan keputusan 1. Keterbatasan: audit menunjukkan skor CV acak bisa jauh lebih tinggi daripada CV grup, dan tidak ada jurnal yang membahas pola per 50 baris, jadi kesamaan cara dengan jurnal bukan bukti cara ini tepat untuk data ini. Model yang dipilih bisa cenderung menghafal pola. Skor gabungan out-of-fold ditolak, karena ROC-AUC `DummyClassifier` pada CV grup menjadi 0,301 | 2026-11-05 |
 | 23 | Metrik utama PR-AUC, dengan baseline churn rate 0,157. ROC-AUC menjadi pendukung. Precision, recall, dan F1 dilaporkan setelah threshold dipilih di Fase 3 | Keputusan pengguna. Churn hanya 15,65%, dan PR-AUC berfokus pada kelas churn tanpa bergantung threshold | 2026-11-05 |
-| 24 | Pisahkan 20% data uji acak berstrata di awal, dan pakai sekali di akhir. CV berjalan pada 80% sisanya | Keputusan pengguna, sama dengan keempat jurnal. Keterbatasan: data uji memuat pola yang sama dengan data latih, jadi skornya tidak mewakili pelanggan baru | 2026-11-05 |
+| 24 | Pisahkan 20% data uji acak berstrata di awal, dan pakai sekali di akhir. CV berjalan pada 80% sisanya | Keputusan pengguna, sama dengan keempat jurnal. Keterbatasan: data uji memuat pola yang sama dengan data latih, jadi skornya tidak mewakili pelanggan baru. Catatan: data uji dipakai lagi di Fase 3 (`program/Threshold_Biaya.ipynb`) hanya untuk melaporkan threshold (keputusan 32), tanpa mengubah model atau threshold. Langkah berikutnya tidak membukanya lagi | 2026-11-05, diperbarui 2026-11-06 |
 | 25 | Kandidat: Logistic Regression, Decision Tree, KNN, SVM RBF, RandomForest, dan XGBoost. `DummyClassifier` menjadi batas bawah | Keputusan pengguna. XGBoost dipilih karena paling dikenal dan dipakai dua jurnal, bukan karena terbukti lebih baik pada data ini | 2026-11-05 |
 | 26 | Pembeda utama project: produk jadi (Fase 4–6), perbandingan dengan dan tanpa `Status` serta `Complains`, dan threshold berbasis skenario biaya. Rentang skor, bahasa asosiatif, dan repo yang bisa dijalankan ulang menjadi standar kerja. Keputusan 2 dan 3 dipertahankan | Keputusan pengguna. Biaya adalah asumsi, bukan data. Klaim dibatasi pada keempat jurnal yang ditinjau, dan peran semua fitur dilihat dengan *permutation importance* di Fase 3 | 2026-11-05 |
 | 27 | Ketidakseimbangan kelas: bandingkan tanpa penanganan dan pembobotan kelas (`class_weight`, atau `scale_pos_weight` per fold pada XGBoost). KNN hanya tanpa penanganan. SMOTE belum dipakai | Keputusan pengguna. Tidak membuat baris sintetis dan tidak butuh library baru. SMOTE bisa memperkuat pola berulang | 2026-11-05 |
@@ -127,6 +131,11 @@
 | 29 | 12 fitur menjadi model utama. 10 fitur tanpa `Status` dan `Complains` dilaporkan sebagai pembanding | Keputusan pengguna. Tidak ada bukti keduanya leakage. Keterbatasan: cara `Status` ditentukan tidak dijelaskan UCI, jadi skor 12 fitur bisa terlalu tinggi | 2026-11-05 |
 | 30 | Penyetelan XGBoost memakai `RandomizedSearchCV` 60 kombinasi dengan PR-AUC pada data latih. Kombinasi terbaik dinilai ulang dengan CV 10 kali ulang memakai seed lain. Hasilnya hanya dipakai kalau rentangnya tidak bertumpuk dengan default pada fold yang sama, dan lebih tinggi | Keputusan pengguna. Tanpa library baru, dan jangkauan nilainya luas. Keterbatasan: penilaian ulang masih memakai data latih yang sama, dan CV acak bisa mendorong model menghafal pola | 2026-11-05 |
 | 31 | Model terpilih: XGBoost, parameter default, tanpa pembobotan, 12 fitur. Model tidak diubah berdasarkan hasil data uji | Keputusan pengguna. PR-AUC CV acak tertinggi, rentangnya tidak bertumpuk dengan RandomForest, pembobotan dan penyetelan tidak jelas lebih baik. Keterbatasan: pada cek grup, Logistic Regression lebih tinggi dengan rentang bertumpuk, dan CV acak bisa menguntungkan model yang menghafal pola | 2026-11-05 |
+| 32 | Threshold disediakan sebagai pilihan rasio biaya 1:2, 1:5, dan 1:10, dengan default 1:5. Threshold tiap rasio adalah median threshold berbiaya terendah dari 10 ulangan prediksi out-of-fold data latih. Threshold tidak diubah setelah melihat data uji | Keputusan pengguna, supaya perusahaan atau pembaca repo bisa memilih rasio sesuai biaya mereka tanpa melatih ulang model. Biaya adalah asumsi, bukan data. Keterbatasan: rumus biaya tidak menghitung biaya promo untuk pelanggan yang berisiko churn dan mengabaikan keberhasilan menahan pelanggan, skor belum terkalibrasi, threshold tidak stabil antarulangan, dan threshold berasal dari model yang dilatih pada 80% data latih | 2026-11-05 |
+| 33 | Analisis risiko × nilai memakai matriks 4 segmen sebagai hasil utama, dengan urutan skor × nilai sebagai pembanding. Risiko adalah skor out-of-fold data latih dengan threshold default 1:5, dan pelanggan disebut berisiko tinggi jika skornya mencapai threshold di lebih dari separuh dari 10 ulangan. Nilai adalah `Customer_Value` dengan batas median data latih. Data uji tidak dipakai. `Customer_Value` disebut **nilai terhitung**, bukan uang. Pemusatan segmen pada kelompok audit dirinci di notebook sebagai cek internal, dan README cukup memuat satu kalimat umum | Keputusan pengguna. UCI hanya menyebut *"the calculated value of customer"*, tanpa rumus dan satuan, dan dataset tidak punya kolom pendapatan. Caranya mirip Damuri dkk. (2026), dan kemiripan ini ditulis terbuka. Keterbatasan: arti pasti `Customer_Value` tidak diketahui dan nilainya sangat bisa dijelaskan oleh penggunaan telepon dan SMS (temuan 8), nilai berasal dari 9 bulan pertama, `Customer_Value` juga fitur model, segmen prioritas kecil dan terpusat pada beberapa kelompok audit, dan tindakan per segmen adalah hipotesis | 2026-11-06 |
+| 34 | Interpretasi model memakai *permutation importance* (turunnya PR-AUC) dan SHAP bawaan XGBoost (`pred_contribs`), dihitung pada fold validasi data latih. Data uji tidak dipakai. Kepentingan dilaporkan per fitur dan per kelompok pemakaian (`Seconds_of_Use`, `Frequency_of_use`, `Frequency_of_SMS`, `Distinct_Called_Numbers`, `Customer_Value`). Arah hubungan ditampilkan untuk 4 fitur teratas. CV grup per `audit_group` menjadi cek internal. Penjelasan per pelanggan, kalibrasi, dan interpretasi model 10 fitur belum dikerjakan | Keputusan pengguna. `shap` 0.49.1 sempat dipasang, tetapi gagal membaca model XGBoost 3.2.0 (`base_score` berformat baru), jadi tidak masuk requirements dan SHAP dihitung dengan fungsi bawaan XGBoost. Keterbatasan: kepentingan fitur bukan sebab-akibat, fitur yang saling berkorelasi berbagi kepentingan, cara `Status` ditentukan tidak dijelaskan UCI (keputusan 29), dan CV acak bisa menonjolkan pola berulang | 2026-11-06 |
+| 35 | Analisis error memakai prediksi out-of-fold data latih dengan threshold 1:5 dan suara mayoritas, seperti keputusan 33. Data uji tidak dipakai. Isinya: ringkasan churn terlewat (FN) dan salah hubungi (FP), sebaran skor kesalahan, profil kesalahan, kaitan dengan baris janggal Fase 1 (keputusan 5–9), cek internal kelompok audit, dan 3 contoh churn terlewat yang dijelaskan dengan SHAP bawaan XGBoost. Model dan threshold tidak diubah, dan temuan dicatat sebagai keterbatasan serta bahan pemantauan Fase 6 | Keputusan pengguna. Keterbatasan: hanya data latih dengan CV acak, penanda baris janggal mengikuti definisi Fase 1, baris dengan fitur identik tetapi label berbeda adalah kesalahan yang tidak bisa dihindari, dan penjelasan SHAP menggambarkan cara model bekerja, bukan sebab churn | 2026-11-06 |
+| 36 | Logika yang dipakai ulang dipindah ke `src/`: `config.py` (satu sumber `SEED`, path, dan fitur), `data.py`, `model.py`, `threshold.py`, lalu `train.py` untuk pelatihan ulang dengan satu perintah. Model final dilatih pada 2.280 baris latih, sama dengan model yang dinilai. Notebook di `program/` tidak diubah, dan test di `tests/` membuktikan `src/` menghasilkan angka yang sama. File model disimpan di `models/` dan tidak dilacak Git. `pytest` 9.2.0 dan `ruff` 0.17.4 dicatat di `requirements-dev.txt` | Keputusan pengguna (pilihan A). Semua angka yang sudah dilaporkan (data uji dan threshold) tetap berlaku untuk model ini. Keterbatasan: model tidak memakai 570 baris uji untuk belajar, dan cara penyimpanan model untuk demo diputuskan lagi di Fase 4 atau 5 | 2026-11-06 |
 
 ---
 
@@ -149,7 +158,7 @@ Accuracy tidak dipakai sebagai metrik utama. Lihat keputusan 22 dan 23 di bagian
 | 0 Housekeeping | **Selesai.** `requirements.txt`, Git, GitHub privat, dan struktur folder sudah ada. Environment `ds_env` terverifikasi (dry-run 0 paket baru, `pip check` bersih) |
 | 1 EDA dan data preparation | **Selesai.** Audit duplikat dan struktur data disimpan, dan `program/EDA_Project_Churn_v2.ipynb` sudah diperbaiki. `python -X utf8 src/clean_data.py` menghasilkan `dataset_clean/customer_churn_clean.csv` (2.850 baris, 14 kolom). Dua kali jalan menghasilkan hash yang sama |
 | 2 Modeling | **Selesai.** Perbandingan ada di `program/Modeling_Project_Churn.ipynb`, penyetelan di `program/Tuning_XGBoost.ipynb`, dan data uji di `program/Evaluasi_Data_Uji.ipynb`. Model terpilih: XGBoost default, tanpa pembobotan, 12 fitur (keputusan 31). Data uji sudah dipakai, jadi model tidak diubah berdasarkan hasilnya |
-| 3 Evaluasi dan refactor | Belum dimulai |
+| 3 Evaluasi dan refactor | **Selesai.** Threshold skenario biaya (`program/Threshold_Biaya.ipynb`, `docs/threshold_skenario.csv`, keputusan 32), risiko × nilai (`program/Risiko_Nilai.ipynb`, keputusan 33), interpretasi model (`program/Interpretasi_Model.ipynb`, keputusan 34), dan analisis error (`program/Analisis_Error.ipynb`, keputusan 35). Logika dipindah ke `src/` dengan 19 test, dan `python -X utf8 -m src.train` melatih ulang Pipeline final pada 2.280 baris latih serta menyimpannya ke `models/` (keputusan 36). Dua kali jalan menghasilkan hash model yang sama |
 | 4 Experiment tracking | Belum dimulai |
 | 5 Deployment | Belum dimulai |
 | 6 Monitoring | Belum dimulai |
@@ -198,12 +207,12 @@ Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 **DoD:** tabel perbandingan model dengan ketidakpastian dan satu model terpilih dengan alasan.
 
 ### Fase 3: Evaluasi, interpretasi, dan refactor
-- [ ] Pilih threshold berdasarkan skenario biaya (tandai asumsi)
-- [ ] Analisis risiko × nilai: peluang churn dari prediksi di luar data latih × `Customer_Value`
-- [ ] Interpretasi model dengan bahasa asosiatif, bukan kausal
-- [ ] Analisis error
-- [ ] Pindahkan logika ke `src/`, tambah test sederhana
-- [ ] Simpan model final sebagai satu Pipeline
+- [x] Pilih threshold berdasarkan skenario biaya (tandai asumsi)
+- [x] Analisis risiko × nilai: skor churn dari prediksi di luar data latih × `Customer_Value` (nilai terhitung)
+- [x] Interpretasi model dengan bahasa asosiatif, bukan kausal
+- [x] Analisis error
+- [x] Pindahkan logika ke `src/`, tambah test sederhana
+- [x] Simpan model final sebagai satu Pipeline
 
 **DoD:** pelatihan ulang dapat dijalankan dengan satu perintah.
 
@@ -248,11 +257,11 @@ Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 
 | Fase | Library yang biasanya ditambahkan |
 |---|---|
-| 1 EDA (sekarang) | pandas, numpy, scipy, statsmodels, scikit-learn, matplotlib, seaborn, ipykernel (sesuai import `EDA_Project_Churn_v2.ipynb`) |
+| 1 EDA | pandas, numpy, scipy, statsmodels, scikit-learn, matplotlib, seaborn, ipykernel (sesuai import `EDA_Project_Churn_v2.ipynb`) |
 | 2 Modeling | `imbalanced-learn` (jika resampling dipakai), opsional `xgboost` / `lightgbm` / `catboost` |
-| 3 Evaluasi dan refactor | `shap`; dev: `pytest`, `ruff` |
+| 3 Evaluasi dan refactor | `joblib` (runtime). Dev di `requirements-dev.txt`: `pytest`, `ruff`, `nbconvert`, `jupyter_core`. `shap` tidak dipakai (keputusan 34) |
 | 4 Tracking | `mlflow` |
-| 5 Deployment | `fastapi`, `uvicorn`, `pydantic`, `streamlit` atau `gradio`. Pecah ke `requirements.txt` (runtime) dan `requirements-dev.txt` karena layanan deploy membaca `requirements.txt` di root |
+| 5 Deployment | `fastapi`, `uvicorn`, `pydantic`, `streamlit` atau `gradio`. `requirements.txt` (runtime) dan `requirements-dev.txt` sudah dipisah sejak Fase 3, karena layanan deploy membaca `requirements.txt` di root |
 | 6 Monitoring | opsional `evidently` |
 
 **Git:** commit kecil per langkah, pesan Bahasa Indonesia dengan awalan fase (`fase1: ...`).
@@ -266,16 +275,19 @@ project_iranian_churn/
 ├── PROJECT_GUIDE.md
 ├── CLAUDE.md
 ├── README.md
-├── requirements.txt
+├── requirements.txt      # library runtime
+├── requirements-dev.txt  # library pengembangan (test, lint, notebook)
+├── pyproject.toml        # pengaturan pytest dan ruff
 ├── .gitignore
 ├── dataset/          # data mentah, read-only (dilacak, CC BY 4.0)
 ├── dataset_clean/    # data bersih, dibuat ulang dari script (tidak dilacak Git)
+├── models/           # Pipeline terlatih dan metadata, dibuat ulang dengan src.train (tidak dilacak Git)
 ├── jurnal/           # referensi, diabaikan Git
-├── program/          # notebook eksplorasi
+├── program/          # notebook eksplorasi (peta di program/README.md)
 ├── ringkasan_temuan/ # ringkasan temuan bernomor (.md)
 ├── src/              # logika yang dipakai ulang
-├── tests/
-└── docs/             # decision log, laporan
+├── tests/            # test pytest untuk src/
+└── docs/             # decision log, laporan, threshold_skenario.csv
 ```
 
 ---
@@ -320,9 +332,22 @@ project_iranian_churn/
 | 2026-11-05 | Model dikunci sebelum data uji dibuka: XGBoost default, tanpa pembobotan, 12 fitur (keputusan 31) | Diputuskan |
 | 2026-11-05 | Data uji dinilai sekali di `program/Evaluasi_Data_Uji.ipynb` (temuan 18), dan Fase 2 memenuhi DoD. Skor yang lebih tinggi dari CV acak masih dibaca dengan curiga | Diputuskan |
 | 2026-11-05 | Baris co-author dihapus dari 30 commit, lalu semua branch dan tag `arsip-v1` diperbarui dengan force push. Isi file tidak berubah. Commit lama masih bisa tersimpan sementara di cache GitHub | Diputuskan |
+| 2026-11-05 | Threshold disediakan sebagai pilihan rasio 1:2, 1:5, dan 1:10, dengan default 1:5 (keputusan 32). Tampilan pilihan di demo dibuat di Fase 5 | Diputuskan |
+| 2026-11-06 | Analisis risiko × nilai memakai matriks 4 segmen dan `Customer_Value` sebagai nilai terhitung, bukan uang (keputusan 33). UCI dan keempat jurnal tidak menjelaskan rumus kolom ini | Diputuskan |
+| 2026-11-06 | Pengecekan konsistensi Fase 0–3: semua angka temuan 13–21 cocok dengan output notebook, dan pembagian data, fitur, model, serta threshold sama di semua notebook. Diperbaiki: catatan pemakaian kedua data uji di keputusan 24, label PR-AUC gabungan di notebook Fase 3, istilah "skor" di checklist Fase 3, dan dokumentasi pendukung | Diputuskan |
+| 2026-11-06 | Ditutup (keputusan 36): `SEED` dan konstanta lain kini bersumber satu di `src/config.py`. Notebook di `program/`, termasuk angka CV yang disalin tangan di `Evaluasi_Data_Uji.ipynb`, tetap sebagai catatan eksperimen dan tidak diubah. `jupyter_core` dan `nbconvert` masuk `requirements-dev.txt` | Diputuskan |
 | | Ukuran notebook EDA v2 (sekitar 6 MB): output tetap disimpan, dan resolusi gambar dikurangi sekali saat notebook final | **Terbuka** |
 | | Fitur putaran berikutnya dan fitur final | **Terbuka** |
-| | Hal yang belum dijelaskan UCI: definisi operasional churn, cara `Status` ditentukan, rumus `Customer Value`, arti `Age`, dan detail hitungan `Call  Failure`, `Frequency of use`, `Frequency of SMS`, serta `Distinct Called Numbers` (bagian 2) | **Terbuka** || | Platform demo (Render, Hugging Face Spaces, atau Streamlit Cloud) | **Terbuka** |
+| | Hal yang belum dijelaskan UCI: definisi operasional churn, cara `Status` ditentukan, rumus `Customer Value`, arti `Age`, dan detail hitungan `Call  Failure`, `Frequency of use`, `Frequency of SMS`, serta `Distinct Called Numbers` (bagian 2) | **Terbuka** |
+| | Platform demo (Render, Hugging Face Spaces, atau Streamlit Cloud) | **Terbuka** |
+| 2026-11-06 | `program/README.md` dibuat sebagai peta notebook: urutan baca dan jalan, tujuan tiap notebook, serta penanda alur utama dan simpanan | Diputuskan |
+| | Sebelum repo dijadikan publik (Fase 7): apakah `CLAUDE.md` tetap dilacak, apakah `PROJECT_GUIDE.md` dirapikan atau dirangkum ke `docs/`, nasib tag `arsip-v1` di GitHub, dan penghapusan branch `fase1-audit-struktur-data` serta `fase2-modeling` yang sudah masuk `main`. Riwayat commit ikut terlihat jika repo dibuka. `program/EDA_Project_Churn.ipynb` (notebook asli) juga masih memuat path absolut lokal | **Terbuka** |
+| 2026-11-06 | Interpretasi model memakai permutation importance dan SHAP bawaan XGBoost (keputusan 34). `shap` 0.49.1 tidak cocok dengan XGBoost 3.2.0, jadi tidak masuk requirements | Diputuskan |
+| | `shap` 0.49.1, `numba`, `llvmlite`, dan `slicer` masih terpasang di `ds_env`, tetapi tidak ada di `requirements.txt`. Di Fase 5, uji pemakaian `shap` hanya untuk grafik penjelasan per pelanggan (nilai dari `pred_contribs` XGBoost), atau versi `shap` yang sudah mendukung XGBoost 3. Jika tidak dipakai, paket-paket itu dihapus | **Terbuka** |
+| 2026-11-06 | Analisis error memakai data latih, threshold 1:5, dan suara mayoritas, tanpa mengubah model (keputusan 35) | Diputuskan |
+| | Bahan tabel pembeda README Fase 7, dari pencarian kata kunci dan bagian prapemrosesan keempat jurnal. Kelima penanda baris janggal (keputusan 5–9) tidak dibahas secara eksplisit oleh jurnal mana pun. Damuri dkk. mempertahankan 314 baris berfitur identik, yang pada data mentah terdiri atas 300 duplikat persis dan 14 baris konflik label. Wang dkk. menghapus 300 duplikat dan mengklaim tidak ada outlier Tukey, padahal dengan rumus yang sama data bersih kita punya 44–333 baris di luar batas per kolom numerik. Information mengganti outlier dengan rata-rata data latih dan menganggap `Charge Amount` 0–10. PLOS ONE tidak membahas pembersihan data. Angka-angka ini dihitung ulang dengan kode sebelum masuk README | **Terbuka** |
+| 2026-11-06 | Logika yang dipakai ulang dipindah ke `src/` (`config`, `data`, `model`, `threshold`) dengan test di `tests/`. Model final dilatih pada 2.280 baris latih. `pytest` dan `ruff` dipasang (keputusan 36) | Diputuskan |
+| 2026-11-06 | `src/train.py` melatih ulang Pipeline final dengan satu perintah, memeriksa threshold terhadap `docs/threshold_skenario.csv` tanpa menimpanya, lalu menyimpan model dan metadata ke `models/` (tidak dilacak Git). `joblib==1.5.3` masuk `requirements.txt`. Fase 3 memenuhi DoD | Diputuskan |
 
 ---
 

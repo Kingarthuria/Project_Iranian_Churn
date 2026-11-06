@@ -1,0 +1,11 @@
+# Library pengembangan: test, lint, dan menjalankan notebook dari terminal.
+# Pasang dengan: pip install -r requirements-dev.txt
+-r requirements.txt
+
+# Test dan lint (keputusan 36)
+pytest==9.2.0
+ruff==0.17.4
+
+# Menjalankan notebook: python -X utf8 -m jupyter nbconvert --to notebook --execute --inplace <notebook>
+nbconvert==7.17.0
+jupyter_core==5.9.1

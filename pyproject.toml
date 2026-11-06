@@ -1,0 +1,12 @@
+# Pengaturan alat pengembangan. Library runtime ada di requirements.txt,
+# dan library pengembangan di requirements-dev.txt.
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 110
+# Notebook adalah catatan eksperimen dan tidak diubah (keputusan 36)
+extend-exclude = ["program"]

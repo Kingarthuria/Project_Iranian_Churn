@@ -1,6 +1,7 @@
-# Tahap: Modeling (Fase 2). Python 3.10 (diuji dengan 3.10.20, environment conda "ds_env").
-# Isi: library yang di-import program/EDA_Project_Churn_v2.ipynb dan
-# program/Modeling_Project_Churn.ipynb.
+# Tahap: Evaluasi dan refactor (Fase 3). Python 3.10 (diuji dengan 3.10.20, environment conda "ds_env").
+# Isi: library yang di-import program/EDA_Project_Churn_v2.ipynb, notebook Fase 2
+# (Modeling_Project_Churn, Tuning_XGBoost, Evaluasi_Data_Uji), dan notebook Fase 3
+# (Threshold_Biaya, Risiko_Nilai), semuanya di program/.
 #
 # Aturan: library baru ditambahkan di commit yang SAMA dengan notebook/kode yang
 # memakainya, versi dipatok (==). Peta fase ke library ada di PROJECT_GUIDE.md bagian 9.
@@ -14,6 +15,8 @@ statsmodels==0.14.6
 # Modeling
 scikit-learn==1.7.2
 xgboost==3.2.0
+# Menyimpan dan memuat Pipeline (src/train.py)
+joblib==1.5.3
 
 # Visualisasi
 matplotlib==3.10.9
