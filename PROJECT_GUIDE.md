@@ -332,6 +332,8 @@ project_iranian_churn/
 | | Fitur putaran berikutnya dan fitur final | **Terbuka** |
 | | Hal yang belum dijelaskan UCI: definisi operasional churn, cara `Status` ditentukan, rumus `Customer Value`, arti `Age`, dan detail hitungan `Call  Failure`, `Frequency of use`, `Frequency of SMS`, serta `Distinct Called Numbers` (bagian 2) | **Terbuka** |
 | | Platform demo (Render, Hugging Face Spaces, atau Streamlit Cloud) | **Terbuka** |
+| 2026-11-06 | `program/README.md` dibuat sebagai peta notebook: urutan baca dan jalan, tujuan tiap notebook, serta penanda alur utama dan simpanan | Diputuskan |
+| | Sebelum repo dijadikan publik (Fase 7): apakah `CLAUDE.md` tetap dilacak, apakah `PROJECT_GUIDE.md` dirapikan atau dirangkum ke `docs/`, nasib tag `arsip-v1` di GitHub, dan penghapusan branch `fase1-audit-struktur-data` serta `fase2-modeling` yang sudah masuk `main`. Riwayat commit ikut terlihat jika repo dibuka. `program/EDA_Project_Churn.ipynb` (notebook asli) juga masih memuat path absolut lokal | **Terbuka** |
 
 ---
 
