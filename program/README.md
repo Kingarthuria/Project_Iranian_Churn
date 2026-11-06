@@ -19,8 +19,9 @@ python -X utf8 src/clean_data.py
 | 5 | `Threshold_Biaya.ipynb` | 3 | Memilih threshold untuk rasio biaya 1:2, 1:5, dan 1:10 | `dataset_clean/` | `docs/threshold_skenario.csv` |
 | 6 | `Risiko_Nilai.ipynb` | 3 | Membagi pelanggan ke empat segmen berdasarkan skor risiko dan nilai terhitung | `dataset_clean/`, `docs/threshold_skenario.csv` | - |
 | 7 | `Interpretasi_Model.ipynb` | 3 | Melihat fitur yang paling dipakai model dengan permutation importance dan SHAP, beserta cek CV grup | `dataset_clean/` | - |
+| 8 | `Analisis_Error.ipynb` | 3 | Melihat di mana dan kenapa model salah: churn terlewat, salah hubungi, dan kaitannya dengan baris janggal Fase 1 | `dataset_clean/`, `docs/threshold_skenario.csv` | - |
 
-Notebook 6 membutuhkan CSV dari notebook 5. Notebook 2–7 memakai pembagian data latih dan uji yang sama.
+Notebook 6 dan 8 membutuhkan CSV dari notebook 5. Notebook 2–8 memakai pembagian data latih dan uji yang sama.
 
 ## Simpanan, bukan alur utama
 
