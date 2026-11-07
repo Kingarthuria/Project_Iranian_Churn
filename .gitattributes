@@ -1,0 +1,4 @@
+# Akhir baris LF untuk file CSV buatan project, supaya hash-nya sama di Windows dan Linux
+# (Streamlit Community Cloud dan CI). dataset/ sengaja tidak diatur di sini, karena data
+# mentah tidak boleh tersentuh.
+docs/*.csv text eol=lf

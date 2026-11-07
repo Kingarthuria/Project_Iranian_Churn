@@ -12,6 +12,42 @@ Logika yang dipakai ulang dan dipindah dari notebook di `program/` (keputusan 36
 | `train.py` | Pelatihan ulang model final dengan satu perintah |
 | `evaluate.py` | Penilaian dengan CV acak dan cek CV grup, sama dengan notebook Fase 2 |
 | `track.py` | Experiment tracking dan registry dengan MLflow lokal |
+| `schema.py` | Skema input dan output demo, divalidasi dengan pydantic |
+| `predict.py` | Skor, keputusan hubungi, segmen, penjelasan SHAP, dan pasangan kelompok usia dengan kolom `Age` untuk demo |
+| `texts.py` | Semua teks demo dalam Bahasa Indonesia (default) dan Inggris, serta format angka per bahasa |
+| `charts.py` | Grafik demo dengan Altair: posisi skor, waterfall SHAP, matriks segmen, dan kepentingan fitur |
+| `summary.py` | Ringkasan angka untuk tab Cara kerja model (`docs/ringkasan_model.csv` dan `docs/kepentingan_fitur.csv`) |
+
+## Lingkungan
+
+Project memakai env conda **`ds_env312`** (Python 3.12, keputusan 38 dan 39), karena Python 3.10 sudah tidak menerima pembaruan keamanan dan tidak didukung Streamlit Community Cloud. Buat env ini dari root project:
+
+```
+conda create -n ds_env312 python=3.12
+conda activate ds_env312
+pip install -r requirements-dev.txt
+```
+
+`requirements.txt` hanya berisi library demo, dan `requirements-dev.txt` menambah library notebook, test, lint, dan MLflow. Notebook lama di `program/` dibuat dengan Python 3.10 (`ds_env`), dan test menunjukkan hasil model sama di kedua versi.
+
+## Menjalankan demo
+
+Jalankan dari root project:
+
+```
+streamlit run streamlit_app.py --server.address 127.0.0.1
+```
+
+Opsi `--server.address 127.0.0.1` membuat demo hanya bisa dibuka dari komputer sendiri di `http://127.0.0.1:8501`. Tanpa opsi ini, Streamlit menerima koneksi dari semua jaringan, dan Windows Firewall akan meminta izin. Pilih **Cancel** jika peringatan itu muncul, karena demo lokal tidak membutuhkan akses jaringan. Opsi ini tidak dipakai di Streamlit Community Cloud, yang mengatur alamatnya sendiri. Matikan demo dengan `Ctrl + C`.
+
+Saat pertama dinyalakan, aplikasi melatih model dari dataset dalam beberapa detik. Di sidebar, pengguna memilih contoh atau mengisi 12 fitur pelanggan, lalu mengatur rasio biaya. Hasilnya tersebar di empat tab (keputusan 41):
+
+- **Hasil & rekomendasi:** keputusan hubungi, skor risiko, arti hasil dalam bahasa awam, segmen risiko × nilai, dan rekomendasi untuk siklus tahun berikutnya.
+- **Detail teknis:** posisi skor, waterfall SHAP 12 fitur, dan tabel SHAP pelanggan ini.
+- **Cara kerja model:** alur data, PR-AUC, kepentingan fitur, dan cara memilih skor minimal untuk dihubungi.
+- **Keterbatasan & data:** pola berulang per 50 baris, hal yang tidak dijelaskan UCI, asumsi demo, dan sumber data.
+
+Input divalidasi dengan `src/schema.py` dan tidak disimpan. Angka di tab Cara kerja model dibaca dari `docs/`. Buat ulang dengan `python -X utf8 -m src.summary` jika model atau data berubah.
 
 ## Melatih ulang model
 
@@ -60,5 +96,9 @@ Pasang library pengembangan dulu dengan `pip install -r requirements-dev.txt`, l
 
 ```
 python -X utf8 -m pytest
-python -m ruff check src tests
+python -m ruff check src tests streamlit_app.py
 ```
+
+## CI
+
+GitHub Actions (`.github/workflows/ci.yml`) menjalankan kedua perintah di atas secara otomatis setiap ada push ke branch mana pun dan setiap pull request ke `main`, di Linux dengan Python 3.12. Hasilnya bisa dilihat di tab **Actions** repo GitHub. Tanda hijau berarti semua test dan lint lulus. Workflow hanya membaca kode dan tidak memakai rahasia atau token.
