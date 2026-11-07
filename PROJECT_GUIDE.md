@@ -2,7 +2,7 @@
 
 > File ini adalah **sumber kebenaran** project. Isi hanya fakta yang sudah pasti. Bagian yang belum diketahui dibiarkan kosong.
 > Berikan ke AI di awal setiap sesi ("baca PROJECT_GUIDE.md dulu"). Perbarui **Status** dan **Log Keputusan** setiap selesai satu langkah.
-> Terakhir diperbarui: 2026-11-06 (CI GitHub Actions hijau, Fase 5 berjalan)
+> Terakhir diperbarui: 2026-11-07 (tampilan demo Fase 5 dikunci, deploy belum)
 
 ---
 
@@ -140,6 +140,9 @@
 | 38 | Demo Fase 5: satu halaman Streamlit (`streamlit_app.py`) dengan input 12 fitur yang divalidasi skema `pydantic`, pilihan rasio 1:2, 1:5 (default), dan 1:10, skor risiko, keputusan hubungi, segmen Prioritas I–IV, dan penjelasan 5 fitur teratas dengan SHAP bawaan XGBoost. Platform Streamlit Community Cloud: repo tetap privat dan aplikasi dijadikan publik. Demo dan CI memakai Python 3.12, sedangkan `ds_env` (Python 3.10) tetap untuk notebook. Model dilatih ulang dari dataset saat aplikasi menyala, tanpa file model di Git. `requirements.txt` hanya berisi library demo, dan library notebook pindah ke `requirements-dev.txt`. Test, lint, dan CI GitHub Actions. Input tidak disimpan. Paket `shap` tetap di `ds_env`, tidak masuk requirements, dan tidak di-import kode project | Keputusan pengguna. Python 3.10 sudah melewati akhir masa dukungan keamanan (Oktober 2026), dan Streamlit Community Cloud hanya mendukung versi yang masih menerima pembaruan keamanan. Aplikasi dari repo privat bisa dijadikan publik tanpa membuka repo. Keterbatasan: segmen di demo memakai skor satu model final, bukan suara mayoritas out-of-fold seperti `program/Risiko_Nilai.ipynb`. Demo tidak bisa menyimpan log prediksi, jadi pemantauan Fase 6 perlu cara lain. Skor demo bukan performa pada pelanggan baru | 2026-11-06 |
 | 39 | Lingkungan Python 3.12 memakai env conda `ds_env312` (Python 3.12.16 dari channel conda, paket dari `requirements-dev.txt` lewat pip), bukan `venv` dari Python sistem. Mulai sekarang `ds_env312` dipakai untuk demo, test, dan pekerjaan baru. `ds_env` (Python 3.10) disimpan sementara sebagai pembanding hasil notebook lama, dan penghapusannya diputuskan pengguna nanti. Python di luar env conda dan perintah yang membuka akses jaringan tidak dijalankan tanpa penjelasan rinci lebih dulu | Keputusan pengguna (pilihan A). Mengganti Python di `ds_env` secara langsung berisiko merusak 200 paket pip dan sulit dikembalikan. `streamlit_env` memakai Python 3.9, jadi juga tidak cocok untuk Streamlit Community Cloud, dan tidak diubah. `.venv` dari Python 3.12 sistem dihapus setelah `ds_env312` terbukti memberi 46 test lulus dan skor identik | 2026-11-06 |
 | 40 | CI memakai GitHub Actions (`.github/workflows/ci.yml`): berjalan setiap push ke branch mana pun dan setiap pull request ke `main`, di `ubuntu-latest` dengan Python 3.12. Langkahnya memasang `requirements-dev.txt`, menjalankan `pip check`, `ruff check src tests streamlit_app.py`, dan `pytest`. Izin workflow hanya membaca kode (`contents: read`), tanpa rahasia atau token. Run lama di branch yang sama dibatalkan jika ada push baru, dengan batas waktu 20 menit | Keputusan pengguna (keputusan 38). Test di `tests/` sudah mencocokkan angka notebook, MLflow, dan demo, jadi CI menjaga hasil tetap sama setiap ada perubahan. Keterbatasan: CI hanya menguji Linux dengan Python 3.12, repo privat memakai kuota menit GitHub Actions akun, dan satu run diperkirakan 5–10 menit | 2026-11-06 |
+| 41 | Tampilan demo Fase 5 ditulis ulang. **Sidebar:** judul Bahasa, pilihan contoh berupa segmented control tiga pilihan sama lebar (Risiko tinggi, Risiko rendah, Nilai median), Data pelanggan dalam 4 grup dengan petunjuk median dan rentang di ikon bantuan, kotak **Pengaturan keputusan** (rasio biaya) bergaris putus-putus di antara grup isian dan tombol hitung, tanpa `st.form` supaya rasio langsung berlaku. **Empat tab:** (1) *Hasil & rekomendasi* untuk pembaca bisnis, berjudul "Perlukah pelanggan ini dihubungi?", dengan alur What, So What, Now What tanpa judul per bagian: 3 kartu (keputusan, skor risiko, skor minimal), insight bahasa awam yang membandingkan pelanggan dengan median data latih, kalimat penghubung ke matriks segmen 2×2 (nilai tinggi di kiri), rekomendasi per segmen untuk siklus 12 bulan berikutnya, saran yang disesuaikan dari alasan risiko (komplain, non-aktif, kegagalan panggilan di atas umumnya, pemakaian di bawah umumnya) hanya untuk pelanggan yang disarankan dihubungi, dan pengingat keterbatasan satu baris; (2) *Detail teknis*: posisi skor pada sumbu log, waterfall SHAP 12 fitur, dan tabel SHAP; (3) *Cara kerja model*: alur data, PR-AUC dan ROC-AUC dari `docs/ringkasan_model.csv`, permutation importance dari `docs/kepentingan_fitur.csv` (keduanya dibuat `python -X utf8 -m src.summary`, sama dengan temuan 13 dan 22), dan tabel skor minimal per rasio; (4) *Keterbatasan & data*. Istilah "skor minimal untuk dihubungi" menggantikan "batas hubungi" dan threshold. Dua bahasa (`src/texts.py`, default Indonesia), tema terang `#334155` (`.streamlit/config.toml`), grafik Altair (`src/charts.py`, `altair==6.3.0` dipatok), dan sedikit CSS tata letak di `streamlit_app.py`. Menggantikan bagian tampilan keputusan 38, termasuk penjelasan 5 fitur teratas | Keputusan pengguna setelah 16 putaran peninjauan dari sudut pandang pembaca awam. Bagian bisnis dan teknis dipisah supaya beban baca berkurang. Keterbatasan: tindakan dan contoh penawaran adalah hipotesis, CSS bergantung pada struktur HTML Streamlit 1.65 sehingga bisa rusak saat upgrade, dan di tab hasil kalimat keterbatasan hanya berupa pengingat satu baris (kalimat lengkap ada di tab 4, keputusan 2 berlaku untuk README dan laporan model) | 2026-11-07 |
+| 42 | Dua asumsi tampilan di demo, keduanya ditulis di tab Keterbatasan & data. (a) Isian kelompok usia berupa 5 tombol perkiraan umur ≈15, ≈25, ≈30, ≈45, dan ≈55 tahun, yaitu nilai kolom `Age` yang berpasangan satu-satu dengan `Age_Group` 1–5 di data latih (dihitung `src/predict.py`, `_age_by_group`). Model tetap memakai `Age_Group`. (b) Waktu tindakan memakai siklus 12 bulan menurut UCI (fitur dari bulan 1–9, status churn di akhir bulan ke-12): hitung ulang skor di akhir bulan ke-9, bertindak di bulan ke-10 sampai ke-11, dan cek status di akhir bulan ke-12, untuk siklus tahun berikutnya | Keputusan pengguna. Slider 1–5 membingungkan pembaca, dan rekomendasi butuh waktu yang jelas. Keterbatasan: arti `Age` tidak dijelaskan UCI (keputusan 10), UCI tidak menyebut kapan pelanggan benar-benar berhenti, dan pola pelanggan tahun berikutnya diasumsikan mirip dengan data ini | 2026-11-07 |
+| 43 | Peringatan "kombinasi input tidak umum" dihapus dari demo beserta fungsi `unusual_combinations`, datanya di `Bundle`, teks, dan test-nya | Keputusan pengguna. Aturan sisa regresi `Customer_Value` (temuan 8) menandai nilai yang masih di dalam rentang data latih, sehingga membingungkan pembaca. Keterbatasan: kombinasi isian yang tidak konsisten tidak lagi ditandai. Input tetap dibatasi rentang data latih oleh `src/schema.py` | 2026-11-07 |
 
 ---
 
@@ -164,7 +167,7 @@ Accuracy tidak dipakai sebagai metrik utama. Lihat keputusan 22 dan 23 di bagian
 | 2 Modeling | **Selesai.** Perbandingan ada di `program/Modeling_Project_Churn.ipynb`, penyetelan di `program/Tuning_XGBoost.ipynb`, dan data uji di `program/Evaluasi_Data_Uji.ipynb`. Model terpilih: XGBoost default, tanpa pembobotan, 12 fitur (keputusan 31). Data uji sudah dipakai, jadi model tidak diubah berdasarkan hasilnya |
 | 3 Evaluasi dan refactor | **Selesai.** Threshold skenario biaya (`program/Threshold_Biaya.ipynb`, `docs/threshold_skenario.csv`, keputusan 32), risiko × nilai (`program/Risiko_Nilai.ipynb`, keputusan 33), interpretasi model (`program/Interpretasi_Model.ipynb`, keputusan 34), dan analisis error (`program/Analisis_Error.ipynb`, keputusan 35). Logika dipindah ke `src/` dengan 19 test, dan `python -X utf8 -m src.train` melatih ulang Pipeline final pada 2.280 baris latih serta menyimpannya ke `models/` (keputusan 36). Dua kali jalan menghasilkan hash model yang sama |
 | 4 Experiment tracking | **Selesai.** `python -X utf8 -m src.track` mencatat 4 run ke MLflow lokal (`mlflow.db`, experiment `iranian-churn`) dan mendaftarkan Pipeline final sebagai `iranian-churn-xgboost@champion` (keputusan 37). Metrik di MLflow sama dengan temuan 13–15, model dari registry memberi skor sama dengan `models/churn_pipeline.joblib`, dan UI (`mlflow ui --backend-store-uri sqlite:///mlflow.db`) menampilkan keempat run. Ada 26 test |
-| 5 Deployment | **Berjalan.** `streamlit_app.py` dengan skema input `src/schema.py` dan prediksi `src/predict.py` sudah berjalan lokal. Env conda `ds_env312` (Python 3.12.16) dibuat dari `requirements-dev.txt`, dan 46 test lulus di `ds_env312` maupun `ds_env` dengan skor model identik (keputusan 39). CI GitHub Actions hijau di Linux dengan Python 3.12 (keputusan 40). Perbaikan tampilan demo dan deploy belum (keputusan 38) |
+| 5 Deployment | **Berjalan.** `streamlit_app.py` dengan skema input `src/schema.py` dan prediksi `src/predict.py` sudah berjalan lokal. Env conda `ds_env312` (Python 3.12.16) dibuat dari `requirements-dev.txt`, dan 46 test lulus di `ds_env312` maupun `ds_env` dengan skor model identik (keputusan 39). CI GitHub Actions hijau di Linux dengan Python 3.12 (keputusan 40). Tampilan demo ditulis ulang dan dikunci (keputusan 41–43): 4 tab, dua bahasa, dan rekomendasi per segmen. 72 test lulus. Deploy belum (keputusan 38) |
 | 6 Monitoring | Belum dimulai |
 | 7 Dokumentasi portofolio | Belum dimulai |
 
@@ -265,7 +268,7 @@ Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 | 2 Modeling | `imbalanced-learn` (jika resampling dipakai), opsional `xgboost` / `lightgbm` / `catboost` |
 | 3 Evaluasi dan refactor | `joblib` (runtime). Dev di `requirements-dev.txt`: `pytest`, `ruff`, `nbconvert`, `jupyter_core`. `shap` tidak dipakai (keputusan 34) |
 | 4 Tracking | `mlflow==3.18.0` di `requirements-dev.txt` (keputusan 37) |
-| 5 Deployment | `streamlit` dan `pydantic` di `requirements.txt`, yang kini hanya berisi library demo. Library notebook pindah ke `requirements-dev.txt` (keputusan 38). FastAPI tidak dipakai |
+| 5 Deployment | `streamlit` dan `pydantic` di `requirements.txt`, yang kini hanya berisi library demo. Library notebook pindah ke `requirements-dev.txt` (keputusan 38). `altair` dipatok untuk grafik demo (keputusan 41). FastAPI tidak dipakai |
 | 6 Monitoring | opsional `evidently` |
 
 **Git:** commit kecil per langkah, pesan Bahasa Indonesia dengan awalan fase (`fase1: ...`).
@@ -281,6 +284,7 @@ project_iranian_churn/
 ├── README.md
 ├── streamlit_app.py      # demo Fase 5
 ├── requirements.txt      # library runtime demo (dibaca Streamlit Community Cloud)
+├── .streamlit/config.toml # tema demo (keputusan 41)
 ├── requirements-dev.txt  # library pengembangan (test, lint, notebook)
 ├── pyproject.toml        # pengaturan pytest dan ruff
 ├── .gitignore
@@ -292,7 +296,7 @@ project_iranian_churn/
 ├── ringkasan_temuan/ # ringkasan temuan bernomor (.md)
 ├── src/              # logika yang dipakai ulang
 ├── tests/            # test pytest untuk src/
-└── docs/             # decision log, laporan, threshold_skenario.csv
+└── docs/             # decision log, laporan, threshold_skenario.csv, ringkasan angka demo
 ```
 
 ---
@@ -344,7 +348,7 @@ project_iranian_churn/
 | | Ukuran notebook EDA v2 (sekitar 6 MB): output tetap disimpan, dan resolusi gambar dikurangi sekali saat notebook final | **Terbuka** |
 | | Fitur putaran berikutnya dan fitur final | **Terbuka** |
 | | Hal yang belum dijelaskan UCI: definisi operasional churn, cara `Status` ditentukan, rumus `Customer Value`, arti `Age`, dan detail hitungan `Call  Failure`, `Frequency of use`, `Frequency of SMS`, serta `Distinct Called Numbers` (bagian 2) | **Terbuka** |
-| | Platform demo (Render, Hugging Face Spaces, atau Streamlit Cloud) | **Terbuka** |
+| | Platform demo: Streamlit Community Cloud (keputusan 38) | Diputuskan |
 | 2026-11-06 | `program/README.md` dibuat sebagai peta notebook: urutan baca dan jalan, tujuan tiap notebook, serta penanda alur utama dan simpanan | Diputuskan |
 | | Sebelum repo dijadikan publik (Fase 7): apakah `CLAUDE.md` tetap dilacak, apakah `PROJECT_GUIDE.md` dirapikan atau dirangkum ke `docs/`, nasib tag `arsip-v1` di GitHub, dan penghapusan branch `fase1-audit-struktur-data` serta `fase2-modeling` yang sudah masuk `main`. Riwayat commit ikut terlihat jika repo dibuka. `program/EDA_Project_Churn.ipynb` (notebook asli) juga masih memuat path absolut lokal | **Terbuka** |
 | 2026-11-06 | Interpretasi model memakai permutation importance dan SHAP bawaan XGBoost (keputusan 34). `shap` 0.49.1 tidak cocok dengan XGBoost 3.2.0, jadi tidak masuk requirements | Diputuskan |
@@ -362,6 +366,7 @@ project_iranian_churn/
 | 2026-11-06 | `.gitattributes` ditambahkan dengan `docs/*.csv text eol=lf`. Sebelumnya `core.autocrlf=true` mengubah `docs/threshold_skenario.csv` ke CRLF saat pindah branch, sehingga hash-nya di Windows (`1697bccd...`) berbeda dari isi repo (`38f68339...`), walaupun isinya sama. `dataset/` sengaja tidak diatur supaya data mentah tidak tersentuh | Diputuskan |
 | 2026-11-06 | Langkah 5b: CI GitHub Actions dibuat di `.github/workflows/ci.yml` (keputusan 40). Perbaikan tampilan demo dibahas setelah CI, sebelum deploy | Diputuskan |
 | 2026-11-06 | Run CI pertama (commit `20818d2`) hijau dalam sekitar 2 menit: `pip check` bersih, `ruff` lulus, dan 46 test lulus di Linux dengan Python 3.12. Angka test sama dengan hasil di Windows | Diputuskan |
+| 2026-11-07 | Mockup HTML demo (`mockup/`, tidak dilacak Git) dinilai, lalu pengguna memilih memperbaiki tampilan Streamlit yang ada. Setelah 16 putaran peninjauan, tampilan demo dikunci (keputusan 41–43). Tiap putaran dicadangkan di `cadangan/` (tidak dilacak Git). 72 test lulus di `ds_env312` | Diputuskan |
 
 ---
 
