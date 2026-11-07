@@ -6,7 +6,7 @@ import xgboost as xgb
 
 from src import config
 from src.model import build_pipeline
-from src.predict import SEGMENTS, load_bundle, predict, to_frame
+from src.predict import SEGMENTS, explain_all, load_bundle, predict, to_frame
 from src.schema import CustomerInput
 
 
@@ -64,7 +64,39 @@ def test_explanation_consistent_with_score(bundle, customers):
 
 
 def test_examples_are_valid_and_separated(bundle):
-    risky = predict(bundle, bundle.examples["Contoh pelanggan berisiko"])
-    safe = predict(bundle, bundle.examples["Contoh pelanggan aman"])
+    risky = predict(bundle, bundle.examples["high"])
+    safe = predict(bundle, bundle.examples["low"])
     assert risky.contact and not safe.contact
     assert predict(bundle, bundle.defaults).score >= 0
+
+
+def test_explain_all_adds_up_to_score(bundle, customers):
+    for customer in customers[:5]:
+        base, contributions = explain_all(bundle, customer)
+        assert len(contributions) == len(config.FEATURES)
+        assert {c.feature for c in contributions} == set(config.FEATURES)
+        margin = base + sum(c.shap for c in contributions)
+        score = predict(bundle, customer).score
+        assert 1 / (1 + np.exp(-margin)) == pytest.approx(score, abs=1e-5)
+
+
+def test_hints_and_counts_from_training_data(bundle, split):
+    train, _ = split
+    for feature in config.FEATURES:
+        median, low, high = bundle.hints[feature]
+        assert median == pytest.approx(train[feature].median())
+        assert (low, high) == (train[feature].min(), train[feature].max())
+    assert bundle.counts == {
+        "raw": 3150, "duplicates": 300, "clean": config.EXPECTED_CLEAN_ROWS,
+        "train": config.EXPECTED_TRAIN_ROWS, "train_churn": config.EXPECTED_TRAIN_CHURN,
+        "test": config.EXPECTED_TEST_ROWS, "test_churn": config.EXPECTED_TEST_CHURN,
+    }
+
+
+def test_age_by_group_is_one_to_one_from_training_data(bundle, split):
+    # Pasangan kelompok usia dan kolom Age hanya untuk tampilan formulir. Harus satu-satu dan berasal dari data latih
+    train, _ = split
+    expected = train.groupby("Age_Group")["Age_Binning"].agg(lambda s: s.unique().tolist())
+    assert all(len(values) == 1 for values in expected)
+    assert bundle.age_by_group == {int(g): int(v[0]) for g, v in expected.items()}
+    assert list(bundle.age_by_group) == sorted(bundle.age_by_group)
