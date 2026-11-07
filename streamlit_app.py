@@ -16,8 +16,8 @@ from src.schema import BOUNDS, CustomerInput
 from src.texts import DEFAULT_LANGUAGE, FORM_GROUPS, LANGUAGES, TEXTS, fmt_number, fmt_score, fmt_value
 
 # Info pembuat, diisi sebelum deploy. Tautan kosong ditampilkan sebagai penanda
-AUTHOR_NAME = ""
-AUTHOR_LINKS = {"GitHub": "", "LinkedIn": ""}
+AUTHOR_NAME = "Arthur Pendragon"
+AUTHOR_LINKS = {"GitHub": "https://github.com/Kingarthuria"}
 # Kolom berkode kecil yang memakai slider, bukan angka bebas
 SLIDERS = ("Charge_Amount",)
 # Pilihan contoh di sidebar, urut sesuai tampilan

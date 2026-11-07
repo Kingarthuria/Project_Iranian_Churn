@@ -192,3 +192,10 @@ def test_contacted_customer_gets_tailored_hints(app):
     assert t["personal_title"] in text
     assert t["hints"]["Complains"] in text and t["hints"]["Call_Failure"] in text
     assert t["hints"]["Status"] not in text
+
+
+def test_author_shown_without_placeholder(app):
+    # Info pembuat sudah diisi sebelum deploy, jadi penanda tidak boleh tampil lagi
+    captions = " ".join(c.value for c in app.sidebar.caption)
+    assert "Arthur Pendragon" in captions and "https://github.com/Kingarthuria" in captions
+    assert TEXTS["id"]["author_placeholder"] not in captions
