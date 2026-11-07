@@ -18,3 +18,5 @@ joblib==1.5.3
 # Demo dan validasi input
 streamlit==1.65.0
 pydantic==2.13.3
+# Grafik demo (src/charts.py). Sudah ikut terpasang bersama Streamlit, di sini hanya dipatok versinya
+altair==6.3.0

@@ -1,0 +1,14 @@
+item,drop_mean,drop_min,drop_max
+usage_group,0.446,0.427,0.463
+Complains,0.224,0.208,0.239
+Frequency_of_use,0.167,0.154,0.178
+Subscription_Length,0.127,0.118,0.133
+Status,0.099,0.092,0.108
+Call_Failure,0.096,0.084,0.108
+Seconds_of_Use,0.093,0.079,0.108
+Age_Group,0.049,0.042,0.054
+Distinct_Called_Numbers,0.034,0.029,0.038
+Customer_Value,0.022,0.014,0.029
+Frequency_of_SMS,0.016,0.01,0.021
+Charge_Amount,0.002,-0.0,0.003
+Tariff_Plan,-0.0,-0.0,0.0

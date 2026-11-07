@@ -1,0 +1,11 @@
+# Tema demo (keputusan pengguna: tema terang, warna utama abu gelap).
+# Pengaturan server sengaja tidak ditulis di sini: lokal dijalankan dengan --server.address 127.0.0.1,
+# dan Streamlit Community Cloud mengatur alamatnya sendiri.
+
+[theme]
+base = "light"
+primaryColor = "#334155"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F1F5F9"
+textColor = "#0F172A"
+font = "sans serif"
