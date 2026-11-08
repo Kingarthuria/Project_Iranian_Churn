@@ -6,6 +6,9 @@ Jalankan lokal dari root project:
 Input pengguna tidak disimpan. Model dilatih ulang dari dataset saat aplikasi pertama dinyalakan.
 Semua teks tampilan ada di src/texts.py (Bahasa Indonesia dan Inggris).
 """
+import os
+import time
+
 import pandas as pd
 import streamlit as st
 from pydantic import ValidationError
@@ -60,7 +63,12 @@ st.html(LAYOUT_CSS)
 
 @st.cache_resource(show_spinner="Melatih model dari dataset... / Training the model...")
 def get_bundle():
-    return load_bundle()
+    start = time.perf_counter()
+    bundle = load_bundle()
+    # Satu baris di log server (Manage app di Streamlit Cloud) untuk memantau lama muat pertama. Tidak memuat data
+    # pengguna
+    print(f"[demo] model siap dalam {time.perf_counter() - start:.1f} detik, cpu_count={os.cpu_count()}", flush=True)
+    return bundle
 
 
 @st.cache_data

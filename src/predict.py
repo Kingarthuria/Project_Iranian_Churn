@@ -24,6 +24,10 @@ SEGMENTS = {
 # Kode segmen untuk teks dua bahasa di demo (src/texts.py)
 SEGMENT_IDS = {(True, True): "I", (False, True): "II", (True, False): "III", (False, False): "IV"}
 N_CONTRIBUTIONS = 5
+# Jumlah thread XGBoost di demo. Server gratis Streamlit Community Cloud bisa melaporkan banyak inti CPU padahal
+# jatah CPU-nya kecil, sehingga thread yang berebut membuat muat pertama sangat lambat. Ini hanya mengatur
+# komputasi, bukan parameter model (keputusan 31 tetap berlaku), dan test memastikan skornya sama
+DEMO_N_JOBS = 1
 
 
 @dataclass
@@ -55,7 +59,7 @@ def load_bundle() -> Bundle:
         clean_data.main()
     clean = load_clean()
     train, test = split_train_test(clean)
-    pipeline = build_pipeline().fit(train, train[config.TARGET])
+    pipeline = build_pipeline().set_params(model__n_jobs=DEMO_N_JOBS).fit(train, train[config.TARGET])
     thresholds = pd.read_csv(config.THRESHOLD_PATH).set_index("rasio")
 
     # Contoh dari data latih: churn dengan skor tertinggi dan tidak churn dengan skor terendah
