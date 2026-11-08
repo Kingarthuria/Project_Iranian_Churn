@@ -4,6 +4,8 @@ Proyek data science end-to-end pada dataset UCI *Iranian Churn*. Pertanyaannya s
 
 **[Buka demo langsung](https://churn-risk-priority.streamlit.app/)** · Bahasa Indonesia dan Inggris · input pengguna tidak disimpan
 
+Bukan orang teknis? Baca [ringkasan satu halaman](docs/ringkasan_non_teknis.md).
+
 ## Ringkasan hasil
 
 - **Model:** XGBoost dengan 12 fitur. PR-AUC pada CV acak data latih **0,931 (rentang 10 ulangan 0,920–0,939)**, dibanding baseline churn rate **0,157**. Angka ini mengukur kemampuan mengurutkan pelanggan di data yang tersedia, **bukan performa pada pelanggan baru** (lihat [Keterbatasan](#keterbatasan)).

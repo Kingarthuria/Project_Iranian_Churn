@@ -2,7 +2,7 @@
 
 > File ini adalah **sumber kebenaran** project. Isi hanya fakta yang sudah pasti. Bagian yang belum diketahui dibiarkan kosong.
 > Berikan ke AI di awal setiap sesi ("baca PROJECT_GUIDE.md dulu"). Perbarui **Status** dan **Log Keputusan** setiap selesai satu langkah.
-> Terakhir diperbarui: 2026-11-08 (Fase 6 di-merge ke `main`, target peran ditetapkan, Fase 7 dimulai)
+> Terakhir diperbarui: 2026-11-08 (Fase 7: README dan ringkasan non-teknis selesai)
 
 ---
 
@@ -80,7 +80,7 @@
 | 9 | Baris dengan komplain dan berstatus non-aktif punya churn rate 89,3% (133 dari 149). Menurut UCI, kedua kolom berasal dari 9 bulan pertama. Cara `Status` ditentukan dan definisi churn tidak dijelaskan, jadi hubungan ini perlu dibaca hati-hati | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
 | 10 | Baris churn hanya memegang 4,4% total `Customer_Value` (median 102,6 berbanding 271,5). Dibaca sebagai porsi relatif, bukan uang | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
 | 11 | Gabungan `Complains=1`, `Status=2`, dan `Seconds_of_Use` Rendah mencakup 992 baris (34,8%) dan 90,8% baris churn. Deskriptif, karena sinyal dipilih setelah melihat churn | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
-| 12 | Selisih churn rate, IK 95%: komplain 72,8 poin (67,3 sampai 77,3), non-aktif 41,9 poin (38,1 sampai 45,8), `Seconds_of_Use` kuartil terendah 25,3 poin (21,7 sampai 29,1). Eksploratif | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04 |
+| 12 | Selisih churn rate, IK 95%: komplain 72,8 poin (67,3 sampai 77,3), non-aktif 41,9 poin (38,1 sampai 45,8), `Seconds_of_Use` kuartil terendah 25,3 poin (21,7 sampai 29,1). Churn rate per kelompok: pernah komplain 82,6% (230 baris) dan tidak 9,8% (2.620), non-aktif 47,5% (684) dan aktif 5,6% (2.166). Eksploratif | `program/EDA_Project_Churn_v2.ipynb` | 2026-11-04, churn rate per kelompok ditambahkan 2026-11-08 dari `load_clean()` |
 | 13 | PR-AUC CV acak pada 2.280 baris latih, parameter default, 12 fitur: XGBoost 0,931 (0,920–0,939), RandomForest 0,914 (0,908–0,919), Logistic Regression 0,773 (0,768–0,776), `DummyClassifier` 0,157. Bukan performa pada pelanggan baru, dan skor setinggi ini dicurigai | `program/Modeling_Project_Churn.ipynb` | 2026-11-05 |
 | 14 | Cek internal CV grup, dengan model dan fitur yang sama: Logistic Regression 0,625 (0,484–0,771), RandomForest 0,504 (0,400–0,635), XGBoost 0,474 (0,323–0,588), `DummyClassifier` 0,161. Rentangnya lebar dan bertumpuk | `program/Modeling_Project_Churn.ipynb` | 2026-11-05 |
 | 15 | Tanpa `Status` dan `Complains`, PR-AUC XGBoost turun 0,045 pada CV acak dan 0,243 pada CV grup, sedangkan Logistic Regression turun 0,225 dan 0,256 | `program/Modeling_Project_Churn.ipynb` | 2026-11-05 |
@@ -172,7 +172,7 @@ Accuracy tidak dipakai sebagai metrik utama. Lihat keputusan 22 dan 23 di bagian
 | 4 Experiment tracking | **Selesai.** `python -X utf8 -m src.track` mencatat 4 run ke MLflow lokal (`mlflow.db`, experiment `iranian-churn`) dan mendaftarkan Pipeline final sebagai `iranian-churn-xgboost@champion` (keputusan 37). Metrik di MLflow sama dengan temuan 13–15, model dari registry memberi skor sama dengan `models/churn_pipeline.joblib`, dan UI (`mlflow ui --backend-store-uri sqlite:///mlflow.db`) menampilkan keempat run. Ada 26 test |
 | 5 Deployment | **Selesai.** Demo publik: https://churn-risk-priority.streamlit.app/ (Streamlit Community Cloud, branch `main`, Python 3.12). `streamlit_app.py` dengan skema input `src/schema.py` dan prediksi `src/predict.py` sudah berjalan lokal. Env conda `ds_env312` (Python 3.12.16) dibuat dari `requirements-dev.txt`, dan 46 test lulus di `ds_env312` maupun `ds_env` dengan skor model identik (keputusan 39). CI GitHub Actions hijau di Linux dengan Python 3.12 (keputusan 40). Tampilan demo ditulis ulang dan dikunci (keputusan 41–43): 4 tab, dua bahasa, dan rekomendasi per segmen. 73 test lulus, dan PR #4 di-merge ke `main` setelah CI hijau |
 | 6 Monitoring | **Selesai**, di-merge ke `main` lewat PR #8. `python -X utf8 -m src.monitor` membuat laporan drift dari 4 batch simulasi (keputusan 44). Batch `normal` stabil (PSI semua fitur di bawah 0,015), dan ketiga skenario buatan tertangkap pada fitur yang diubah. Aturan retraining dan rollback ada di `docs/monitoring.md`. 80 test lulus |
-| 7 Dokumentasi portofolio | Belum dimulai |
+| 7 Dokumentasi portofolio | **Berjalan** di branch `fase7-dokumentasi`. README portofolio (dengan tabel kesalahan yang ditemukan dan diperbaiki serta kalimat keterbatasan) dan `docs/ringkasan_non_teknis.md` sudah ditulis dan disetujui pengguna. Sisa: lisensi kode, PR ke `main`, lalu repo dijadikan publik (keputusan 45) |
 
 ---
 
@@ -249,9 +249,9 @@ Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 **DoD:** laporan drift dapat dihasilkan dengan satu perintah.
 
 ### Fase 7: Dokumentasi portofolio
-- [ ] `README.md` dari template portofolio, termasuk keterbatasan
-- [ ] Tabel "kesalahan yang saya temukan dan perbaiki"
-- [ ] Ringkasan satu halaman untuk non-teknis
+- [x] `README.md` dari template portofolio, termasuk keterbatasan
+- [x] Tabel "kesalahan yang saya temukan dan perbaiki"
+- [x] Ringkasan satu halaman untuk non-teknis (`docs/ringkasan_non_teknis.md`)
 
 **DoD:** orang lain dapat mengklon, menjalankan, dan memahami hasilnya tanpa bertanya.
 
@@ -379,6 +379,7 @@ project_iranian_churn/
 | 2026-11-08 | Pelajaran dari Fase 6: target peran (Data Analyst, Data Scientist, ML Engineer/MLOps) tidak pernah ditulis di guide ini, sehingga kedalaman fase tidak dicek terhadap tujuan. Mulai sekarang target peran dicatat di bagian 1, dan aturan ini ditambahkan ke `ai-playbooks` (template `PROJECT_GUIDE` dan `CLAUDE.global.md`) untuk project berikutnya | Diputuskan |
 | 2026-11-08 | Fase 6 di branch `fase6-monitoring`: `src/simulate.py`, `src/score_batch.py`, `src/monitor.py`, `docs/monitoring.md`, dan 6 test (keputusan 44). `monitoring/` dan `.claude/` masuk `.gitignore`. Folder lokal `cadangan/` dan `mockup/` dipindah ke Recycle Bin | Diputuskan |
 | 2026-11-08 | Fase 6 di-merge ke `main` lewat PR #8 (`a4d3dec`). Target peran project ditetapkan: Data Scientist (utama) + ML Engineer/MLOps (pendukung), atas saran AI yang disetujui pengguna. Alasan: bagian data science (audit pola berulang, validasi, rentang skor, threshold biaya, interpretasi) paling kuat dan khas, MLOps cukup kuat tetapi versi ringan, dan sisi analyst paling tipis karena tidak ada dashboard BI atau SQL | Diputuskan |
+| 2026-11-08 | `docs/ringkasan_non_teknis.md` ditulis dengan gaya bercerita untuk pembaca awam: istilah diperkenalkan sebelum dipakai, angka ditulis sebagai "X dari 100 pelanggan", dan alasan kenapa temuan belum membuktikan sebab-akibat dijelaskan. Semua angka dihitung ulang dengan kode, dan churn rate per kelompok ditambahkan ke temuan 12. README dan `docs/README.md` menautkan ringkasan ini | Diputuskan |
 
 ---
 
