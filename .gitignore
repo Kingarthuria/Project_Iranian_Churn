@@ -22,6 +22,10 @@ dataset_clean/
 # Model terlatih, dibuat ulang dengan python -X utf8 -m src.train (keputusan 36)
 models/
 
+# Hasil monitoring (batch simulasi, log prediksi, laporan drift), dibuat ulang dengan
+# python -X utf8 -m src.monitor (keputusan 44)
+monitoring/
+
 # Python / Jupyter
 __pycache__/
 *.pyc
@@ -35,3 +39,6 @@ __pycache__/
 # OS
 Thumbs.db
 .DS_Store
+
+# Pengaturan lokal Claude Code (berisi path Python di komputer sendiri)
+.claude/

@@ -17,6 +17,9 @@ Logika yang dipakai ulang dan dipindah dari notebook di `program/` (keputusan 36
 | `texts.py` | Semua teks demo dalam Bahasa Indonesia (default) dan Inggris, serta format angka per bahasa |
 | `charts.py` | Grafik demo dengan Altair: posisi skor, waterfall SHAP, matriks segmen, dan kepentingan fitur |
 | `summary.py` | Ringkasan angka untuk tab Cara kerja model (`docs/ringkasan_model.csv` dan `docs/kepentingan_fitur.csv`) |
+| `simulate.py` | Batch simulasi untuk monitoring: normal, komplain naik, pemakaian turun, dan non-aktif naik |
+| `score_batch.py` | Menilai satu batch pelanggan dan mencatat log prediksi |
+| `monitor.py` | PSI, uji KS dan chi-kuadrat, serta laporan drift dengan satu perintah (Fase 6) |
 
 ## Lingkungan
 
@@ -89,6 +92,16 @@ import mlflow
 mlflow.set_tracking_uri("sqlite:///mlflow.db")
 model = mlflow.sklearn.load_model("models:/iranian-churn-xgboost@champion")
 ```
+
+## Monitoring
+
+Jalankan dari root project:
+
+```
+python -X utf8 -m src.monitor
+```
+
+Perintah ini membuat 4 batch simulasi, menilainya, lalu menulis `monitoring/laporan_drift.md`, `monitoring/drift_per_fitur.csv`, dan `monitoring/prediction_log.csv` (tidak dilacak Git). Aturan retraining dan rollback ada di `docs/monitoring.md` (keputusan 44).
 
 ## Menjalankan test dan lint
 

@@ -2,7 +2,7 @@
 
 > File ini adalah **sumber kebenaran** project. Isi hanya fakta yang sudah pasti. Bagian yang belum diketahui dibiarkan kosong.
 > Berikan ke AI di awal setiap sesi ("baca PROJECT_GUIDE.md dulu"). Perbarui **Status** dan **Log Keputusan** setiap selesai satu langkah.
-> Terakhir diperbarui: 2026-11-08 (demo publik aktif, Fase 5 selesai)
+> Terakhir diperbarui: 2026-11-08 (Fase 6 monitoring selesai di branch `fase6-monitoring`)
 
 ---
 
@@ -143,6 +143,7 @@
 | 41 | Tampilan demo Fase 5 ditulis ulang. **Sidebar:** judul Bahasa, pilihan contoh berupa segmented control tiga pilihan sama lebar (Risiko tinggi, Risiko rendah, Nilai median), Data pelanggan dalam 4 grup dengan petunjuk median dan rentang di ikon bantuan, kotak **Pengaturan keputusan** (rasio biaya) bergaris putus-putus di antara grup isian dan tombol hitung, tanpa `st.form` supaya rasio langsung berlaku. **Empat tab:** (1) *Hasil & rekomendasi* untuk pembaca bisnis, berjudul "Perlukah pelanggan ini dihubungi?", dengan alur What, So What, Now What tanpa judul per bagian: 3 kartu (keputusan, skor risiko, skor minimal), insight bahasa awam yang membandingkan pelanggan dengan median data latih, kalimat penghubung ke matriks segmen 2×2 (nilai tinggi di kiri), rekomendasi per segmen untuk siklus 12 bulan berikutnya, saran yang disesuaikan dari alasan risiko (komplain, non-aktif, kegagalan panggilan di atas umumnya, pemakaian di bawah umumnya) hanya untuk pelanggan yang disarankan dihubungi, dan pengingat keterbatasan satu baris; (2) *Detail teknis*: posisi skor pada sumbu log, waterfall SHAP 12 fitur, dan tabel SHAP; (3) *Cara kerja model*: alur data, PR-AUC dan ROC-AUC dari `docs/ringkasan_model.csv`, permutation importance dari `docs/kepentingan_fitur.csv` (keduanya dibuat `python -X utf8 -m src.summary`, sama dengan temuan 13 dan 22), dan tabel skor minimal per rasio; (4) *Keterbatasan & data*. Istilah "skor minimal untuk dihubungi" menggantikan "batas hubungi" dan threshold. Dua bahasa (`src/texts.py`, default Indonesia), tema terang `#334155` (`.streamlit/config.toml`), grafik Altair (`src/charts.py`, `altair==6.3.0` dipatok), dan sedikit CSS tata letak di `streamlit_app.py`. Menggantikan bagian tampilan keputusan 38, termasuk penjelasan 5 fitur teratas | Keputusan pengguna setelah 16 putaran peninjauan dari sudut pandang pembaca awam. Bagian bisnis dan teknis dipisah supaya beban baca berkurang. Keterbatasan: tindakan dan contoh penawaran adalah hipotesis, CSS bergantung pada struktur HTML Streamlit 1.65 sehingga bisa rusak saat upgrade, dan di tab hasil kalimat keterbatasan hanya berupa pengingat satu baris (kalimat lengkap ada di tab 4, keputusan 2 berlaku untuk README dan laporan model) | 2026-11-07 |
 | 42 | Dua asumsi tampilan di demo, keduanya ditulis di tab Keterbatasan & data. (a) Isian kelompok usia berupa 5 tombol perkiraan umur ≈15, ≈25, ≈30, ≈45, dan ≈55 tahun, yaitu nilai kolom `Age` yang berpasangan satu-satu dengan `Age_Group` 1–5 di data latih (dihitung `src/predict.py`, `_age_by_group`). Model tetap memakai `Age_Group`. (b) Waktu tindakan memakai siklus 12 bulan menurut UCI (fitur dari bulan 1–9, status churn di akhir bulan ke-12): hitung ulang skor di akhir bulan ke-9, bertindak di bulan ke-10 sampai ke-11, dan cek status di akhir bulan ke-12, untuk siklus tahun berikutnya | Keputusan pengguna. Slider 1–5 membingungkan pembaca, dan rekomendasi butuh waktu yang jelas. Keterbatasan: arti `Age` tidak dijelaskan UCI (keputusan 10), UCI tidak menyebut kapan pelanggan benar-benar berhenti, dan pola pelanggan tahun berikutnya diasumsikan mirip dengan data ini | 2026-11-07 |
 | 43 | Peringatan "kombinasi input tidak umum" dihapus dari demo beserta fungsi `unusual_combinations`, datanya di `Bundle`, teks, dan test-nya | Keputusan pengguna. Aturan sisa regresi `Customer_Value` (temuan 8) menandai nilai yang masih di dalam rentang data latih, sehingga membingungkan pembaca. Keterbatasan: kombinasi isian yang tidak konsisten tidak lagi ditandai. Input tetap dibatasi rentang data latih oleh `src/schema.py` | 2026-11-07 |
+| 44 | Monitoring Fase 6 tanpa library baru. `python -X utf8 -m src.monitor` membuat 4 batch simulasi berisi 500 pelanggan dari data latih (`normal`, `komplain_naik`, `pemakaian_turun`, `nonaktif_naik`, `src/simulate.py`), menilainya dengan model demo dan mencatat log prediksi (`src/score_batch.py`), lalu membandingkannya dengan 2.280 baris data latih (`src/monitor.py`): PSI per fitur (10 kuantil data acuan, atau per kode untuk 5 kolom berkode), uji KS dan chi-kuadrat sebagai pelengkap, dan porsi pelanggan yang disarankan dihubungi. Status fitur memakai batas PSI 0,10 dan 0,25. Batch bergeser jika ada fitur penting (temuan 22) dengan PSI 0,25 ke atas, atau porsi dihubungi bergeser 10 poin persen atau lebih. Hasilnya `monitoring/laporan_drift.md`, `monitoring/drift_per_fitur.csv`, dan `monitoring/prediction_log.csv` (tidak dilacak Git). Aturan retraining dan rollback ada di `docs/monitoring.md`: drift memicu pemeriksaan, retraining menunggu label sekitar 3 bulan, `champion` hanya diganti jika rentang PR-AUC model baru tidak lebih buruk (seperti keputusan 30), dan rollback mengembalikan alias `champion` di MLflow atau me-revert commit `main` untuk demo. Data uji tidak dipakai | Keputusan pengguna: batch simulasi, PSI dengan uji statistik, log dari script batch, dan laporan Markdown + CSV. Dataset hanya punya satu periode, dan demo publik tidak menyimpan input (keputusan 38). Keterbatasan: batch adalah simulasi dari data latih model sendiri, sehingga skornya lebih yakin daripada skor pelanggan baru; drift data tidak sama dengan turunnya performa; label churn datang terlambat; dan batas PSI serta batas porsi dihubungi adalah aturan praktis atau asumsi | 2026-11-08 |
 
 ---
 
@@ -168,7 +169,7 @@ Accuracy tidak dipakai sebagai metrik utama. Lihat keputusan 22 dan 23 di bagian
 | 3 Evaluasi dan refactor | **Selesai.** Threshold skenario biaya (`program/Threshold_Biaya.ipynb`, `docs/threshold_skenario.csv`, keputusan 32), risiko × nilai (`program/Risiko_Nilai.ipynb`, keputusan 33), interpretasi model (`program/Interpretasi_Model.ipynb`, keputusan 34), dan analisis error (`program/Analisis_Error.ipynb`, keputusan 35). Logika dipindah ke `src/` dengan 19 test, dan `python -X utf8 -m src.train` melatih ulang Pipeline final pada 2.280 baris latih serta menyimpannya ke `models/` (keputusan 36). Dua kali jalan menghasilkan hash model yang sama |
 | 4 Experiment tracking | **Selesai.** `python -X utf8 -m src.track` mencatat 4 run ke MLflow lokal (`mlflow.db`, experiment `iranian-churn`) dan mendaftarkan Pipeline final sebagai `iranian-churn-xgboost@champion` (keputusan 37). Metrik di MLflow sama dengan temuan 13–15, model dari registry memberi skor sama dengan `models/churn_pipeline.joblib`, dan UI (`mlflow ui --backend-store-uri sqlite:///mlflow.db`) menampilkan keempat run. Ada 26 test |
 | 5 Deployment | **Selesai.** Demo publik: https://churn-risk-priority.streamlit.app/ (Streamlit Community Cloud, branch `main`, Python 3.12). `streamlit_app.py` dengan skema input `src/schema.py` dan prediksi `src/predict.py` sudah berjalan lokal. Env conda `ds_env312` (Python 3.12.16) dibuat dari `requirements-dev.txt`, dan 46 test lulus di `ds_env312` maupun `ds_env` dengan skor model identik (keputusan 39). CI GitHub Actions hijau di Linux dengan Python 3.12 (keputusan 40). Tampilan demo ditulis ulang dan dikunci (keputusan 41–43): 4 tab, dua bahasa, dan rekomendasi per segmen. 73 test lulus, dan PR #4 di-merge ke `main` setelah CI hijau |
-| 6 Monitoring | Belum dimulai |
+| 6 Monitoring | **Selesai di branch `fase6-monitoring`.** `python -X utf8 -m src.monitor` membuat laporan drift dari 4 batch simulasi (keputusan 44). Batch `normal` stabil (PSI semua fitur di bawah 0,015), dan ketiga skenario buatan tertangkap pada fitur yang diubah. Aturan retraining dan rollback ada di `docs/monitoring.md`. 80 test lulus |
 | 7 Dokumentasi portofolio | Belum dimulai |
 
 ---
@@ -239,9 +240,9 @@ Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 **DoD:** demo publik bisa diakses lewat URL dan CI hijau.
 
 ### Fase 6: Monitoring
-- [ ] Log prediksi, laporan drift terhadap data referensi
-- [ ] Aturan retraining dan prosedur rollback
-- [ ] Catatan keterbatasan monitoring (label sering datang terlambat)
+- [x] Log prediksi, laporan drift terhadap data referensi (`src/score_batch.py`, `src/monitor.py`)
+- [x] Aturan retraining dan prosedur rollback (`docs/monitoring.md`)
+- [x] Catatan keterbatasan monitoring (label sering datang terlambat)
 
 **DoD:** laporan drift dapat dihasilkan dengan satu perintah.
 
@@ -269,7 +270,7 @@ Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 | 3 Evaluasi dan refactor | `joblib` (runtime). Dev di `requirements-dev.txt`: `pytest`, `ruff`, `nbconvert`, `jupyter_core`. `shap` tidak dipakai (keputusan 34) |
 | 4 Tracking | `mlflow==3.18.0` di `requirements-dev.txt` (keputusan 37) |
 | 5 Deployment | `streamlit` dan `pydantic` di `requirements.txt`, yang kini hanya berisi library demo. Library notebook pindah ke `requirements-dev.txt` (keputusan 38). `altair` dipatok untuk grafik demo (keputusan 41). FastAPI tidak dipakai |
-| 6 Monitoring | opsional `evidently` |
+| 6 Monitoring | Tidak ada library baru. PSI dan uji statistik memakai `numpy` dan `scipy` yang sudah ada, `evidently` tidak dipakai (keputusan 44) |
 
 **Git:** commit kecil per langkah, pesan Bahasa Indonesia dengan awalan fase (`fase1: ...`).
 
@@ -291,12 +292,13 @@ project_iranian_churn/
 ├── dataset/          # data mentah, read-only (dilacak, CC BY 4.0)
 ├── dataset_clean/    # data bersih, dibuat ulang dari script (tidak dilacak Git)
 ├── models/           # Pipeline terlatih dan metadata, dibuat ulang dengan src.train (tidak dilacak Git)
+├── monitoring/       # batch simulasi, log prediksi, dan laporan drift dari src.monitor (tidak dilacak Git)
 ├── jurnal/           # referensi, diabaikan Git
 ├── program/          # notebook eksplorasi (peta di program/README.md)
 ├── ringkasan_temuan/ # ringkasan temuan bernomor (.md)
 ├── src/              # logika yang dipakai ulang
 ├── tests/            # test pytest untuk src/
-└── docs/             # decision log, laporan, threshold_skenario.csv, ringkasan angka demo
+└── docs/             # decision log, laporan, threshold_skenario.csv, ringkasan angka demo, monitoring.md
 ```
 
 ---
@@ -371,6 +373,7 @@ project_iranian_churn/
 | 2026-11-08 | Demo di-deploy pengguna ke Streamlit Community Cloud: https://churn-risk-priority.streamlit.app/, dari branch `main` dengan Python 3.12.16. Log build bersih: paket dipasang dengan `uv` dari `requirements.txt`, Streamlit Cloud mengganti `pyarrow` 25.0.1 dengan 24.0.0 (masalah segfault yang diketahui), dan memberi peringatan karena `pyproject.toml` juga terdeteksi, tetapi tetap memakai `requirements.txt`. Halaman awal memberi skor 0,002 dan skor minimal 0,060 untuk nilai median, sama dengan hasil lokal. Fase 5 memenuhi DoD | Diputuskan |
 | 2026-11-08 | Ditutup: muat pertama demo di Streamlit Cloud sempat lebih dari 2 menit, padahal pelatihan lokal sekitar 0,2 detik. Setelah XGBoost di demo dibatasi ke 1 thread (`DEMO_N_JOBS` di `src/predict.py`, PR #6, merge `f9e0077`), log server mencatat `model siap dalam 1.0 detik, cpu_count=16`, dan halaman tampil sekitar 10 detik setelah dibuka. Server melaporkan 16 inti, sehingga dugaan thread yang berebut jatah CPU kecil didukung, walau log versi lama tidak punya angka pembanding. Skor dengan 1 thread persis sama dengan model bawaan (diuji), jadi keputusan 31 tidak berubah. Log juga mencatat `KeyError: 'src.config'` sekali saat Streamlit Cloud menarik kode baru di tengah sesi pengunjung, lalu aplikasi berjalan normal. Setelah merge ke `main`, sebaiknya tekan Reboot app di Manage app | Diputuskan |
 | | `xgboost` di Linux ikut memasang `nvidia-nccl-cu12` (335 MB) yang tidak dipakai demo. Bisa dipertimbangkan paket `xgboost-cpu` nanti, setelah dicek versi dan dampaknya ke CI | **Terbuka** |
+| 2026-11-08 | Fase 6 di branch `fase6-monitoring`: `src/simulate.py`, `src/score_batch.py`, `src/monitor.py`, `docs/monitoring.md`, dan 6 test (keputusan 44). `monitoring/` dan `.claude/` masuk `.gitignore`. Folder lokal `cadangan/` dan `mockup/` dipindah ke Recycle Bin | Diputuskan |
 
 ---
 

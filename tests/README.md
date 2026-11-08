@@ -14,6 +14,7 @@ Test sederhana (pytest) untuk kode di `src/`. Jalankan dari root project dengan 
 | `test_predict.py` | Skor demo sama dengan Pipeline, threshold dan keputusan sesuai CSV, segmen sesuai median nilai, penjelasan SHAP konsisten dengan skor, dan kelompok usia berpasangan satu-satu dengan kolom `Age` |
 | `test_summary.py` | Angka di `docs/ringkasan_model.csv` dan `docs/kepentingan_fitur.csv` sama dengan temuan 13 dan 22, serta sama dengan hasil hitung ulang |
 | `test_texts.py` | Kedua bahasa punya kunci teks yang sama, kalimat keterbatasan sama persis dengan `PROJECT_GUIDE.md`, tiap fitur punya label, format angka per bahasa, dan tidak ada kata yang dilarang |
+| `test_monitor.py` | PSI nol untuk data identik dan tinggi untuk data yang digeser, batch simulasi bisa diulang, batch normal stabil, ketiga skenario tertangkap, log prediksi sesuai model demo, dan laporan dibuat dengan satu perintah |
 | `test_app.py` | Uji aplikasi Streamlit: empat tab, kalimat keterbatasan terlihat, pilihan contoh dan rasio di sidebar, isian sendiri, alur tab bisnis (angka, arti, rekomendasi), saran yang disesuaikan, tab teknis, dan matriks segmen |
 
 Data uji hanya dipakai untuk memeriksa jumlah baris dan memastikan tidak tumpang tindih dengan data latih. Skornya tidak dihitung.
