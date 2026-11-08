@@ -82,6 +82,25 @@ PR-AUC pada CV acak data latih (2.280 baris, 12 fitur, parameter default):
 | Library `shap` gagal membaca model XGBoost 3 | Error saat interpretasi | Memakai SHAP bawaan XGBoost (`pred_contribs`), tanpa library tambahan |
 | Demo publik butuh lebih dari 2 menit saat pertama dibuka | Diukur langsung di browser | Server melaporkan 16 inti CPU. Setelah XGBoost dibatasi ke 1 thread, log mencatat model siap dalam 1,0 detik, dengan skor yang persis sama |
 
+## Apa yang berbeda dari penelitian sebelumnya
+
+Empat penelitian lain yang memakai dataset yang sama ditinjau sebelum memilih cara validasi. Perbandingan ini terbatas pada keempat penelitian itu.
+
+| Aspek | Penelitian yang ditinjau | Proyek ini |
+|---|---|---|
+| Duplikat | Yuan & Liu menghapus 300 duplikat persis. Damuri dkk. mempertahankan 314 baris berfitur identik. Mlambo dkk. dan Faraji Googerdchi dkk. memakai 3.150 baris tanpa menyebut penanganan duplikat | 314 baris itu terdiri atas 300 duplikat persis dan 14 baris yang fiturnya sama tetapi labelnya berbeda. Yang dihapus hanya 300 duplikat persis, supaya baris kembar tidak jatuh ke data latih dan data uji sekaligus |
+| Outlier | Yuan & Liu tidak menemukan outlier dengan Tukey's fences. Mlambo dkk. mengganti outlier dengan rata-rata data latih | Dengan rumus Tukey yang sama, data bersih punya 44–333 baris di luar batas per kolom numerik. Semuanya dipertahankan, karena tidak ada bukti nilainya salah |
+| Independensi baris | Tidak dibahas. Semua penelitian membagi data per baris secara acak | Audit menemukan pola berulang per 50 baris. Skor tetap dilaporkan, tetapi dengan cek per kelompok dan dibaca dengan curiga |
+
+Perbedaan ini tidak berarti penelitian lain salah. Tujuan dan pilihan tiap penelitian berbeda. Tabel ini menunjukkan keputusan yang diambil di proyek ini dan alasannya.
+
+Penelitian yang ditinjau:
+
+- Damuri, A., Wulandari, N., & Mulyana, I. (2026). Prediksi Customer Churn Berbasis Nilai Pelanggan Menggunakan Explainable Machine Learning Untuk Mendukung Strategi Retensi. *ALMUISY: Journal of Al Muslim Information System*, 5(1).
+- Faraji Googerdchi, K., Asadi, S., & Jafari, S. M. (2024). Customer churn modeling in telecommunication using a novel multi-objective evolutionary clustering-based ensemble learning. *PLOS ONE*, 19(6), e0303881. https://doi.org/10.1371/journal.pone.0303881
+- Mlambo, F. F., Musuphi, M., & Letsela, K. (2026). A Hybrid Machine Learning and Survival Analysis Framework for Churn Prediction in the Telecom Sector. *Information*, 17, 680. https://doi.org/10.3390/info17070680
+- Yuan, J., & Liu, H. (2025). Telecom Customer Churn Prediction with Explainable Machine Learning. In *2025 2nd International Conference on Modeling, Natural Language Processing and Machine Learning (CMNM 2025)*. ACM. https://doi.org/10.1145/3757110.3757152
+
 ## Keterbatasan
 
 > Analisis mengikuti dokumentasi UCI yang menyatakan tiap baris mewakili satu pelanggan. Namun audit menemukan pola berulang per 50 baris, sehingga independensi antarbaris tidak terjamin dan skor model bisa terlalu optimistis.
