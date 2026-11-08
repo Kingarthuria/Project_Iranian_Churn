@@ -66,6 +66,21 @@ RATIO_EXPLANATIONS = {
         "Cocok jika biaya menghubungi murah.",
 }
 
+# Monitoring Fase 6 (keputusan 44). Hasilnya di monitoring/, tidak dilacak Git
+MONITOR_DIR = ROOT / "monitoring"
+# Kolom berkode: drift diukur per kategori dan diuji dengan chi-kuadrat. Kolom lain diuji dengan KS
+CATEGORICAL_FEATURES = ["Complains", "Status", "Tariff_Plan", "Charge_Amount", "Age_Group"]
+# Fitur penting menurut permutation importance (temuan 22): kelompok pemakaian dan 5 fitur teratas
+KEY_FEATURES = [
+    "Seconds_of_Use", "Frequency_of_use", "Frequency_of_SMS", "Distinct_Called_Numbers", "Customer_Value",
+    "Complains", "Subscription_Length", "Status", "Call_Failure",
+]
+# Batas PSI yang umum dipakai (aturan praktis, bukan hasil hitungan dari data ini)
+PSI_WARN = 0.1
+PSI_ALERT = 0.25
+# Pergeseran porsi pelanggan yang disarankan dihubungi yang dianggap perlu dicek (asumsi, 10 poin persen)
+CONTACT_SHARE_ALERT = 0.10
+
 # Jumlah baris yang diharapkan, untuk menghentikan proses jika data berubah
 EXPECTED_CLEAN_ROWS = 2850
 EXPECTED_TRAIN_ROWS = 2280
