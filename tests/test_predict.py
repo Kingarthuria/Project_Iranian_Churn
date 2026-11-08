@@ -100,3 +100,15 @@ def test_age_by_group_is_one_to_one_from_training_data(bundle, split):
     assert all(len(values) == 1 for values in expected)
     assert bundle.age_by_group == {int(g): int(v[0]) for g, v in expected.items()}
     assert list(bundle.age_by_group) == sorted(bundle.age_by_group)
+
+
+def test_demo_uses_one_thread_with_identical_scores(bundle, split):
+    # Demo membatasi XGBoost ke satu thread untuk server Streamlit Cloud. Skornya harus persis sama dengan model
+    # bawaan yang memakai semua thread, jadi model yang dikunci (keputusan 31) tidak berubah
+    from src.predict import DEMO_N_JOBS
+    train, _ = split
+    assert bundle.pipeline.named_steps["model"].get_params()["n_jobs"] == DEMO_N_JOBS == 1
+    default = build_pipeline().fit(train, train[config.TARGET])
+    np.testing.assert_array_equal(
+        bundle.pipeline.predict_proba(train)[:, 1], default.predict_proba(train)[:, 1]
+    )
