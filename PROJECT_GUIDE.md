@@ -2,7 +2,7 @@
 
 > File ini adalah **sumber kebenaran** project. Isi hanya fakta yang sudah pasti. Bagian yang belum diketahui dibiarkan kosong.
 > Berikan ke AI di awal setiap sesi ("baca PROJECT_GUIDE.md dulu"). Perbarui **Status** dan **Log Keputusan** setiap selesai satu langkah.
-> Terakhir diperbarui: 2026-11-08 (Fase 6 monitoring selesai di branch `fase6-monitoring`)
+> Terakhir diperbarui: 2026-11-08 (Fase 6 di-merge ke `main`, target peran ditetapkan, Fase 7 dimulai)
 
 ---
 
@@ -11,6 +11,7 @@
 | Item | Isi |
 |---|---|
 | Tujuan | **Portofolio / pembelajaran**: menunjukkan alur data science dan MLOps end-to-end yang rapi, jujur, dan bisa dijelaskan |
+| Target peran | **Data Scientist (utama) + ML Engineer/MLOps (pendukung).** README dibuka dengan cerita data science (pola berulang, validasi jujur, hasil dengan rentang), lalu "dari notebook ke produk" (`src/`, test, CI, MLflow, demo, dan monitoring secara singkat). Data Analyst tidak menjadi target project ini. Untuk peran itu, lebih baik project terpisah dengan dashboard BI dan SQL |
 | Masalah | Memprediksi pelanggan sebuah perusahaan telekomunikasi Iran yang churn |
 | Dataset | `dataset/Customer Churn.csv` (UCI *Iranian Churn Dataset*) |
 | Target | `Churn` (1 = churn, 0 = non-churn, menurut UCI) |
@@ -169,7 +170,7 @@ Accuracy tidak dipakai sebagai metrik utama. Lihat keputusan 22 dan 23 di bagian
 | 3 Evaluasi dan refactor | **Selesai.** Threshold skenario biaya (`program/Threshold_Biaya.ipynb`, `docs/threshold_skenario.csv`, keputusan 32), risiko × nilai (`program/Risiko_Nilai.ipynb`, keputusan 33), interpretasi model (`program/Interpretasi_Model.ipynb`, keputusan 34), dan analisis error (`program/Analisis_Error.ipynb`, keputusan 35). Logika dipindah ke `src/` dengan 19 test, dan `python -X utf8 -m src.train` melatih ulang Pipeline final pada 2.280 baris latih serta menyimpannya ke `models/` (keputusan 36). Dua kali jalan menghasilkan hash model yang sama |
 | 4 Experiment tracking | **Selesai.** `python -X utf8 -m src.track` mencatat 4 run ke MLflow lokal (`mlflow.db`, experiment `iranian-churn`) dan mendaftarkan Pipeline final sebagai `iranian-churn-xgboost@champion` (keputusan 37). Metrik di MLflow sama dengan temuan 13–15, model dari registry memberi skor sama dengan `models/churn_pipeline.joblib`, dan UI (`mlflow ui --backend-store-uri sqlite:///mlflow.db`) menampilkan keempat run. Ada 26 test |
 | 5 Deployment | **Selesai.** Demo publik: https://churn-risk-priority.streamlit.app/ (Streamlit Community Cloud, branch `main`, Python 3.12). `streamlit_app.py` dengan skema input `src/schema.py` dan prediksi `src/predict.py` sudah berjalan lokal. Env conda `ds_env312` (Python 3.12.16) dibuat dari `requirements-dev.txt`, dan 46 test lulus di `ds_env312` maupun `ds_env` dengan skor model identik (keputusan 39). CI GitHub Actions hijau di Linux dengan Python 3.12 (keputusan 40). Tampilan demo ditulis ulang dan dikunci (keputusan 41–43): 4 tab, dua bahasa, dan rekomendasi per segmen. 73 test lulus, dan PR #4 di-merge ke `main` setelah CI hijau |
-| 6 Monitoring | **Selesai di branch `fase6-monitoring`.** `python -X utf8 -m src.monitor` membuat laporan drift dari 4 batch simulasi (keputusan 44). Batch `normal` stabil (PSI semua fitur di bawah 0,015), dan ketiga skenario buatan tertangkap pada fitur yang diubah. Aturan retraining dan rollback ada di `docs/monitoring.md`. 80 test lulus |
+| 6 Monitoring | **Selesai**, di-merge ke `main` lewat PR #8. `python -X utf8 -m src.monitor` membuat laporan drift dari 4 batch simulasi (keputusan 44). Batch `normal` stabil (PSI semua fitur di bawah 0,015), dan ketiga skenario buatan tertangkap pada fitur yang diubah. Aturan retraining dan rollback ada di `docs/monitoring.md`. 80 test lulus |
 | 7 Dokumentasi portofolio | Belum dimulai |
 
 ---
@@ -373,7 +374,9 @@ project_iranian_churn/
 | 2026-11-08 | Demo di-deploy pengguna ke Streamlit Community Cloud: https://churn-risk-priority.streamlit.app/, dari branch `main` dengan Python 3.12.16. Log build bersih: paket dipasang dengan `uv` dari `requirements.txt`, Streamlit Cloud mengganti `pyarrow` 25.0.1 dengan 24.0.0 (masalah segfault yang diketahui), dan memberi peringatan karena `pyproject.toml` juga terdeteksi, tetapi tetap memakai `requirements.txt`. Halaman awal memberi skor 0,002 dan skor minimal 0,060 untuk nilai median, sama dengan hasil lokal. Fase 5 memenuhi DoD | Diputuskan |
 | 2026-11-08 | Ditutup: muat pertama demo di Streamlit Cloud sempat lebih dari 2 menit, padahal pelatihan lokal sekitar 0,2 detik. Setelah XGBoost di demo dibatasi ke 1 thread (`DEMO_N_JOBS` di `src/predict.py`, PR #6, merge `f9e0077`), log server mencatat `model siap dalam 1.0 detik, cpu_count=16`, dan halaman tampil sekitar 10 detik setelah dibuka. Server melaporkan 16 inti, sehingga dugaan thread yang berebut jatah CPU kecil didukung, walau log versi lama tidak punya angka pembanding. Skor dengan 1 thread persis sama dengan model bawaan (diuji), jadi keputusan 31 tidak berubah. Log juga mencatat `KeyError: 'src.config'` sekali saat Streamlit Cloud menarik kode baru di tengah sesi pengunjung, lalu aplikasi berjalan normal. Setelah merge ke `main`, sebaiknya tekan Reboot app di Manage app | Diputuskan |
 | | `xgboost` di Linux ikut memasang `nvidia-nccl-cu12` (335 MB) yang tidak dipakai demo. Bisa dipertimbangkan paket `xgboost-cpu` nanti, setelah dicek versi dan dampaknya ke CI | **Terbuka** |
+| 2026-11-08 | Pelajaran dari Fase 6: target peran (Data Analyst, Data Scientist, ML Engineer/MLOps) tidak pernah ditulis di guide ini, sehingga kedalaman fase tidak dicek terhadap tujuan. Mulai sekarang target peran dicatat di bagian 1, dan aturan ini ditambahkan ke `ai-playbooks` (template `PROJECT_GUIDE` dan `CLAUDE.global.md`) untuk project berikutnya | Diputuskan |
 | 2026-11-08 | Fase 6 di branch `fase6-monitoring`: `src/simulate.py`, `src/score_batch.py`, `src/monitor.py`, `docs/monitoring.md`, dan 6 test (keputusan 44). `monitoring/` dan `.claude/` masuk `.gitignore`. Folder lokal `cadangan/` dan `mockup/` dipindah ke Recycle Bin | Diputuskan |
+| 2026-11-08 | Fase 6 di-merge ke `main` lewat PR #8 (`a4d3dec`). Target peran project ditetapkan: Data Scientist (utama) + ML Engineer/MLOps (pendukung), atas saran AI yang disetujui pengguna. Alasan: bagian data science (audit pola berulang, validasi, rentang skor, threshold biaya, interpretasi) paling kuat dan khas, MLOps cukup kuat tetapi versi ringan, dan sisi analyst paling tipis karena tidak ada dashboard BI atau SQL | Diputuskan |
 
 ---
 
