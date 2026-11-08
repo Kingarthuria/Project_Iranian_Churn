@@ -88,4 +88,4 @@ Demo publik tidak membaca registry. Demo melatih model dari dataset di branch `m
 - Drift data tidak sama dengan turunnya performa, dan label churn datang terlambat sekitar 3 bulan.
 - Batas PSI dan batas porsi dihubungi adalah aturan praktis atau asumsi, bukan hasil hitungan dari data ini.
 - Demo publik tidak menyimpan input, jadi log prediksi hanya berasal dari `src.score_batch` dan `src.monitor`.
-- Analisis mengikuti dokumentasi UCI yang menyatakan tiap baris mewakili satu pelanggan. Audit menemukan pola berulang per 50 baris, sehingga independensi antarbaris tidak terjamin dan skor model bisa terlalu optimistis.
+- Analisis mengikuti dokumentasi UCI yang menyatakan tiap baris mewakili satu pelanggan. Namun audit menemukan pola berulang per 50 baris, sehingga independensi antarbaris tidak terjamin dan skor model bisa terlalu optimistis.

@@ -182,7 +182,7 @@ Accuracy tidak dipakai sebagai metrik utama. Lihat keputusan 22 dan 23 di bagian
 
 Kalimat keterbatasan yang wajib masuk README dan laporan model:
 
-> Analisis mengikuti dokumentasi UCI yang menyatakan tiap baris mewakili satu pelanggan. Audit menemukan pola berulang per 50 baris, sehingga independensi antarbaris tidak terjamin dan skor model bisa terlalu optimistis.
+> Analisis mengikuti dokumentasi UCI yang menyatakan tiap baris mewakili satu pelanggan. Namun audit menemukan pola berulang per 50 baris, sehingga independensi antarbaris tidak terjamin dan skor model bisa terlalu optimistis.
 
 ---
 
@@ -355,6 +355,7 @@ project_iranian_churn/
 | | Platform demo: Streamlit Community Cloud (keputusan 38) | Diputuskan |
 | 2026-11-06 | `program/README.md` dibuat sebagai peta notebook: urutan baca dan jalan, tujuan tiap notebook, serta penanda alur utama dan simpanan | Diputuskan |
 | 2026-11-08 | Ditutup (keputusan 45): `CLAUDE.md` dan `PROJECT_GUIDE.md` tetap dilacak, tag `arsip-v1` dihapus dari GitHub, 8 branch yang sudah di-merge dihapus, dan path absolut di notebook asli diganti | Diputuskan |
+| 2026-11-08 | Kalimat keterbatasan wajib (bagian 7) diubah atas permintaan pengguna menjadi "... satu pelanggan. Namun audit menemukan ..." supaya lebih mengalir, beserta versi Inggrisnya ("However, an audit found ..."). Diterapkan di guide, demo (`src/texts.py`), `src/train.py`, `src/track.py`, `src/monitor.py`, README, `docs/monitoring.md`, `program/README.md`, dan `ringkasan_temuan/01_struktur_data.md`. Notebook di `program/` tidak diubah (keputusan 36) | Diputuskan |
 | 2026-11-06 | Interpretasi model memakai permutation importance dan SHAP bawaan XGBoost (keputusan 34). `shap` 0.49.1 tidak cocok dengan XGBoost 3.2.0, jadi tidak masuk requirements | Diputuskan |
 | | `shap` 0.49.1, `numba`, `llvmlite`, dan `slicer` tetap terpasang di `ds_env` atas keputusan pengguna (keputusan 38), tetapi tidak ada di requirements dan tidak di-import kode project. Demo memakai SHAP bawaan XGBoost. `shap` dipakai lagi hanya jika versi barunya sudah mendukung XGBoost 3, dan saat itu harus dimasukkan ke requirements lebih dulu | **Terbuka** |
 | 2026-11-06 | Analisis error memakai data latih, threshold 1:5, dan suara mayoritas, tanpa mengubah model (keputusan 35) | Diputuskan |

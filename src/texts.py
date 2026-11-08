@@ -8,12 +8,12 @@ DEFAULT_LANGUAGE = "id"
 
 LIMITATION_ID = (
     "Analisis mengikuti dokumentasi UCI yang menyatakan tiap baris mewakili satu pelanggan. "
-    "Audit menemukan pola berulang per 50 baris, sehingga independensi antarbaris tidak terjamin "
+    "Namun audit menemukan pola berulang per 50 baris, sehingga independensi antarbaris tidak terjamin "
     "dan skor model bisa terlalu optimistis."
 )
 LIMITATION_EN = (
     "The analysis follows the UCI documentation, which states that each row represents one customer. "
-    "An audit found a pattern repeating every 50 rows, so independence between rows is not guaranteed "
+    "However, an audit found a pattern repeating every 50 rows, so independence between rows is not guaranteed "
     "and model scores may be overly optimistic."
 )
 

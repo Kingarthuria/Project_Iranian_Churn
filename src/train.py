@@ -78,7 +78,7 @@ def build_metadata(train: pd.DataFrame, thresholds: pd.DataFrame, model_path: Pa
         },
         "keterbatasan": (
             "Analisis mengikuti dokumentasi UCI yang menyatakan tiap baris mewakili satu pelanggan. "
-            "Audit menemukan pola berulang per 50 baris, sehingga independensi antarbaris tidak terjamin "
+            "Namun audit menemukan pola berulang per 50 baris, sehingga independensi antarbaris tidak terjamin "
             "dan skor model bisa terlalu optimistis."
         ),
     }
