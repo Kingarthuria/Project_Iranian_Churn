@@ -124,12 +124,17 @@ python -X utf8 -m pytest                                          # test
 ├── docs/                # skor minimal per rasio, ringkasan angka demo, panduan monitoring
 ├── dataset/             # data mentah UCI (tidak diubah)
 ├── PROJECT_GUIDE.md     # semua temuan dan keputusan beserta alasannya
+├── LICENSE              # MIT untuk kode, dataset tetap CC BY 4.0
 └── requirements*.txt
 ```
 
 ## Cara kerja proyek ini
 
 Proyek ini dikerjakan dengan bantuan AI (Claude Code). Setiap keputusan analisis, mulai dari pembersihan, validasi, metrik, sampai model, diambil oleh saya setelah opsinya dibahas, lalu dicatat beserta alasan dan keterbatasannya di [PROJECT_GUIDE.md](PROJECT_GUIDE.md). Angka di dokumen ini berasal dari notebook dan kode, bukan diketik tangan.
+
+## Lisensi
+
+Kode dan dokumentasi proyek ini berlisensi [MIT](LICENSE). Dataset di `dataset/` tidak termasuk lisensi itu: dataset berasal dari UCI dan tetap berlisensi [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), sehingga pemakaian ulang wajib menyebut sumbernya (sitasi ada di bagian [Data](#data)).
 
 ## Penulis
 
