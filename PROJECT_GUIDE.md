@@ -384,6 +384,7 @@ project_iranian_churn/
 | 2026-11-08 | Lisensi kode diputuskan: MIT, dengan dataset tetap CC BY 4.0 (keputusan 46) | Diputuskan |
 | 2026-11-08 | Fase 7 di-merge ke `main` lewat PR #9 (`fb08668`) setelah CI hijau, lalu repo dijadikan publik. GitHub membaca lisensi sebagai "Other" karena ada catatan dataset di akhir `LICENSE`, jadi catatan itu dihapus dan cukup ditulis di README (keputusan 46 diperbarui). Fase 7 memenuhi DoD | Diputuskan |
 | 2026-11-08 | Simulasi pembaca non-teknis yang membuka repo publik: deskripsi About masih "tahap pengerjaan", tautan ringkasan non-teknis mudah terlewat, dan letak file tidak dijelaskan dengan bahasa awam. Diperbaiki: About GitHub diisi deskripsi baru, tautan demo, dan 8 topik; README dibuka dengan kotak "Mulai dari sini" untuk tiga jenis pembaca; dan `docs/ringkasan_non_teknis.md` mendapat bagian "Di mana letak filenya". Struktur README untuk rekruter tidak berubah | Diputuskan |
+| 2026-11-08 | Nama pembuat memakai alias **Arthur Pendragon** di semua tempat yang terlihat publik (`LICENSE`, README, dan demo), demi privasi pengguna. Username GitHub `Kingarthuria` dan email noreply tetap dipakai | Diputuskan |
 
 ---
 
