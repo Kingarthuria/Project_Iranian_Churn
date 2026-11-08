@@ -2,7 +2,7 @@
 
 > File ini adalah **sumber kebenaran** project. Isi hanya fakta yang sudah pasti. Bagian yang belum diketahui dibiarkan kosong.
 > Berikan ke AI di awal setiap sesi ("baca PROJECT_GUIDE.md dulu"). Perbarui **Status** dan **Log Keputusan** setiap selesai satu langkah.
-> Terakhir diperbarui: 2026-11-07 (tampilan demo Fase 5 dikunci, deploy belum)
+> Terakhir diperbarui: 2026-11-08 (demo publik aktif, Fase 5 selesai)
 
 ---
 
@@ -167,7 +167,7 @@ Accuracy tidak dipakai sebagai metrik utama. Lihat keputusan 22 dan 23 di bagian
 | 2 Modeling | **Selesai.** Perbandingan ada di `program/Modeling_Project_Churn.ipynb`, penyetelan di `program/Tuning_XGBoost.ipynb`, dan data uji di `program/Evaluasi_Data_Uji.ipynb`. Model terpilih: XGBoost default, tanpa pembobotan, 12 fitur (keputusan 31). Data uji sudah dipakai, jadi model tidak diubah berdasarkan hasilnya |
 | 3 Evaluasi dan refactor | **Selesai.** Threshold skenario biaya (`program/Threshold_Biaya.ipynb`, `docs/threshold_skenario.csv`, keputusan 32), risiko × nilai (`program/Risiko_Nilai.ipynb`, keputusan 33), interpretasi model (`program/Interpretasi_Model.ipynb`, keputusan 34), dan analisis error (`program/Analisis_Error.ipynb`, keputusan 35). Logika dipindah ke `src/` dengan 19 test, dan `python -X utf8 -m src.train` melatih ulang Pipeline final pada 2.280 baris latih serta menyimpannya ke `models/` (keputusan 36). Dua kali jalan menghasilkan hash model yang sama |
 | 4 Experiment tracking | **Selesai.** `python -X utf8 -m src.track` mencatat 4 run ke MLflow lokal (`mlflow.db`, experiment `iranian-churn`) dan mendaftarkan Pipeline final sebagai `iranian-churn-xgboost@champion` (keputusan 37). Metrik di MLflow sama dengan temuan 13–15, model dari registry memberi skor sama dengan `models/churn_pipeline.joblib`, dan UI (`mlflow ui --backend-store-uri sqlite:///mlflow.db`) menampilkan keempat run. Ada 26 test |
-| 5 Deployment | **Berjalan.** `streamlit_app.py` dengan skema input `src/schema.py` dan prediksi `src/predict.py` sudah berjalan lokal. Env conda `ds_env312` (Python 3.12.16) dibuat dari `requirements-dev.txt`, dan 46 test lulus di `ds_env312` maupun `ds_env` dengan skor model identik (keputusan 39). CI GitHub Actions hijau di Linux dengan Python 3.12 (keputusan 40). Tampilan demo ditulis ulang dan dikunci (keputusan 41–43): 4 tab, dua bahasa, dan rekomendasi per segmen. 72 test lulus. Deploy belum (keputusan 38) |
+| 5 Deployment | **Selesai.** Demo publik: https://churn-risk-priority.streamlit.app/ (Streamlit Community Cloud, branch `main`, Python 3.12). `streamlit_app.py` dengan skema input `src/schema.py` dan prediksi `src/predict.py` sudah berjalan lokal. Env conda `ds_env312` (Python 3.12.16) dibuat dari `requirements-dev.txt`, dan 46 test lulus di `ds_env312` maupun `ds_env` dengan skor model identik (keputusan 39). CI GitHub Actions hijau di Linux dengan Python 3.12 (keputusan 40). Tampilan demo ditulis ulang dan dikunci (keputusan 41–43): 4 tab, dua bahasa, dan rekomendasi per segmen. 73 test lulus, dan PR #4 di-merge ke `main` setelah CI hijau |
 | 6 Monitoring | Belum dimulai |
 | 7 Dokumentasi portofolio | Belum dimulai |
 
@@ -234,7 +234,7 @@ Kerjakan berurutan. Jangan lanjut sebelum fase sekarang memenuhi DoD.
 - [x] API atau aplikasi demo dengan skema input/output yang divalidasi
 - [x] Lingkungan dikunci dengan `venv` dan `requirements.txt` (env conda `ds_env312` dari `requirements-dev.txt`, keputusan 39)
 - [x] Test, lint, dan CI
-- [ ] Deploy demo ke layanan gratis (Render, Hugging Face Spaces, atau Streamlit Cloud)
+- [x] Deploy demo ke layanan gratis (Streamlit Community Cloud: https://churn-risk-priority.streamlit.app/)
 
 **DoD:** demo publik bisa diakses lewat URL dan CI hijau.
 
@@ -367,6 +367,9 @@ project_iranian_churn/
 | 2026-11-06 | Langkah 5b: CI GitHub Actions dibuat di `.github/workflows/ci.yml` (keputusan 40). Perbaikan tampilan demo dibahas setelah CI, sebelum deploy | Diputuskan |
 | 2026-11-06 | Run CI pertama (commit `20818d2`) hijau dalam sekitar 2 menit: `pip check` bersih, `ruff` lulus, dan 46 test lulus di Linux dengan Python 3.12. Angka test sama dengan hasil di Windows | Diputuskan |
 | 2026-11-07 | Mockup HTML demo (`mockup/`, tidak dilacak Git) dinilai, lalu pengguna memilih memperbaiki tampilan Streamlit yang ada. Setelah 16 putaran peninjauan, tampilan demo dikunci (keputusan 41–43). Tiap putaran dicadangkan di `cadangan/` (tidak dilacak Git). 72 test lulus di `ds_env312` | Diputuskan |
+| 2026-11-07 | Info pembuat diisi (Arthur Pendragon, tautan GitHub). Fase 5 di-merge ke `main` lewat PR #4 (merge commit `2091b72`) setelah CI hijau. Auto-merge GitHub tidak diizinkan di repo ini | Diputuskan |
+| 2026-11-08 | Demo di-deploy pengguna ke Streamlit Community Cloud: https://churn-risk-priority.streamlit.app/, dari branch `main` dengan Python 3.12.16. Log build bersih: paket dipasang dengan `uv` dari `requirements.txt`, Streamlit Cloud mengganti `pyarrow` 25.0.1 dengan 24.0.0 (masalah segfault yang diketahui), dan memberi peringatan karena `pyproject.toml` juga terdeteksi, tetapi tetap memakai `requirements.txt`. Halaman awal memberi skor 0,002 dan skor minimal 0,060 untuk nilai median, sama dengan hasil lokal. Fase 5 memenuhi DoD | Diputuskan |
+| | Muat pertama demo setelah server menyala terpantau lebih dari 2 menit di Streamlit Cloud, padahal pelatihan lokal sekitar 0,2 detik. Penyebab belum terbukti. Dugaan: XGBoost memakai semua inti CPU yang terdeteksi (`n_jobs` tidak diatur) dan berebut jatah CPU yang kecil. `xgboost` di Linux juga ikut memasang `nvidia-nccl-cu12` (335 MB) yang tidak dipakai | **Terbuka** |
 
 ---
 
