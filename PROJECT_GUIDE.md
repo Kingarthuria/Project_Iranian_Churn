@@ -383,6 +383,7 @@ project_iranian_churn/
 | 2026-11-08 | `docs/ringkasan_non_teknis.md` ditulis dengan gaya bercerita untuk pembaca awam: istilah diperkenalkan sebelum dipakai, angka ditulis sebagai "X dari 100 pelanggan", dan alasan kenapa temuan belum membuktikan sebab-akibat dijelaskan. Semua angka dihitung ulang dengan kode, dan churn rate per kelompok ditambahkan ke temuan 12. README dan `docs/README.md` menautkan ringkasan ini | Diputuskan |
 | 2026-11-08 | Lisensi kode diputuskan: MIT, dengan dataset tetap CC BY 4.0 (keputusan 46) | Diputuskan |
 | 2026-11-08 | Fase 7 di-merge ke `main` lewat PR #9 (`fb08668`) setelah CI hijau, lalu repo dijadikan publik. GitHub membaca lisensi sebagai "Other" karena ada catatan dataset di akhir `LICENSE`, jadi catatan itu dihapus dan cukup ditulis di README (keputusan 46 diperbarui). Fase 7 memenuhi DoD | Diputuskan |
+| 2026-11-08 | Simulasi pembaca non-teknis yang membuka repo publik: deskripsi About masih "tahap pengerjaan", tautan ringkasan non-teknis mudah terlewat, dan letak file tidak dijelaskan dengan bahasa awam. Diperbaiki: About GitHub diisi deskripsi baru, tautan demo, dan 8 topik; README dibuka dengan kotak "Mulai dari sini" untuk tiga jenis pembaca; dan `docs/ringkasan_non_teknis.md` mendapat bagian "Di mana letak filenya". Struktur README untuk rekruter tidak berubah | Diputuskan |
 
 ---
 

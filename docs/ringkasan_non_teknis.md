@@ -48,4 +48,18 @@ Selain itu, ada beberapa hal yang tidak dijelaskan oleh sumber data, misalnya ar
 
 Sebelum alat ini dipakai secara luas, kami menyarankan uji coba kecil. Ambil pelanggan yang disarankan untuk dihubungi, lalu bagi menjadi dua kelompok secara acak: satu kelompok dihubungi, kelompok lain sengaja tidak. Di akhir siklus, bandingkan berapa banyak yang churn di masing-masing kelompok. Jika kelompok yang dihubungi lebih sedikit churn, barulah ada bukti bahwa menghubungi pelanggan memang membantu. Setelah itu, model sebaiknya dilatih ulang dengan data perusahaan sendiri dan dipantau setiap periode (lihat [panduan monitoring](monitoring.md)).
 
-Detail teknis, angka lengkap, dan semua keputusan ada di [README](../README.md) dan [PROJECT_GUIDE.md](../PROJECT_GUIDE.md).
+## Di mana letak filenya
+
+Saat membuka repo di GitHub, daftar file di halaman depan mungkin terlihat membingungkan. Tidak perlu membuka semuanya. Berikut yang paling berguna:
+
+| Yang ingin Anda lihat | Letaknya |
+|---|---|
+| Penjelasan lengkap proyek | [README.md](../README.md), yang tampil di halaman depan repo |
+| Data asli dari UCI | folder [dataset/](../dataset) |
+| Catatan analisis langkah demi langkah, lengkap dengan grafik | folder [program/](../program). Urutan bacanya ada di [program/README.md](../program/README.md) |
+| Ringkasan hasil pemeriksaan data | folder [ringkasan_temuan/](../ringkasan_temuan) |
+| Semua keputusan beserta alasannya | [PROJECT_GUIDE.md](../PROJECT_GUIDE.md) |
+| Kode demo dan model | `streamlit_app.py` dan folder [src/](../src) |
+| Pemeriksaan otomatis untuk kode | folder [tests/](../tests) |
+
+File lain, seperti `pyproject.toml`, `requirements.txt`, dan folder `.github/`, adalah pengaturan untuk programmer dan bisa dilewati.
