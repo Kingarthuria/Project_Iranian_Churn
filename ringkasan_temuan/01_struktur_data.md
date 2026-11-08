@@ -65,7 +65,7 @@ Perbandingan per kolom saja tidak menangkap perbedaan pada `drop_253`.
 
 Pengguna memutuskan untuk melanjutkan project dengan asumsi tiap baris adalah satu pelanggan, mengikuti UCI dan keempat paper di `jurnal/`. Hasil akhir memuat kalimat keterbatasan berikut:
 
-> Analisis mengikuti dokumentasi UCI yang menyatakan tiap baris mewakili satu pelanggan. Audit menemukan pola berulang per 50 baris, sehingga independensi antarbaris tidak terjamin dan skor model bisa terlalu optimistis.
+> Analisis mengikuti dokumentasi UCI yang menyatakan tiap baris mewakili satu pelanggan. Namun audit menemukan pola berulang per 50 baris, sehingga independensi antarbaris tidak terjamin dan skor model bisa terlalu optimistis.
 
 ## Kesimpulan untuk pembaca umum
 

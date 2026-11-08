@@ -34,7 +34,7 @@ REPORT_FILE = "laporan_drift.md"
 DRIFT_FILE = "drift_per_fitur.csv"
 STATUS_LABELS = {"stabil": "Stabil", "perlu_dicek": "Perlu dicek", "bergeser": "Bergeser"}
 LIMITATION = (
-    "Analisis mengikuti dokumentasi UCI yang menyatakan tiap baris mewakili satu pelanggan. Audit menemukan pola "
+    "Analisis mengikuti dokumentasi UCI yang menyatakan tiap baris mewakili satu pelanggan. Namun audit menemukan pola "
     "berulang per 50 baris, sehingga independensi antarbaris tidak terjamin dan skor model bisa terlalu optimistis."
 )
 
