@@ -35,3 +35,6 @@ __pycache__/
 # OS
 Thumbs.db
 .DS_Store
+
+# Pengaturan lokal Claude Code (berisi path Python di komputer sendiri)
+.claude/
