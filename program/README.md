@@ -27,9 +27,9 @@ Notebook 6 dan 8 membutuhkan CSV dari notebook 5. Notebook 2–8 memakai pembagi
 
 | Notebook | Isi | Kenapa disimpan |
 |---|---|---|
-| `EDA_Project_Churn.ipynb` | Notebook EDA asli sebelum project dimulai ulang | Dipertahankan apa adanya sebagai titik awal. Versi yang dipakai adalah `_v2` |
+| `EDA_Project_Churn.ipynb` | Notebook EDA asli sebelum project dimulai ulang | Dipertahankan sebagai titik awal, kecuali satu baris path data yang diganti menjadi path relatif (keputusan 45). Versi yang dipakai adalah `_v2` |
 | `analisis_duplikat_v2.ipynb` | Audit duplikat dan pola berulang per 50 baris (Fase 1) | Bukti untuk kalimat keterbatasan di README. Ringkasannya ada di `ringkasan_temuan/` (keputusan 3) |
 
 ## Keterbatasan
 
-Analisis mengikuti dokumentasi UCI yang menyatakan tiap baris mewakili satu pelanggan. Audit menemukan pola berulang per 50 baris, sehingga independensi antarbaris tidak terjamin dan skor model bisa terlalu optimistis.
+Analisis mengikuti dokumentasi UCI yang menyatakan tiap baris mewakili satu pelanggan. Namun audit menemukan pola berulang per 50 baris, sehingga independensi antarbaris tidak terjamin dan skor model bisa terlalu optimistis.
