@@ -195,15 +195,13 @@ TEXTS = {
             "lower": "▼ Menahan risiko",
             "lower_slight": "▼ Sedikit menahan risiko",
         },
-        "risk_contact": "Karena polanya mirip pelanggan yang churn, risiko pelanggan ini tergolong tinggi.",
-        "risk_no_contact": "Karena polanya mirip pelanggan yang bertahan, risiko pelanggan ini tergolong rendah.",
         "position_above": "di atas",
         "position_equal": "sama dengan",
         "position_below": "di bawah",
         "segment_bridge": (
-            "{risk} Namun, risiko saja belum cukup untuk menentukan prioritas, karena nilai tiap pelanggan "
-            "berbeda. Nilai terhitung pelanggan ini {value}, {position} nilai tengah semua pelanggan ({cutoff}). "
-            "Gabungan risiko dan nilai itu menempatkannya di **{segment}** pada matriks: {desc}."
+            # Versi pendek (keputusan 48, matriks): risiko sudah terlihat di skala, jadi kalimat ini hanya menambah nilai
+            "Nilai terhitungnya {value}, {position} nilai tengah semua pelanggan ({cutoff}). Risiko {risk} dan "
+            "nilai {level} menempatkannya di **{segment}**."
         ),
         "now_title": "Rekomendasi untuk siklus tahun berikutnya (hipotesis, perlu diuji)",
         "now_intro": (
@@ -245,10 +243,12 @@ TEXTS = {
         "table_value": "Nilai",
         "table_shap": "Dorongan (log-odds)",
         "segment_title": "Segmen risiko × nilai",
-        "segment_axis_value": "Nilai terhitung",
-        "segment_axis_risk": "Risiko",
-        "segment_low": "Rendah",
-        "segment_high": "Tinggi",
+        # Matriks prioritas HTML (keputusan 48): label baris dan kolom, dan kata untuk kalimat jembatan
+        "matrix_title": "Posisi di matriks prioritas",
+        "matrix_rows": {"high": "Risiko tinggi", "low": "Risiko rendah"},
+        "matrix_cols": {"high": "Nilai tinggi", "low": "Nilai rendah"},
+        "matrix_aria": "Matriks prioritas risiko × nilai terhitung. Pelanggan ini di {segment}.",
+        "level": {"high": "tinggi", "low": "rendah"},
         "segment_you": "pelanggan ini",
         "segments": {
             "I": {
@@ -607,15 +607,12 @@ TEXTS = {
             "lower": "▼ Holds the risk down",
             "lower_slight": "▼ Slightly holds the risk down",
         },
-        "risk_contact": "Because the pattern resembles customers who churned, this customer's risk is high.",
-        "risk_no_contact": "Because the pattern resembles customers who stayed, this customer's risk is low.",
         "position_above": "above",
         "position_equal": "equal to",
         "position_below": "below",
         "segment_bridge": (
-            "{risk} But risk alone does not set the priority, because customers differ in value. This "
-            "customer's calculated value is {value}, {position} the middle value of all customers ({cutoff}). "
-            "Together, risk and value place the customer in **{segment}** on the matrix: {desc}."
+            "Its calculated value is {value}, {position} the middle value of all customers ({cutoff}). This "
+            "combination of {risk} risk and {level} value places it in **{segment}**."
         ),
         "now_title": "Recommendation for the next yearly cycle (hypothesis, needs testing)",
         "now_intro": (
@@ -657,10 +654,11 @@ TEXTS = {
         "table_value": "Value",
         "table_shap": "Push (log-odds)",
         "segment_title": "Risk × value segment",
-        "segment_axis_value": "Calculated value",
-        "segment_axis_risk": "Risk",
-        "segment_low": "Low",
-        "segment_high": "High",
+        "matrix_title": "Position in the priority matrix",
+        "matrix_rows": {"high": "High risk", "low": "Low risk"},
+        "matrix_cols": {"high": "High value", "low": "Low value"},
+        "matrix_aria": "Priority matrix of risk × calculated value. This customer is in {segment}.",
+        "level": {"high": "high", "low": "low"},
         "segment_you": "this customer",
         "segments": {
             "I": {
