@@ -5,7 +5,7 @@ Proyek data science end-to-end pada dataset UCI *Iranian Churn*. Pertanyaannya s
 > **Mulai dari sini**
 > - **Ingin mencoba?** Buka [demo](https://churn-risk-priority.streamlit.app/). Pilih contoh pelanggan, dan demo menjelaskan apakah pelanggan itu perlu dihubungi dan kenapa. Tersedia dalam Bahasa Indonesia dan Inggris, dan isian tidak disimpan.
 > - **Bukan orang teknis?** Baca [ringkasan satu halaman](docs/ringkasan_non_teknis.md): masalahnya, temuannya, cara memakainya, dan letak file penting.
-> - **Rekruter atau pembaca teknis?** Lanjutkan membaca README ini. Semua keputusan dan alasannya ada di [PROJECT_GUIDE.md](PROJECT_GUIDE.md).
+> - **Pembaca teknis?** Lanjutkan membaca README ini. Semua keputusan dan alasannya ada di [PROJECT_GUIDE.md](PROJECT_GUIDE.md).
 
 ## Ringkasan hasil
 
