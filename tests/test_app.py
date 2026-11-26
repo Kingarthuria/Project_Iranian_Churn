@@ -24,6 +24,11 @@ def text_of(block):
     return " ".join(m.value for m in block.markdown)
 
 
+def scale_html(block):
+    # Skala keputusan digambar dengan st.html. AppTest belum punya akses khusus untuk elemen html
+    return next(e.proto.body for e in block.get("html") if "decision-scale" in e.proto.body)
+
+
 def test_app_runs_in_indonesian_by_default(app):
     assert not app.exception
     assert app.title[0].value == TEXTS["id"]["title"]
@@ -35,8 +40,10 @@ def test_limitation_always_visible(app):
 
 
 def test_result_shown_on_first_load(app):
-    labels = [m.label for m in app.metric]
-    assert TEXTS["id"]["metric_score"] in labels
+    # Nilai median: skor 0,002, di bawah skor minimal, jadi jalur "Tidak perlu dihubungi" yang menyala
+    html = scale_html(app)
+    assert 'class="lane stay on"' in html and 'class="lane go"' in html
+    assert "Pelanggan ini, skor 0,002" in html
     assert app.radio(key="ratio").value == f"1:{config.DEFAULT_RATIO}"
 
 
@@ -45,7 +52,7 @@ def test_high_risk_example_is_contacted(app):
     assert not app.exception
     assert app.segmented_control(key="example").value == "high"
     assert app.session_state["source"] == "high"
-    assert any(m.value == TEXTS["id"]["contact"] for m in app.metric)
+    assert 'class="lane go on"' in scale_html(app)
 
 
 def test_median_example_marked_on_first_load(app):
@@ -121,6 +128,20 @@ def test_short_limitation_reminder_and_segment_help(app):
     assert any(m.help == TEXTS["id"]["segment_help"] for m in app.markdown)
 
 
+def test_decision_scale_positions_and_edges():
+    # Sumbu log 0,0001–1: skor minimal 0,06 di sekitar 69,4%, skor 1 tetap di dalam batang, label di tepi rata
+    from src import charts
+    t = TEXTS["id"]
+    fmt = lambda v, d: f"{v:.{d}f}"
+    assert abs(charts.log_position(0.06) - 69.45) < 0.01
+    assert charts.log_position(0.00001) == 0
+    high = charts.decision_scale(1.0, 0.06, True, t, "1:5", "1,000", "0,060", fmt)
+    assert f"--to:{charts.SCALE_MAX_POSITION:.2f}%" in high and 'class="tag edge-r"' in high
+    assert 'class="lane go on"' in high and 'class="lane stay"' in high
+    low = charts.decision_scale(0.0001, 0.06, False, t, "1:5", "< 0,001", "0,060", fmt)
+    assert 'class="tag edge-l"' in low and "Pelanggan ini, skor &lt; 0,001" in low
+
+
 def test_segment_matrix_puts_high_value_on_the_left():
     # Urutan baca matriks: Prioritas I kiri atas, II kiri bawah, III kanan atas, IV kanan bawah
     from src import charts
@@ -139,8 +160,7 @@ def test_ratio_lives_in_sidebar_and_changes_decision(app):
     app.segmented_control(key="example").set_value("high").run()
     app.sidebar.radio(key="ratio").set_value("1:2").run()
     assert not app.exception
-    labels = [m.label for m in app.metric]
-    assert TEXTS["id"]["metric_threshold"].format(ratio="1:2") in labels
+    assert "Skor minimal untuk dihubungi (1:2)" in scale_html(app)
 
 
 def test_business_tab_follows_what_so_what_now_what(app):
@@ -148,10 +168,10 @@ def test_business_tab_follows_what_so_what_now_what(app):
     t = TEXTS["id"]
     business = app.tabs[0]
     assert [h.value for h in business.subheader] == [t["business_title"]]
-    # Kartu hanya angka keputusan. Segmen dijelaskan di kalimat bersama matriksnya, jadi tidak dibuat kartu
-    assert [m.label for m in business.metric] == [
-        t["metric_decision"], t["metric_score"], t["metric_threshold"].format(ratio=f"1:{config.DEFAULT_RATIO}"),
-    ]
+    # Keputusan 48: 3 kartu metrik diganti skala keputusan. Catatan skor (bukan peluang terkalibrasi) tetap tampil
+    assert len(business.metric) == 0
+    assert "decision-scale" in scale_html(business)
+    assert t["scale_caption"] in [c.value for c in business.caption]
     assert t["insight_no_contact"] in text_of(business)
     assert "Prioritas II" in text_of(business)
     text = " ".join(m.value for m in business.markdown)

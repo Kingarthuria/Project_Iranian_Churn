@@ -27,9 +27,13 @@ FORM_GROUPS = {
 
 TEXTS = {
     "id": {
-        "page_title": "Pelanggan Mana yang Perlu Dihubungi?",
-        "title": "Pelanggan Mana yang Perlu Dihubungi?",
-        "subtitle": "Prediksi risiko churn pelanggan telekomunikasi · dataset UCI Iranian Churn",
+        "page_title": "Pelanggan mana yang perlu dihubungi?",
+        "title": "Pelanggan mana yang perlu dihubungi?",
+        "subtitle": (
+            "Skor risiko churn untuk satu pelanggan telekomunikasi (dataset UCI Iranian Churn). "
+            "Proyek portofolio, bukan sistem produksi."
+        ),
+        "howto_title": "Cara memakai demo ini",
         "intro": (
             "Demo ini memberi **skor risiko churn** untuk satu pelanggan dan menyarankan apakah pelanggan itu "
             "**perlu dihubungi**. Model yang dipakai adalah XGBoost dengan 12 fitur dari 9 bulan pertama data "
@@ -131,17 +135,17 @@ TEXTS = {
             "form": "data yang kamu isi",
         },
         "invalid": "Input tidak valid:",
-        "metric_score": "Skor risiko",
-        "metric_score_help": "Skor model antara 0 dan 1 untuk mengurutkan pelanggan. Bukan peluang yang terkalibrasi.",
-        # Label pendek supaya muat satu baris di kartu. Artinya dijelaskan di ikon bantuan
-        "metric_threshold": "Skor minimal dihubungi ({ratio})",
-        "metric_threshold_help": (
-            "Pelanggan disarankan dihubungi jika skor risikonya sama dengan atau di atas angka ini. Angkanya "
-            "bergantung pada rasio biaya yang dipilih di atas."
+        # Skala keputusan di tab hasil (keputusan 48): menggantikan 3 kartu metrik
+        "scale_stay": "Tidak perlu dihubungi",
+        "scale_go": "Hubungi",
+        "scale_marker": "Pelanggan ini, skor {score}",
+        "scale_threshold": "Skor minimal untuk dihubungi ({ratio}): {threshold}",
+        "scale_aria": "{decision}. Skor risiko {score}, skor minimal untuk dihubungi {threshold}.",
+        "scale_caption": (
+            "Skor model antara 0 dan 1 untuk mengurutkan pelanggan, bukan peluang yang terkalibrasi. Pelanggan "
+            "disarankan dihubungi jika skornya sama dengan atau di atas skor minimal, yang bergantung pada rasio biaya "
+            "di sidebar. Jarak angka pada sumbu bertingkat (skala log)."
         ),
-        "metric_decision": "Keputusan",
-        "contact": "Hubungi",
-        "no_contact": "Tidak dihubungi",
         # Penjelasan hasil dalam bahasa awam, dipilih sesuai keputusan
         "position_explain_contact": (
             "**Pelanggan ini disarankan dihubungi.** Skor risikonya {score}, sudah mencapai skor minimal untuk dihubungi "
@@ -439,9 +443,13 @@ TEXTS = {
         ],
     },
     "en": {
-        "page_title": "Which Customers Should Be Contacted?",
-        "title": "Which Customers Should Be Contacted?",
-        "subtitle": "Churn risk prediction for telecom customers · UCI Iranian Churn dataset",
+        "page_title": "Which customers should be contacted?",
+        "title": "Which customers should be contacted?",
+        "subtitle": (
+            "Churn risk score for one telecom customer (UCI Iranian Churn dataset). "
+            "A portfolio project, not a production system."
+        ),
+        "howto_title": "How to use this demo",
         "intro": (
             "This demo gives a **churn risk score** for one customer and suggests whether that customer "
             "**should be contacted**. The model is XGBoost with 12 features from the first 9 months of customer "
@@ -538,16 +546,16 @@ TEXTS = {
             "form": "the data you entered",
         },
         "invalid": "Invalid input:",
-        "metric_score": "Risk score",
-        "metric_score_help": "Model score between 0 and 1 for ranking customers. Not a calibrated probability.",
-        "metric_threshold": "Minimum score to contact ({ratio})",
-        "metric_threshold_help": (
-            "A customer is suggested for contact if their risk score is equal to or above this number. The number "
-            "depends on the cost ratio selected above."
+        "scale_stay": "No contact needed",
+        "scale_go": "Contact",
+        "scale_marker": "This customer, score {score}",
+        "scale_threshold": "Minimum score to contact ({ratio}): {threshold}",
+        "scale_aria": "{decision}. Risk score {score}, minimum score to contact {threshold}.",
+        "scale_caption": (
+            "Model score between 0 and 1 for ranking customers, not a calibrated probability. A customer is suggested "
+            "for contact if their score is equal to or above the minimum score, which depends on the cost ratio in "
+            "the sidebar. The axis uses stepped spacing (log scale)."
         ),
-        "metric_decision": "Decision",
-        "contact": "Contact",
-        "no_contact": "No contact",
         "position_explain_contact": (
             "**This customer should be contacted.** Their risk score is {score}, which reaches the minimum score to "
             "contact ({threshold}). In other words, the model sees this customer's pattern as similar to customers who "

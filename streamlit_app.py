@@ -56,6 +56,40 @@ LAYOUT_CSS = """
 /*    !important diperlukan karena gaya bawaan Streamlit pada teks metrik lebih spesifik. Label kartu juga dibungkus */
 :is([data-testid="stMetricValue"], [data-testid="stMetricLabel"]) :is(div, p) {
   white-space: normal !important; overflow: visible !important; text-overflow: clip !important; }
+/* 7) Keputusan 48: judul halaman dan judul bagian lebih kecil, supaya skala keputusan menjadi titik fokus */
+[data-testid="stMain"] h1 { font-size: 1.75rem !important; }
+[data-testid="stMain"] h3 { font-size: 1.375rem !important; }
+/* 8) Skala keputusan (src/charts.py, decision_scale). Biru dan merah sama artinya dengan grafik di tab teknis */
+.decision-scale { position: relative; margin: 3rem 0 0.5rem; font-variant-numeric: tabular-nums; }
+.decision-scale .lanes { position: relative; display: flex; gap: 3px; height: 3rem; }
+.decision-scale .lane { display: flex; align-items: center; padding: 0 1rem; font-size: 0.9375rem; color: #586274;
+  background: #EEF1F5; min-width: 0; white-space: nowrap; overflow: hidden; }
+.decision-scale .lane.stay { border-radius: 6px 0 0 6px; }
+.decision-scale .lane.go { border-radius: 0 6px 6px 0; justify-content: flex-end; flex: 1; }
+.decision-scale .lane.on { color: #FFFFFF; font-weight: 600; font-size: 1.125rem; }
+.decision-scale .lane.stay.on { background: #1F5FA8; }
+.decision-scale .lane.go.on { background: #B42F46; }
+.decision-scale .marker { position: absolute; top: -12px; bottom: -12px; left: var(--to); width: 4px; margin-left: -2px;
+  background: #0F172A; border-radius: 2px; box-shadow: 0 0 0 2px #FFFFFF; }
+.decision-scale .tag { position: absolute; top: -2.6rem; left: var(--to); transform: translateX(-50%); white-space: nowrap;
+  font-size: 0.875rem; font-weight: 600; color: #0F172A; }
+.decision-scale .tag.edge-r { transform: translateX(-100%); }
+.decision-scale .tag.edge-l { transform: none; }
+.decision-scale .ticks { position: relative; height: 1.2rem; margin-top: 1rem; font-size: 0.75rem; color: #586274; }
+.decision-scale .tick { position: absolute; top: 0; transform: translateX(-50%); }
+.decision-scale .tick:first-child { transform: none; }
+.decision-scale .tick.last { transform: translateX(-100%); }
+.decision-scale .thr { position: relative; display: inline-block; margin-top: 0.5rem; transform: translateX(-50%);
+  white-space: nowrap; font-size: 0.8125rem; color: #0F172A; }
+/*    Satu gerak setiap halaman digambar ulang: penanda bergeser ke skor, lalu jalur jawabannya menyala */
+.decision-scale .marker { animation: scale-slide 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.decision-scale .tag { animation: scale-fade 0.3s 0.7s both; }
+.decision-scale .lane.on { animation: scale-light 0.35s 0.75s both; }
+@keyframes scale-slide { from { left: 0; } }
+@keyframes scale-fade { from { opacity: 0; } }
+@keyframes scale-light { from { background: #EEF1F5; color: #586274; } }
+@media (prefers-reduced-motion: reduce) {
+  .decision-scale .marker, .decision-scale .tag, .decision-scale .lane.on { animation: none; } }
 </style>
 """
 st.html(LAYOUT_CSS)
@@ -219,8 +253,10 @@ input_errors = st.session_state.pop("input_error", None)
 # --- Bagian atas ----------------------------------------------------------------------------------------
 st.title(t["title"])
 st.caption(t["subtitle"])
-st.markdown(t["intro"])
-st.markdown(t["steps"])
+# Pengantar dan langkah dilipat (keputusan 48), supaya hasil terlihat tanpa scroll
+with st.expander(t["howto_title"]):
+    st.markdown(t["intro"])
+    st.markdown(t["steps"])
 
 tab_business, tab_technical, tab_model, tab_limits = st.tabs(t["tabs"])
 
@@ -302,14 +338,15 @@ with tab_business:
     st.subheader(t["business_title"])
     st.caption(source_caption)
 
-    # Alur tanpa judul bernomor (permintaan pengguna): angka utama, lalu artinya, lalu rekomendasi.
-    # The What: hanya angka keputusan. Segmen tidak dibuat kartu karena sudah dijelaskan di bawah bersama matriksnya,
-    # dan kalimat di bawah tidak mengulang angka
-    c1, c2, c3 = st.columns(3, border=True)
-    c1.metric(t["metric_decision"], t["contact"] if result.contact else t["no_contact"])
-    c2.metric(t["metric_score"], fmt_score(lang, result.score), help=t["metric_score_help"])
-    c3.metric(t["metric_threshold"].format(ratio=ratio), fmt_number(lang, result.threshold, 3),
-              help=t["metric_threshold_help"])
+    # Alur tanpa judul bernomor: keputusan, lalu artinya, lalu rekomendasi.
+    # The What (keputusan 48): skala keputusan menggantikan 3 kartu metrik. Keputusan, skor risiko, dan skor minimal
+    # untuk dihubungi tetap tampil, tetapi jawabannya dibaca dari posisi pelanggan di skala
+    st.html(charts.decision_scale(
+        result.score, result.threshold, result.contact, t, ratio,
+        fmt_score(lang, result.score), fmt_number(lang, result.threshold, 3),
+        lambda value, digits: fmt_number(lang, value, digits),
+    ))
+    st.caption(t["scale_caption"])
 
     # The So What: cerita singkat dalam bahasa bisnis. Arah utama mengikuti keputusan: alasan yang menaikkan risiko
     # untuk pelanggan yang dihubungi, dan alasan yang menahan risiko untuk yang tidak

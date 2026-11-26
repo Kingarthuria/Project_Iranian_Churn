@@ -1,7 +1,11 @@
 """Grafik demo dengan Altair (ikut terpasang bersama Streamlit) dan diagram alur Graphviz.
 
 Warna dipilih untuk tema terang (.streamlit/config.toml). Merah berarti menaikkan skor, biru menurunkan.
+Skala keputusan di tab hasil berupa HTML (decision_scale), bukan Altair, supaya label jalur dan gerak penanda bisa
+diatur dengan CSS.
 """
+from html import escape
+
 import altair as alt
 import numpy as np
 import pandas as pd
@@ -168,6 +172,48 @@ def flow_dot(counts: dict, t: dict, fmt) -> str:
         "}",
     ]
     return "\n".join(lines)
+
+
+def log_position(value: float) -> float:
+    """Posisi nilai pada sumbu log SCORE_FLOOR–1, dalam persen lebar (0–100)."""
+    return float((np.log10(max(value, SCORE_FLOOR)) - np.log10(SCORE_FLOOR)) / -np.log10(SCORE_FLOOR) * 100)
+
+
+# Ujung kanan sumbu: penanda skor 1 tetap terlihat di dalam batang
+SCALE_MAX_POSITION = 99.6
+# Label penanda rata kiri/kanan jika terlalu dekat dengan tepi batang
+SCALE_EDGE = 15
+
+
+def decision_scale(score: float, threshold: float, contact: bool, t: dict, ratio: str,
+                   score_text: str, threshold_text: str, fmt) -> str:
+    """Skala keputusan (keputusan 48): batang dua jalur, batasnya skor minimal untuk dihubungi.
+
+    Jalur tempat pelanggan berada diberi warna penuh, dan penanda menunjukkan skor pelanggan pada sumbu log.
+    Hasilnya HTML untuk st.html. Gaya ada di LAYOUT_CSS streamlit_app.py. Skor dan skor minimal datang sudah
+    diformat sesuai bahasa, dan `fmt(nilai, desimal)` memformat angka sumbu.
+    """
+    to = min(log_position(score), SCALE_MAX_POSITION)
+    cut = log_position(threshold)
+    edge = " edge-r" if to > 100 - SCALE_EDGE else " edge-l" if to < SCALE_EDGE else ""
+    decision = t["scale_go"] if contact else t["scale_stay"]
+    label = escape(t["scale_aria"].format(decision=decision, score=score_text, threshold=threshold_text))
+    ticks = "".join(
+        f'<span class="tick{" last" if v == 1 else ""}" style="left:{log_position(v):.2f}%">{fmt(v, digits)}</span>'
+        for v, digits in ((0.0001, 4), (0.001, 3), (0.01, 2), (1, 0))
+    )
+    return (
+        f'<div class="decision-scale" role="img" aria-label="{label}" style="--to:{to:.2f}%">'
+        f'<div class="tag{edge}">{escape(t["scale_marker"].format(score=score_text))}</div>'
+        '<div class="lanes">'
+        f'<div class="lane stay{" on" if not contact else ""}" style="width:{cut:.2f}%">{escape(t["scale_stay"])}</div>'
+        f'<div class="lane go{" on" if contact else ""}">{escape(t["scale_go"])}</div>'
+        '<div class="marker"></div></div>'
+        f'<div class="ticks">{ticks}</div>'
+        f'<div class="thr" style="left:{cut:.2f}%">'
+        f'{escape(t["scale_threshold"].format(ratio=ratio, threshold=threshold_text))}</div>'
+        "</div>"
+    )
 
 
 def sigmoid(margin: float) -> float:
