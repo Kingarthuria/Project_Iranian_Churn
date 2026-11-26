@@ -1,6 +1,10 @@
-# Tema demo (keputusan pengguna: tema terang, warna utama abu gelap).
-# Pengaturan server sengaja tidak ditulis di sini: lokal dijalankan dengan --server.address 127.0.0.1,
+# Tema demo (keputusan 41 dan 48: tema terang, warna utama abu gelap, huruf IBM Plex Sans).
+# Alamat server sengaja tidak ditulis di sini: lokal dijalankan dengan --server.address 127.0.0.1,
 # dan Streamlit Community Cloud mengatur alamatnya sendiri.
+
+[server]
+# Menyajikan folder static/ (file huruf), supaya demo tidak memanggil Google Fonts
+enableStaticServing = true
 
 [theme]
 base = "light"
@@ -8,4 +12,24 @@ primaryColor = "#334155"
 backgroundColor = "#FFFFFF"
 secondaryBackgroundColor = "#F1F5F9"
 textColor = "#0F172A"
-font = "sans serif"
+font = "IBM Plex Sans, sans-serif"
+
+# IBM Plex Sans dari repo resmi IBM (github.com/IBM/plex), lisensi SIL OFL 1.1 di static/fonts/
+[[theme.fontFaces]]
+family = "IBM Plex Sans"
+url = "app/static/fonts/IBMPlexSans-Regular.woff2"
+weight = "400"
+style = "normal"
+
+[[theme.fontFaces]]
+family = "IBM Plex Sans"
+url = "app/static/fonts/IBMPlexSans-Medium.woff2"
+weight = "500"
+style = "normal"
+
+# SemiBold juga dipakai untuk teks tebal (700), supaya browser tidak menebalkan huruf secara buatan
+[[theme.fontFaces]]
+family = "IBM Plex Sans"
+url = "app/static/fonts/IBMPlexSans-SemiBold.woff2"
+weight = "600 700"
+style = "normal"

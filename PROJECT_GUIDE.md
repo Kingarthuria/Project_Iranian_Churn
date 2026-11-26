@@ -289,7 +289,8 @@ project_iranian_churn/
 ├── README.md
 ├── streamlit_app.py      # demo Fase 5
 ├── requirements.txt      # library runtime demo (dibaca Streamlit Community Cloud)
-├── .streamlit/config.toml # tema demo (keputusan 41)
+├── .streamlit/config.toml # tema demo dan huruf (keputusan 41 dan 48)
+├── static/fonts/     # huruf IBM Plex Sans untuk demo, lisensi SIL OFL 1.1 (keputusan 48)
 ├── requirements-dev.txt  # library pengembangan (test, lint, notebook)
 ├── pyproject.toml        # pengaturan pytest dan ruff
 ├── .gitignore
@@ -391,6 +392,7 @@ project_iranian_churn/
 | 2026-11-26 | Desain demo v5 disetujui dan diterapkan bertahap di branch `fase5-desain-v5` (keputusan 48). Mockup sebelum/sesudah dibuat di Figma (draft pribadi) lalu dilanjutkan sebagai HTML lokal di `mockup/` karena kuota Figma plan Starter habis | Diputuskan |
 | 2026-11-26 | Keputusan 48 langkah 2: alasan di tab hasil ditulis sebagai butir di bawah subjudul "Menahan risiko" atau "Menaikkan risiko" (berwarna biru atau merah, dengan tanda ▼ atau ▲), dan langkah rencana per segmen tampil sebagai linimasa (`src/charts.py`, `plan_timeline`). Konteks siklus 12 bulan dan catatan hipotesis digabung dalam satu keterangan di atas linimasa | Diputuskan |
 | 2026-11-26 | Keputusan 48 langkah 3: pilihan bahasa (ID / EN) pindah ke kanan atas halaman utama, dan rasio biaya memakai segmented control sama lebar. Keduanya tidak bisa dikosongkan dan kembali ke nilai bawaan jika sempat kosong. Ditemukan sekaligus diperbaiki: sejak demo awal, mengganti bahasa membuat pilihan radio di sidebar (komplain, status, tarif) tampil kosong walau nilainya tetap tersimpan, karena label isian berubah. Nilai isian kini ditulis ulang saat bahasa diganti | Diputuskan |
+| 2026-11-26 | Keputusan 48 langkah terakhir: huruf demo IBM Plex Sans (Regular, Medium, SemiBold, `.woff2`, total sekitar 200 KB) diunduh sekali dari `raw.githubusercontent.com/IBM/plex` (paket `plex-sans`) dan disimpan di `static/fonts/` bersama teks lisensi SIL OFL 1.1. `.streamlit/config.toml` mengaktifkan `server.enableStaticServing` dan `[[theme.fontFaces]]`, sehingga demo memuat huruf dari servernya sendiri, bukan Google Fonts. README menyebut lisensi huruf ini | Diputuskan |
 
 ---
 

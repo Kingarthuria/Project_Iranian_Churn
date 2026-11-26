@@ -143,6 +143,7 @@ python -X utf8 -m pytest                                          # test
 ├── ringkasan_temuan/    # ringkasan audit dan EDA
 ├── docs/                # skor minimal per rasio, ringkasan angka demo, panduan monitoring
 ├── dataset/             # data mentah UCI (tidak diubah)
+├── static/fonts/        # huruf IBM Plex Sans untuk demo (SIL OFL 1.1)
 ├── PROJECT_GUIDE.md     # semua temuan dan keputusan beserta alasannya
 ├── LICENSE              # MIT untuk kode, dataset tetap CC BY 4.0
 └── requirements*.txt
@@ -154,7 +155,7 @@ Proyek ini dikerjakan dengan bantuan AI (Claude Code). Setiap keputusan analisis
 
 ## Lisensi
 
-Kode dan dokumentasi proyek ini berlisensi [MIT](LICENSE). Dataset di `dataset/` tidak termasuk lisensi itu: dataset berasal dari UCI dan tetap berlisensi [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), sehingga pemakaian ulang wajib menyebut sumbernya (sitasi ada di bagian [Data](#data)).
+Kode dan dokumentasi proyek ini berlisensi [MIT](LICENSE). Dataset di `dataset/` tidak termasuk lisensi itu: dataset berasal dari UCI dan tetap berlisensi [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), sehingga pemakaian ulang wajib menyebut sumbernya (sitasi ada di bagian [Data](#data)). Huruf IBM Plex Sans di `static/fonts/` berasal dari [IBM](https://github.com/IBM/plex) dan berlisensi SIL Open Font License 1.1 (teks lisensi ada di folder yang sama).
 
 ## Penulis
 
