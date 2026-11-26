@@ -27,9 +27,13 @@ FORM_GROUPS = {
 
 TEXTS = {
     "id": {
-        "page_title": "Pelanggan Mana yang Perlu Dihubungi?",
-        "title": "Pelanggan Mana yang Perlu Dihubungi?",
-        "subtitle": "Prediksi risiko churn pelanggan telekomunikasi · dataset UCI Iranian Churn",
+        "page_title": "Pelanggan mana yang perlu dihubungi?",
+        "title": "Pelanggan mana yang perlu dihubungi?",
+        "subtitle": (
+            "Skor risiko churn untuk satu pelanggan telekomunikasi (dataset UCI Iranian Churn). "
+            "Proyek portofolio, bukan sistem produksi."
+        ),
+        "howto_title": "Cara memakai demo ini",
         "intro": (
             "Demo ini memberi **skor risiko churn** untuk satu pelanggan dan menyarankan apakah pelanggan itu "
             "**perlu dihubungi**. Model yang dipakai adalah XGBoost dengan 12 fitur dari 9 bulan pertama data "
@@ -131,17 +135,17 @@ TEXTS = {
             "form": "data yang kamu isi",
         },
         "invalid": "Input tidak valid:",
-        "metric_score": "Skor risiko",
-        "metric_score_help": "Skor model antara 0 dan 1 untuk mengurutkan pelanggan. Bukan peluang yang terkalibrasi.",
-        # Label pendek supaya muat satu baris di kartu. Artinya dijelaskan di ikon bantuan
-        "metric_threshold": "Skor minimal dihubungi ({ratio})",
-        "metric_threshold_help": (
-            "Pelanggan disarankan dihubungi jika skor risikonya sama dengan atau di atas angka ini. Angkanya "
-            "bergantung pada rasio biaya yang dipilih di atas."
+        # Skala keputusan di tab hasil (keputusan 48): menggantikan 3 kartu metrik
+        "scale_stay": "Tidak perlu dihubungi",
+        "scale_go": "Hubungi",
+        "scale_marker": "Pelanggan ini, skor {score}",
+        "scale_threshold": "Skor minimal untuk dihubungi ({ratio}): {threshold}",
+        "scale_aria": "{decision}. Skor risiko {score}, skor minimal untuk dihubungi {threshold}.",
+        "scale_caption": (
+            "Skor model antara 0 dan 1 untuk mengurutkan pelanggan, bukan peluang yang terkalibrasi. Pelanggan "
+            "disarankan dihubungi jika skornya sama dengan atau di atas skor minimal, yang bergantung pada rasio biaya "
+            "di sidebar. Jarak angka pada sumbu bertingkat (skala log)."
         ),
-        "metric_decision": "Keputusan",
-        "contact": "Hubungi",
-        "no_contact": "Tidak dihubungi",
         # Penjelasan hasil dalam bahasa awam, dipilih sesuai keputusan
         "position_explain_contact": (
             "**Pelanggan ini disarankan dihubungi.** Skor risikonya {score}, sudah mencapai skor minimal untuk dihubungi "
@@ -178,15 +182,19 @@ TEXTS = {
         "compare_above": "(di atas umumnya, {typical})",
         "compare_below": "(di bawah umumnya, {typical})",
         "compare_choice": "(kebanyakan pelanggan {typical})",
-        "and": "dan",
         # Subjek di awal frasa kata kerja, dibuang saat frasa dipakai sebagai pembanding
         "subject": "ia ",
         "insight_contact": "Menurut model, pola pelanggan ini **mirip pelanggan yang churn**.",
         "insight_no_contact": "Menurut model, pola pelanggan ini **mirip pelanggan yang bertahan**.",
-        "insight_main_contact": "Tanda yang paling kuat: {items}.",
-        "insight_main_no_contact": "Hal yang paling menahan risikonya: {items}.",
-        "insight_other_contact": "Sebaliknya, ada hal yang sedikit menahan risikonya: {items}.",
-        "insight_other_no_contact": "Meski begitu, ada hal yang sedikit menaikkan risikonya: {items}.",
+        # Alasan dikelompokkan dengan subjudul (keputusan 48 langkah 2), bukan satu paragraf panjang
+        "reasons_title": "Kenapa skornya begini",
+        "item_prefix": "",
+        "groups": {
+            "raise": "▲ Menaikkan risiko",
+            "raise_slight": "▲ Sedikit menaikkan risiko",
+            "lower": "▼ Menahan risiko",
+            "lower_slight": "▼ Sedikit menahan risiko",
+        },
         "risk_contact": "Karena polanya mirip pelanggan yang churn, risiko pelanggan ini tergolong tinggi.",
         "risk_no_contact": "Karena polanya mirip pelanggan yang bertahan, risiko pelanggan ini tergolong rendah.",
         "position_above": "di atas",
@@ -439,9 +447,13 @@ TEXTS = {
         ],
     },
     "en": {
-        "page_title": "Which Customers Should Be Contacted?",
-        "title": "Which Customers Should Be Contacted?",
-        "subtitle": "Churn risk prediction for telecom customers · UCI Iranian Churn dataset",
+        "page_title": "Which customers should be contacted?",
+        "title": "Which customers should be contacted?",
+        "subtitle": (
+            "Churn risk score for one telecom customer (UCI Iranian Churn dataset). "
+            "A portfolio project, not a production system."
+        ),
+        "howto_title": "How to use this demo",
         "intro": (
             "This demo gives a **churn risk score** for one customer and suggests whether that customer "
             "**should be contacted**. The model is XGBoost with 12 features from the first 9 months of customer "
@@ -538,16 +550,16 @@ TEXTS = {
             "form": "the data you entered",
         },
         "invalid": "Invalid input:",
-        "metric_score": "Risk score",
-        "metric_score_help": "Model score between 0 and 1 for ranking customers. Not a calibrated probability.",
-        "metric_threshold": "Minimum score to contact ({ratio})",
-        "metric_threshold_help": (
-            "A customer is suggested for contact if their risk score is equal to or above this number. The number "
-            "depends on the cost ratio selected above."
+        "scale_stay": "No contact needed",
+        "scale_go": "Contact",
+        "scale_marker": "This customer, score {score}",
+        "scale_threshold": "Minimum score to contact ({ratio}): {threshold}",
+        "scale_aria": "{decision}. Risk score {score}, minimum score to contact {threshold}.",
+        "scale_caption": (
+            "Model score between 0 and 1 for ranking customers, not a calibrated probability. A customer is suggested "
+            "for contact if their score is equal to or above the minimum score, which depends on the cost ratio in "
+            "the sidebar. The axis uses stepped spacing (log scale)."
         ),
-        "metric_decision": "Decision",
-        "contact": "Contact",
-        "no_contact": "No contact",
         "position_explain_contact": (
             "**This customer should be contacted.** Their risk score is {score}, which reaches the minimum score to "
             "contact ({threshold}). In other words, the model sees this customer's pattern as similar to customers who "
@@ -584,14 +596,17 @@ TEXTS = {
         "compare_above": "(above the typical {typical})",
         "compare_below": "(below the typical {typical})",
         "compare_choice": "(most customers: {typical})",
-        "and": "and",
         "subject": "",
         "insight_contact": "According to the model, this customer's pattern is **similar to customers who churned**.",
         "insight_no_contact": "According to the model, this customer's pattern is **similar to customers who stayed**.",
-        "insight_main_contact": "The strongest signs: the customer {items}.",
-        "insight_main_no_contact": "What holds the risk down most: the customer {items}.",
-        "insight_other_contact": "On the other hand, a few things slightly lower the risk: the customer {items}.",
-        "insight_other_no_contact": "Even so, a few things slightly raise the risk: the customer {items}.",
+        "reasons_title": "Why this score",
+        "item_prefix": "The customer ",
+        "groups": {
+            "raise": "▲ Raises the risk",
+            "raise_slight": "▲ Slightly raises the risk",
+            "lower": "▼ Holds the risk down",
+            "lower_slight": "▼ Slightly holds the risk down",
+        },
         "risk_contact": "Because the pattern resembles customers who churned, this customer's risk is high.",
         "risk_no_contact": "Because the pattern resembles customers who stayed, this customer's risk is low.",
         "position_above": "above",
