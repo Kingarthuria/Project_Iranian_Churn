@@ -389,6 +389,7 @@ project_iranian_churn/
 | 2026-11-08 | Ditutup: tabel "Apa yang berbeda dari penelitian sebelumnya" masuk README. Klaim dicek ulang langsung di PDF keempat jurnal, dan angkanya dihitung ulang dengan kode: pada data mentah ada 300 duplikat persis dan 314 baris berfitur identik (selisih 14 baris beda label), dan pada data bersih rumus Tukey 1,5 × IQR menandai 44 (`Call_Failure`) sampai 333 (`Frequency_of_SMS`) baris per kolom numerik. Koreksi: penulis makalah ACM adalah Yuan & Liu (2025), bukan "Wang dkk." seperti catatan sebelumnya. Tidak ada jurnal yang membahas independensi baris. Skor jurnal tidak dibandingkan (keputusan 2) | Diputuskan |
 | 2026-11-26 | Sebutan alat bantu di file yang dilacak dinetralkan dan kata "rekruter" diganti "pembaca teknis" (keputusan 47). Riwayat commit tidak diubah | Diputuskan |
 | 2026-11-26 | Desain demo v5 disetujui dan diterapkan bertahap di branch `fase5-desain-v5` (keputusan 48). Mockup sebelum/sesudah dibuat di Figma (draft pribadi) lalu dilanjutkan sebagai HTML lokal di `mockup/` karena kuota Figma plan Starter habis | Diputuskan |
+| 2026-11-26 | Keputusan 48 langkah 2: alasan di tab hasil ditulis sebagai butir di bawah subjudul "Menahan risiko" atau "Menaikkan risiko" (berwarna biru atau merah, dengan tanda ▼ atau ▲), dan langkah rencana per segmen tampil sebagai linimasa (`src/charts.py`, `plan_timeline`). Konteks siklus 12 bulan dan catatan hipotesis digabung dalam satu keterangan di atas linimasa | Diputuskan |
 
 ---
 

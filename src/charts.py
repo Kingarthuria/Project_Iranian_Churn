@@ -4,6 +4,7 @@ Warna dipilih untuk tema terang (.streamlit/config.toml). Merah berarti menaikka
 Skala keputusan di tab hasil berupa HTML (decision_scale), bukan Altair, supaya label jalur dan gerak penanda bisa
 diatur dengan CSS.
 """
+import re
 from html import escape
 
 import altair as alt
@@ -214,6 +215,24 @@ def decision_scale(score: float, threshold: float, contact: bool, t: dict, ratio
         f'{escape(t["scale_threshold"].format(ratio=ratio, threshold=threshold_text))}</div>'
         "</div>"
     )
+
+
+def plan_timeline(steps: list[str]) -> str:
+    """Linimasa langkah rencana per segmen (keputusan 48 langkah 2), HTML untuk st.html.
+
+    Tiap langkah di src/texts.py ditulis "**waktu:** tindakan". Gaya ada di LAYOUT_CSS streamlit_app.py.
+    """
+    items = []
+    for step in steps:
+        match = re.fullmatch(r"\*\*(.+?):\*\*\s*(.+)", step, flags=re.DOTALL)
+        if match is None:
+            raise ValueError(f"Format langkah tidak dikenal: {step!r}")
+        when, what = match.groups()
+        items.append(
+            f'<div class="step"><div class="mark"></div><p class="when">{escape(when)}</p>'
+            f'<p class="what">{escape(what[0].upper() + what[1:])}</p></div>'
+        )
+    return f'<div class="plan-timeline">{"".join(items)}</div>'
 
 
 def sigmoid(margin: float) -> float:

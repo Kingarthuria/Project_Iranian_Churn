@@ -88,6 +88,19 @@ LAYOUT_CSS = """
 @keyframes scale-slide { from { left: 0; } }
 @keyframes scale-fade { from { opacity: 0; } }
 @keyframes scale-light { from { background: #EEF1F5; color: #586274; } }
+/* 9) Subjudul alasan (keputusan 48 langkah 2): warna sama dengan skala keputusan */
+.reason-head { font-weight: 600; font-size: 0.9375rem; }
+.reason-head.up { color: #B42F46; }
+.reason-head.down { color: #1F5FA8; }
+/* 10) Linimasa rencana (src/charts.py, plan_timeline): titik dan garis menunjukkan urutan waktu */
+.plan-timeline { display: grid; grid-auto-columns: 1fr; grid-auto-flow: column; margin: 0.5rem 0 0.25rem; }
+.plan-timeline .step { padding-right: 1.5rem; }
+.plan-timeline .mark { display: flex; align-items: center; height: 12px; margin-bottom: 0.625rem; }
+.plan-timeline .mark::before { content: ""; width: 12px; height: 12px; border-radius: 50%; background: #0F172A;
+  flex: none; }
+.plan-timeline .step:not(:last-child) .mark::after { content: ""; flex: 1; height: 2px; background: #0F172A; }
+.plan-timeline .when { font-weight: 600; margin: 0 0 0.25rem; }
+.plan-timeline .what { font-size: 0.9375rem; line-height: 1.55; margin: 0; }
 @media (prefers-reduced-motion: reduce) {
   .decision-scale .marker, .decision-scale .tag, .decision-scale .lane.on { animation: none; } }
 </style>
@@ -322,13 +335,10 @@ def personal_hints(factors) -> list[str]:
     return hints
 
 
-def join_items(items: list[str]) -> str:
-    # "a dan b" untuk dua butir, "a, b, dan c" untuk tiga butir atau lebih
-    if len(items) == 1:
-        return items[0]
-    if len(items) == 2:
-        return f"{items[0]} {t['and']} {items[1]}"
-    return ", ".join(items[:-1]) + f", {t['and']} " + items[-1]
+def reason_item(contribution) -> str:
+    # Satu butir alasan: kalimat utuh dengan huruf besar di awal dan titik di akhir
+    text = t["item_prefix"] + reason_phrase(contribution)
+    return text[0].upper() + text[1:] + "."
 
 
 # --- Tab 1: Hasil & rekomendasi (pembaca bisnis): What, So What, Now What --------------------------------
@@ -354,12 +364,17 @@ with tab_business:
     lowering = [c for c in contributions if c.shap < 0]
     main, other = (raising, lowering) if result.contact else (lowering, raising)
     mode = "contact" if result.contact else "no_contact"
-    insight = t[f"insight_{mode}"]
-    if main:
-        insight += " " + t[f"insight_main_{mode}"].format(items=join_items([reason_phrase(c) for c in main[:3]]))
-    if other:
-        insight += " " + t[f"insight_other_{mode}"].format(items=join_items([reason_phrase(c) for c in other[:2]]))
-    st.markdown(insight)
+    # Keputusan 48 langkah 2: satu kalimat pembuka, lalu alasan dikelompokkan dengan subjudul berwarna sesuai arah
+    # (merah menaikkan, biru menahan), sama dengan skala dan grafik di tab teknis
+    groups = (("raise", main[:3]), ("lower_slight", other[:2])) if result.contact else (
+        ("lower", main[:3]), ("raise_slight", other[:2]))
+    reasons = [f"**{t['reasons_title']}**", t[f"insight_{mode}"]]
+    for group, factors in groups:
+        if factors:
+            direction = "up" if group.startswith("raise") else "down"
+            items = "\n".join(f"- {reason_item(c)}" for c in factors)
+            reasons.append(f'<span class="reason-head {direction}">{t["groups"][group]}</span>\n\n{items}')
+    st.markdown("\n\n".join(reasons), unsafe_allow_html=True)
     st.caption(t["reasons_caption"])
 
     # Jembatan ke segmen: risiko di atas digabung dengan nilai pelanggan, lalu matriks menunjukkan posisinya
@@ -377,14 +392,17 @@ with tab_business:
         st.caption(t["segment_note"].format(cutoff=fmt_number(lang, cutoff, 2)))
 
     # The Now What: rekomendasi rinci untuk siklus 12 bulan berikutnya, dengan langkah bertahap per segmen
-    lines = [f"**{t['now_title']}**", t["now_intro"], segment["summary"]]
-    lines.append("\n".join(f"{i}. {step}" for i, step in enumerate(segment["steps"], start=1)))
+    # Keputusan 48 langkah 2: langkah per segmen sebagai linimasa. Konteks siklus 12 bulan dan catatan hipotesis tetap
+    # tertulis di atas linimasa
+    st.markdown(f"**{t['now_title']}**\n\n{segment['summary']}")
+    st.caption(f"{t['now_intro']} {t['now_caption']}")
+    st.html(charts.plan_timeline(segment["steps"]))
+    lines = []
     personal = personal_hints(main[:3]) if result.contact else []
     if personal:
         lines.append(f"**{t['personal_title']}:** " + " ".join(personal))
     lines.append(f"**{t['now_caution']}:** {segment['caution']}")
     st.markdown("\n\n".join(lines))
-    st.caption(t["now_caption"])
 
     # Pengingat satu baris. Kalimat keterbatasan lengkap (keputusan 2) ada di tab Keterbatasan & data
     st.caption(f":material/info: {t['limitation_box']}")

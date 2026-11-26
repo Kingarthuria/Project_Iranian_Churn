@@ -142,6 +142,15 @@ def test_decision_scale_positions_and_edges():
     assert 'class="tag edge-l"' in low and "Pelanggan ini, skor &lt; 0,001" in low
 
 
+def test_plan_timeline_parses_steps():
+    from src import charts
+    html = charts.plan_timeline(["**Akhir bulan ke-9:** hitung ulang skornya.", "**Akhir bulan ke-12:** cek status."])
+    assert html.count('class="step"') == 2
+    assert '<p class="when">Akhir bulan ke-9</p><p class="what">Hitung ulang skornya.</p>' in html
+    with pytest.raises(ValueError):
+        charts.plan_timeline(["tanpa format waktu"])
+
+
 def test_segment_matrix_puts_high_value_on_the_left():
     # Urutan baca matriks: Prioritas I kiri atas, II kiri bawah, III kanan atas, IV kanan bawah
     from src import charts
@@ -177,8 +186,11 @@ def test_business_tab_follows_what_so_what_now_what(app):
     text = " ".join(m.value for m in business.markdown)
     segment = t["segments"]["II"]  # nilai median: tidak dihubungi, nilai terhitung = nilai tengah
     assert segment["summary"] in text and segment["caution"] in text
-    assert all(step in text for step in segment["steps"])
-    assert t["now_intro"] in text
+    # Langkah tampil sebagai linimasa (keputusan 48 langkah 2), dan konteks siklus 12 bulan tetap tertulis
+    timeline = next(e.proto.body for e in business.get("html") if "plan-timeline" in e.proto.body)
+    assert timeline.count('class="step"') == len(segment["steps"])
+    assert "Sepanjang tahun" in timeline and "Akhir bulan ke-12" in timeline
+    assert any(t["now_intro"] in c.value and t["now_caption"] in c.value for c in business.caption)
     # Pelanggan yang tidak dihubungi tidak mendapat saran yang disesuaikan
     assert t["personal_title"] not in text
 
@@ -200,8 +212,19 @@ def test_insight_compares_with_typical_customer(app):
     app.segmented_control(key="example").set_value("high").run()
     insight = text_of(app.tabs[0])
     assert TEXTS["id"]["insight_contact"] in insight
-    assert "ia pernah komplain (kebanyakan pelanggan tidak pernah komplain)" in insight
-    assert "kegagalan panggilannya 12 kali (di atas umumnya, 6)" in insight
+    assert "- Ia pernah komplain (kebanyakan pelanggan tidak pernah komplain)." in insight
+    assert "- Kegagalan panggilannya 12 kali (di atas umumnya, 6)." in insight
+    assert TEXTS["id"]["groups"]["raise"] in insight
+
+
+def test_reasons_grouped_by_direction(app):
+    # Nilai median (tidak dihubungi): alasan utama menahan risiko, lalu yang sedikit menaikkan, masing-masing dengan
+    # subjudul, bukan satu paragraf
+    t = TEXTS["id"]
+    text = text_of(app.tabs[0])
+    assert t["reasons_title"] in text
+    assert text.index(t["groups"]["lower"]) < text.index(t["groups"]["raise_slight"])
+    assert "- Jumlah panggilannya 54 kali." in text
 
 
 def test_contacted_customer_gets_tailored_hints(app):
