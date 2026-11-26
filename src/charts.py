@@ -87,41 +87,34 @@ def waterfall(base: float, contributions: list, t: dict, value_text) -> alt.Char
     return (bars + labels + zero).properties(height=34 * len(data)).configure_view(stroke=None)
 
 
-def segment_matrix(segment_id: str, t: dict) -> alt.Chart:
-    """Matriks 2×2 risiko × nilai, dengan segmen pelanggan ini ditandai."""
+# Urutan sel matriks: nilai tinggi di kiri dan risiko tinggi di atas, jadi I kiri atas, III kanan atas, II kiri
+# bawah, IV kanan bawah
+MATRIX_LAYOUT = (("high", ("I", "III")), ("low", ("II", "IV")))
+
+
+def segment_matrix(segment_id: str, t: dict) -> str:
+    """Matriks prioritas 2×2 risiko × nilai terhitung (keputusan 48), HTML untuk st.html.
+
+    Lebar sel tetap, jadi matriks tidak ikut melebar saat sidebar ditutup. Gaya ada di LAYOUT_CSS streamlit_app.py.
+    """
+    name = t["segments"][segment_id]["name"]
     cells = [
-        ("III", t["segment_low"], t["segment_high"]),
-        ("I", t["segment_high"], t["segment_high"]),
-        ("IV", t["segment_low"], t["segment_low"]),
-        ("II", t["segment_high"], t["segment_low"]),
+        '<div></div>',
+        f'<div class="col">{escape(t["matrix_cols"]["high"])}</div>',
+        f'<div class="col">{escape(t["matrix_cols"]["low"])}</div>',
     ]
-    data = pd.DataFrame([
-        {
-            "id": seg,
-            "value": value,
-            "risk": risk,
-            "name": t["segments"][seg]["name"],
-            "you": f"● {t['segment_you']}" if seg == segment_id else "",
-            "current": seg == segment_id,
-        }
-        for seg, value, risk in cells
-    ])
-    # Nilai tinggi di kiri (permintaan pengguna), jadi urutan baca: I kiri atas, II kiri bawah, III kanan atas, IV kanan
-    # bawah
-    x = alt.X("value:N", sort=[t["segment_high"], t["segment_low"]], title=t["segment_axis_value"],
-              axis=alt.Axis(orient="top", labelAngle=0, labelColor=INK, titleColor=PRIMARY, ticks=False,
-                            domain=False))
-    y = alt.Y("risk:N", sort=[t["segment_high"], t["segment_low"]], title=t["segment_axis_risk"],
-              axis=alt.Axis(labelColor=INK, titleColor=PRIMARY, ticks=False, domain=False))
-    base = alt.Chart(data).encode(x=x, y=y)
-    rect = base.mark_rect(stroke="white", strokeWidth=4, cornerRadius=6).encode(
-        color=alt.condition("datum.current", alt.value(PRIMARY), alt.value(SURFACE))
-    )
-    name = base.mark_text(fontSize=15, fontWeight="bold", dy=-8).encode(
-        text="name:N", color=alt.condition("datum.current", alt.value("white"), alt.value(PRIMARY))
-    )
-    you = base.mark_text(fontSize=12, dy=14, color="white").encode(text="you:N")
-    return (rect + name + you).properties(height=230).configure_view(stroke=None)
+    for risk, row in MATRIX_LAYOUT:
+        cells.append(f'<div class="row">{escape(t["matrix_rows"][risk])}</div>')
+        for seg in row:
+            if seg == segment_id:
+                cells.append(
+                    f'<div class="cell on"><span>{escape(t["segments"][seg]["name"])}</span>'
+                    f'<small>{escape(t["segment_you"])}</small></div>'
+                )
+            else:
+                cells.append(f'<div class="cell"><span>{escape(t["segments"][seg]["name"])}</span></div>')
+    label = escape(t["matrix_aria"].format(segment=name))
+    return f'<div class="segment-matrix" role="img" aria-label="{label}">{"".join(cells)}</div>'
 
 
 def importance(table: pd.DataFrame, t: dict) -> alt.Chart:

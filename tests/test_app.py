@@ -1,4 +1,6 @@
 """Uji asap aplikasi demo dengan alat uji bawaan Streamlit (tanpa server dan tanpa port)."""
+import re
+
 import pytest
 from streamlit.testing.v1 import AppTest
 
@@ -164,14 +166,28 @@ def test_plan_timeline_parses_steps():
 
 
 def test_segment_matrix_puts_high_value_on_the_left():
-    # Urutan baca matriks: Prioritas I kiri atas, II kiri bawah, III kanan atas, IV kanan bawah
+    # Urutan baca matriks: Prioritas I kiri atas, III kanan atas, II kiri bawah, IV kanan bawah. Hanya segmen
+    # pelanggan ini yang ditandai
     from src import charts
     t = TEXTS["id"]
-    spec = charts.segment_matrix("II", t).to_dict()
-    encoding = spec["layer"][0]["encoding"]
-    assert encoding["x"]["sort"] == [t["segment_high"], t["segment_low"]]
-    assert encoding["y"]["sort"] == [t["segment_high"], t["segment_low"]]
+    html = charts.segment_matrix("II", t)
+    names = re.findall(r'<span>(Prioritas [IV]+)</span>', html)
+    assert names == ["Prioritas I", "Prioritas III", "Prioritas II", "Prioritas IV"]
+    assert html.count('class="cell on"') == 1
+    assert '<div class="cell on"><span>Prioritas II</span>' in html
+    assert html.index(t["matrix_cols"]["high"]) < html.index(t["matrix_cols"]["low"])
 
+
+def test_reasons_and_matrix_side_by_side(app):
+    # Keputusan 48: alasan di kolom kiri dan matriks berlebar tetap di kolom kanan, dengan kalimat jembatan pendek
+    t = TEXTS["id"]
+    business = app.tabs[0]
+    column = next(c for c in business.columns if any(t["matrix_title"] in m.value for m in c.markdown))
+    assert any("segment-matrix" in e.proto.body for e in column.get("html"))
+    bridge = " ".join(m.value for m in column.markdown)
+    assert "Risiko rendah dan nilai tinggi menempatkannya di **Prioritas II**." in bridge
+    # Matriks lama (grafik Altair yang meregang) tidak dipakai lagi di tab hasil
+    assert len(business.get("vega_lite_chart")) == 0
 
 def test_ratio_lives_in_sidebar_and_changes_decision(app):
     # Rasio biaya ada di sidebar, di kotak Pengaturan keputusan antara grup isian dan tombol hitung, bukan di tab

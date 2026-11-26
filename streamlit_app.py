@@ -92,6 +92,15 @@ LAYOUT_CSS = """
 .reason-head { font-weight: 600; font-size: 0.9375rem; }
 .reason-head.up { color: #B42F46; }
 .reason-head.down { color: #1F5FA8; }
+/* 11) Matriks prioritas (src/charts.py, segment_matrix): sel berlebar tetap, tidak meregang saat sidebar ditutup */
+.segment-matrix { display: grid; grid-template-columns: auto repeat(2, 9.5rem); gap: 4px; align-items: center;
+  justify-content: start; margin: 0.25rem 0 0.75rem; }
+.segment-matrix .col { font-size: 0.75rem; color: #586274; text-align: center; padding-bottom: 2px; }
+.segment-matrix .row { font-size: 0.75rem; color: #586274; padding-right: 0.75rem; white-space: nowrap; }
+.segment-matrix .cell { height: 4rem; border-radius: 4px; background: #EEF1F5; color: #586274; font-size: 0.875rem;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.segment-matrix .cell.on { background: #0F172A; color: #FFFFFF; font-weight: 600; }
+.segment-matrix .cell.on small { font-weight: 400; font-size: 0.6875rem; }
 /* 10) Linimasa rencana (src/charts.py, plan_timeline): titik dan garis menunjukkan urutan waktu */
 .plan-timeline { display: grid; grid-auto-columns: 1fr; grid-auto-flow: column; margin: 0.5rem 0 0.25rem; }
 .plan-timeline .step { padding-right: 1.5rem; }
@@ -392,22 +401,26 @@ with tab_business:
             direction = "up" if group.startswith("raise") else "down"
             items = "\n".join(f"- {reason_item(c)}" for c in factors)
             reasons.append(f'<span class="reason-head {direction}">{t["groups"][group]}</span>\n\n{items}')
-    st.markdown("\n\n".join(reasons), unsafe_allow_html=True)
-    st.caption(t["reasons_caption"])
 
-    # Jembatan ke segmen: risiko di atas digabung dengan nilai pelanggan, lalu matriks menunjukkan posisinya
+    # Alasan di kiri, matriks prioritas di kanan (keputusan 48, sesuai mockup v5). Matriks berlebar tetap, jadi
+    # tidak meregang saat sidebar ditutup. Di layar sempit Streamlit menumpuk kedua kolom
     value, cutoff = customer.Customer_Value, bundle.value_cutoff
     position = "above" if value > cutoff else "equal" if value == cutoff else "below"
-    left, right = st.columns([1, 1], vertical_alignment="center")
+    risk_level = "high" if result.contact else "low"
+    value_level = "high" if value >= cutoff else "low"
+    left, right = st.columns([1.15, 1], gap="large")
     with left:
-        st.altair_chart(charts.segment_matrix(segment_id, t), width="stretch")
+        st.markdown("\n\n".join(reasons), unsafe_allow_html=True)
+        st.caption(t["reasons_caption"])
     with right:
+        st.markdown(f"**{t['matrix_title']}**", help=t["segment_help"])
+        st.html(charts.segment_matrix(segment_id, t))
         st.markdown(t["segment_bridge"].format(
-            risk=t[f"risk_{mode}"], value=value_text("Customer_Value", value), position=t[f"position_{position}"],
-            cutoff=fmt_number(lang, cutoff, 2), segment=segment["name"],
-            desc=segment["desc"][0].lower() + segment["desc"][1:],
-        ), help=t["segment_help"])
-        st.caption(t["segment_note"].format(cutoff=fmt_number(lang, cutoff, 2)))
+            value=value_text("Customer_Value", value), position=t[f"position_{position}"],
+            cutoff=fmt_number(lang, cutoff, 2), risk=t["level"][risk_level], level=t["level"][value_level],
+            segment=segment["name"],
+        ))
+        st.caption(t["segment_note"])
 
     # The Now What: rekomendasi rinci untuk siklus 12 bulan berikutnya, dengan langkah bertahap per segmen
     # Keputusan 48 langkah 2: langkah per segmen sebagai linimasa. Konteks siklus 12 bulan dan catatan hipotesis tetap
