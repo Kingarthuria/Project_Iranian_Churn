@@ -32,13 +32,13 @@ st.set_page_config(page_title=TEXTS[DEFAULT_LANGUAGE]["page_title"], layout="wid
 # 1) Tiga pilihan contoh sama lebar dalam satu baris, jadi bilah tidak patah dan sudut bulat tetap di ujung.
 #    Jika sidebar sempit, teks turun ke baris kedua di dalam pilihannya sendiri.
 # 2) Tiga tab sama lebar sampai ujung baris.
-# Aturan 1 juga dipakai tombol kelompok usia (lima pilihan sama lebar).
+# Aturan 1 juga dipakai tombol kelompok usia (lima pilihan sama lebar) dan rasio biaya (keputusan 48).
 LAYOUT_CSS = """
 <style>
-:is(.st-key-example, .st-key-input_Age_Group) [role="radiogroup"] { display: flex; flex-wrap: nowrap; width: 100%; }
-:is(.st-key-example, .st-key-input_Age_Group) [role="radiogroup"] > button { flex: 1 1 0; min-width: 0;
+:is(.st-key-example, .st-key-input_Age_Group, .st-key-ratio) [role="radiogroup"] { display: flex; flex-wrap: nowrap; width: 100%; }
+:is(.st-key-example, .st-key-input_Age_Group, .st-key-ratio) [role="radiogroup"] > button { flex: 1 1 0; min-width: 0;
   height: auto; min-height: 2.5rem; padding: 0.25rem 0.375rem; }
-:is(.st-key-example, .st-key-input_Age_Group) [role="radiogroup"] > button p { white-space: normal;
+:is(.st-key-example, .st-key-input_Age_Group, .st-key-ratio) [role="radiogroup"] > button p { white-space: normal;
   text-align: center; font-size: 0.8125rem; }
 [data-testid="stTabs"] [role="tablist"] > [role="tab"] { flex: 1 1 0; justify-content: center; text-align: center; }
 /* 3) Sidebar lebih rapat: jarak bawaan di atas sidebar, di sekitar garis pemisah, dan di atas judul dikurangi */
@@ -135,13 +135,12 @@ st.session_state.setdefault("example", "median")
 for feature, value in bundle.defaults.model_dump().items():
     st.session_state.setdefault(f"input_{feature}", value)
 
-with st.sidebar:
-    # Judul bahasa memakai gaya yang sama dengan judul bagian sidebar lain, jadi label pilihan disembunyikan
-    st.subheader(TEXTS[DEFAULT_LANGUAGE]["language"])
-    lang = st.radio(
-        TEXTS[DEFAULT_LANGUAGE]["language"], list(LANGUAGES), format_func=LANGUAGES.get, horizontal=True,
-        key="lang", label_visibility="collapsed",
-    )
+# Pilihan bahasa ada di kanan atas halaman utama (keputusan 48 langkah 3) dan digambar setelah sidebar. Nilainya
+# dibaca dari session_state, yang sudah berisi pilihan terbaru saat halaman digambar ulang
+# Pengaman: pilihan yang sempat kosong kembali ke bahasa bawaan
+if st.session_state["lang"] not in LANGUAGES:
+    st.session_state["lang"] = DEFAULT_LANGUAGE
+lang = st.session_state["lang"]
 t = TEXTS[lang]
 
 
@@ -168,6 +167,14 @@ def choose_example() -> None:
         return
     values = bundle.defaults if choice == "median" else bundle.examples[choice]
     apply_values(values.model_dump(), choice)
+
+
+def keep_inputs() -> None:
+    # Ganti bahasa mengubah label isian, sehingga Streamlit membuat isian itu ulang dan pilihan radio tampil kosong
+    # walau nilainya masih tersimpan. Menulis ulang nilainya membuat pilihan tetap terlihat
+    for feature in config.FEATURES:
+        st.session_state[f"input_{feature}"] = st.session_state[f"input_{feature}"]
+    st.session_state["ratio"] = st.session_state.get("ratio")
 
 
 def submit_form() -> None:
@@ -218,8 +225,6 @@ def feature_input(feature: str):
 
 # --- Sidebar: contoh dan formulir -----------------------------------------------------------------------
 with st.sidebar:
-    # Garis pemisah supaya bahasa, contoh, dan formulir terbaca sebagai bagian yang berbeda
-    st.divider()
     # Keterangan pindah ke ikon bantuan di judul, supaya sidebar tidak padat
     st.subheader(t["examples"], help=t["examples_note"])
     # Pilihan aktif ditandai warna, berbeda dari tombol biasa yang tidak menunjukkan pilihan. Lebar ketiga pilihan
@@ -244,9 +249,13 @@ with st.sidebar:
         st.markdown(f":material/tune: **{t['decision_title']}**", help=t["decision_help"])
         ratios = list(bundle.thresholds.index)
         default_ratio = f"1:{config.DEFAULT_RATIO}"
-        st.session_state.setdefault("ratio", default_ratio)
-        ratio = st.radio(
-            t["ratio_label"], ratios, horizontal=True, key="ratio", help=t["ratio_help"],
+        # Pengaman: rasio yang sempat kosong kembali ke rasio bawaan, supaya keputusan selalu bisa dihitung
+        if st.session_state.get("ratio") not in ratios:
+            st.session_state["ratio"] = default_ratio
+        # Segmented control seperti pilihan contoh (keputusan 48 langkah 3). required=True supaya klik ulang tidak
+        # mengosongkan rasio. Lebar ketiga pilihan disamakan lewat CSS
+        ratio = st.segmented_control(
+            t["ratio_label"], ratios, key="ratio", help=t["ratio_help"], required=True, width="stretch",
             format_func=lambda r: t["ratio_default"].format(ratio=r) if r == default_ratio else r,
         )
         st.caption(t["ratio_explanations"][ratio])
@@ -264,8 +273,17 @@ with st.sidebar:
 input_errors = st.session_state.pop("input_error", None)
 
 # --- Bagian atas ----------------------------------------------------------------------------------------
-st.title(t["title"])
-st.caption(t["subtitle"])
+# Judul di kiri, pilihan bahasa di kanan atas (keputusan 48 langkah 3). Label selalu dua bahasa supaya pembaca yang
+# tidak mengerti bahasa aktif tetap menemukannya
+head, lang_col = st.columns([6, 1], vertical_alignment="top")
+with head:
+    st.title(t["title"])
+    st.caption(t["subtitle"])
+with lang_col:
+    st.segmented_control(
+        TEXTS[DEFAULT_LANGUAGE]["language"], list(LANGUAGES), key="lang", required=True, on_change=keep_inputs,
+        format_func=lambda code: code.upper(), label_visibility="collapsed", width="stretch",
+    )
 # Pengantar dan langkah dilipat (keputusan 48), supaya hasil terlihat tanpa scroll
 with st.expander(t["howto_title"]):
     st.markdown(t["intro"])

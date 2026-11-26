@@ -390,6 +390,7 @@ project_iranian_churn/
 | 2026-11-26 | Sebutan alat bantu di file yang dilacak dinetralkan dan kata "rekruter" diganti "pembaca teknis" (keputusan 47). Riwayat commit tidak diubah | Diputuskan |
 | 2026-11-26 | Desain demo v5 disetujui dan diterapkan bertahap di branch `fase5-desain-v5` (keputusan 48). Mockup sebelum/sesudah dibuat di Figma (draft pribadi) lalu dilanjutkan sebagai HTML lokal di `mockup/` karena kuota Figma plan Starter habis | Diputuskan |
 | 2026-11-26 | Keputusan 48 langkah 2: alasan di tab hasil ditulis sebagai butir di bawah subjudul "Menahan risiko" atau "Menaikkan risiko" (berwarna biru atau merah, dengan tanda ▼ atau ▲), dan langkah rencana per segmen tampil sebagai linimasa (`src/charts.py`, `plan_timeline`). Konteks siklus 12 bulan dan catatan hipotesis digabung dalam satu keterangan di atas linimasa | Diputuskan |
+| 2026-11-26 | Keputusan 48 langkah 3: pilihan bahasa (ID / EN) pindah ke kanan atas halaman utama, dan rasio biaya memakai segmented control sama lebar. Keduanya tidak bisa dikosongkan dan kembali ke nilai bawaan jika sempat kosong. Ditemukan sekaligus diperbaiki: sejak demo awal, mengganti bahasa membuat pilihan radio di sidebar (komplain, status, tarif) tampil kosong walau nilainya tetap tersimpan, karena label isian berubah. Nilai isian kini ditulis ulang saat bahasa diganti | Diputuskan |
 
 ---
 

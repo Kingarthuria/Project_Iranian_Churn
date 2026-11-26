@@ -44,7 +44,7 @@ def test_result_shown_on_first_load(app):
     html = scale_html(app)
     assert 'class="lane stay on"' in html and 'class="lane go"' in html
     assert "Pelanggan ini, skor 0,002" in html
-    assert app.radio(key="ratio").value == f"1:{config.DEFAULT_RATIO}"
+    assert app.segmented_control(key="ratio").value == f"1:{config.DEFAULT_RATIO}"
 
 
 def test_high_risk_example_is_contacted(app):
@@ -97,12 +97,24 @@ def test_hints_moved_to_help(app):
 def test_switch_to_english_keeps_submitted_input(app):
     app.number_input(key="input_Call_Failure").set_value(20)
     submit_button(app).click().run()
-    app.radio(key="lang").set_value("en").run()
+    app.segmented_control(key="lang").set_value("en").run()
     assert not app.exception
     assert app.title[0].value == TEXTS["en"]["title"]
     assert LIMITATION_EN in all_markdown(app)
     assert app.session_state["customer"]["Call_Failure"] == 20
     assert app.number_input(key="input_Call_Failure").value == 20
+
+
+def test_language_lives_top_right_and_ratio_cannot_be_cleared(app):
+    # Keputusan 48 langkah 3: bahasa di halaman utama (bukan sidebar), dan klik ulang rasio aktif tidak mengosongkannya
+    assert app.main.segmented_control(key="lang").options == ["ID", "EN"]
+    assert all(r.key != "lang" for r in app.sidebar.radio)
+    app.segmented_control(key="ratio").set_value(None).run()
+    assert not app.exception
+    assert app.segmented_control(key="ratio").value == f"1:{config.DEFAULT_RATIO}"
+    app.segmented_control(key="lang").set_value(None).run()
+    assert not app.exception
+    assert app.title[0].value == TEXTS["id"]["title"]
 
 
 def test_age_group_uses_estimated_age_buttons(app):
@@ -164,10 +176,10 @@ def test_segment_matrix_puts_high_value_on_the_left():
 def test_ratio_lives_in_sidebar_and_changes_decision(app):
     # Rasio biaya ada di sidebar, di kotak Pengaturan keputusan antara grup isian dan tombol hitung, bukan di tab
     # hasil, dan langsung mengubah keputusan tanpa menekan tombol
-    assert app.sidebar.radio(key="ratio").value == f"1:{config.DEFAULT_RATIO}"
+    assert app.sidebar.segmented_control(key="ratio").value == f"1:{config.DEFAULT_RATIO}"
     assert any(TEXTS["id"]["decision_title"] in m.value for m in app.sidebar.markdown)
     app.segmented_control(key="example").set_value("high").run()
-    app.sidebar.radio(key="ratio").set_value("1:2").run()
+    app.sidebar.segmented_control(key="ratio").set_value("1:2").run()
     assert not app.exception
     assert "Skor minimal untuk dihubungi (1:2)" in scale_html(app)
 
