@@ -40,5 +40,5 @@ __pycache__/
 Thumbs.db
 .DS_Store
 
-# Pengaturan lokal Claude Code (berisi path Python di komputer sendiri)
+# Pengaturan editor lokal (berisi path di komputer sendiri)
 .claude/
