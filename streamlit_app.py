@@ -94,10 +94,10 @@ LAYOUT_CSS = """
 .reason-head.up { color: #B42F46; }
 .reason-head.down { color: #1F5FA8; }
 /* 11) Matriks prioritas (src/charts.py, segment_matrix): sel berlebar tetap, tidak meregang saat sidebar ditutup */
-.segment-matrix { display: grid; grid-template-columns: auto repeat(2, 9.5rem); gap: 4px; align-items: center;
+.segment-matrix { display: grid; grid-template-columns: minmax(3.5rem, auto) repeat(2, minmax(6.5rem, 9.5rem)); gap: 4px; align-items: center;
   justify-content: start; margin: 0.25rem 0 0.75rem; }
 .segment-matrix .col { font-size: 0.75rem; color: #586274; text-align: center; padding-bottom: 2px; }
-.segment-matrix .row { font-size: 0.75rem; color: #586274; padding-right: 0.75rem; white-space: nowrap; }
+.segment-matrix .row { font-size: 0.75rem; color: #586274; padding-right: 0.5rem; line-height: 1.3; }
 .segment-matrix .cell { height: 4rem; border-radius: 4px; background: #EEF1F5; color: #586274; font-size: 0.875rem;
   display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .segment-matrix .cell.on { background: #0F172A; color: #FFFFFF; font-weight: 600; }
@@ -119,6 +119,15 @@ LAYOUT_CSS = """
 /*    Jarak atas judul berikon dipindah ke wadahnya, supaya ikon bantuan sejajar dengan baris judul */
 [data-testid="stMarkdownContainer"] > p.section-q:only-child { margin: 0 !important; }
 [data-testid="stElementContainer"]:has(p.section-q:only-child) { margin-top: 1.5rem; }
+/* 14) Alasan dan prioritas berdampingan (keputusan 48, susulan): kedua judul sejajar di atas, dan garis tipis di
+      antara kolom menandai dua bagian terpisah. Hanya di layar lebar, karena di layar sempit kolom menumpuk */
+.st-key-insight_row { margin-top: 1.75rem; }
+.st-key-insight_row p.section-q { margin-top: 0 !important; }
+.st-key-insight_row [data-testid="stElementContainer"]:has(p.section-q:only-child) { margin-top: 0; }
+@media (min-width: 640px) {
+  .st-key-insight_row [data-testid="stColumn"] + [data-testid="stColumn"] { border-left: 1px solid #DDE2E9;
+    padding-left: 2rem; }
+}
 /*    Pengingat keterbatasan diberi jarak dari bagian rencana */
 .st-key-limit_note { margin-top: 1rem; }
 .plan-timeline .step { padding-right: 1.5rem; }
@@ -395,7 +404,8 @@ def reason_item(contribution) -> str:
 with tab_business:
     if input_errors:
         st.error(t["invalid"] + "\n\n" + "\n".join(f"- {e['loc'][0]}: {e['msg']}" for e in input_errors))
-    st.subheader(t["business_title"])
+    # Penjelasan skala (bukan peluang, rasio biaya, skala log) di ikon bantuan judul tab (keputusan 48, catatan tunggal)
+    st.subheader(t["business_title"], help=t["scale_caption"])
     st.caption(source_caption)
 
     # Alur tanpa judul bernomor: keputusan, lalu artinya, lalu rekomendasi.
@@ -406,7 +416,6 @@ with tab_business:
         fmt_score(lang, result.score), fmt_number(lang, result.threshold, 3),
         lambda value, digits: fmt_number(lang, value, digits),
     ))
-    st.caption(t["scale_caption"])
 
     # The So What: cerita singkat dalam bahasa bisnis. Arah utama mengikuti keputusan: alasan yang menaikkan risiko
     # untuk pelanggan yang dihubungi, dan alasan yang menahan risiko untuk yang tidak
@@ -418,40 +427,39 @@ with tab_business:
     # (merah menaikkan, biru menahan), sama dengan skala dan grafik di tab teknis
     groups = (("raise", main[:3]), ("lower_slight", other[:2])) if result.contact else (
         ("lower", main[:3]), ("raise_slight", other[:2]))
-    reasons = [section_title(t["reasons_title"]), t[f"insight_{mode}"]]
+    reasons = [t[f"insight_{mode}"]]
     for group, factors in groups:
         if factors:
             direction = "up" if group.startswith("raise") else "down"
             items = "\n".join(f"- {reason_item(c)}" for c in factors)
             reasons.append(f'<span class="reason-head {direction}">{t["groups"][group]}</span>\n\n{items}')
 
-    # Satu jalur baca dari atas ke bawah (keputusan 48, alur): keputusan, kenapa, seberapa diprioritaskan, lalu apa yang
-    # dilakukan. Judul bagian berupa pertanyaan dengan satu tingkat ukuran, di atas label di dalam bagian
-    st.markdown("\n\n".join(reasons), unsafe_allow_html=True)
-    st.caption(t["reasons_caption"])
-
-    # Matriks berlebar sel tetap di kiri dan kalimat jembatan di sampingnya, jadi tidak meregang saat sidebar ditutup
+    # Dua bagian berdampingan (keputusan 48, susulan): "Kenapa skornya begini?" di kiri dan "Seberapa diprioritaskan?"
+    # di kanan. Tiap bagian punya urutan sendiri (judul, isi, catatan), judul keduanya sejajar, dan garis tipis di antara
+    # kolom menandai bahwa keduanya bagian terpisah. Di layar sempit kedua kolom menumpuk dan garisnya hilang
     value, cutoff = customer.Customer_Value, bundle.value_cutoff
     position = "above" if value > cutoff else "equal" if value == cutoff else "below"
     risk_level = "high" if result.contact else "low"
     value_level = "high" if value >= cutoff else "low"
-    st.markdown(section_title(t["matrix_title"]), help=t["segment_help"], unsafe_allow_html=True)
-    left, right = st.columns([0.45, 0.55], gap="large", vertical_alignment="center")
-    with left:
-        st.html(charts.segment_matrix(segment_id, t))
-    with right:
-        st.markdown(t["segment_bridge"].format(
-            value=value_text("Customer_Value", value), position=t[f"position_{position}"],
-            cutoff=fmt_number(lang, cutoff, 2), risk=t["level"][risk_level], level=t["level"][value_level],
-            segment=segment["name"],
-        ))
-        st.caption(t["segment_note"])
+    with st.container(key="insight_row"):
+        left, right = st.columns(2, gap="large")
+        with left:
+            # Judul terpisah supaya ikon bantuannya (pola model, bukan sebab churn) menempel di samping judul
+            st.markdown(section_title(t["reasons_title"]), help=t["reasons_help"], unsafe_allow_html=True)
+            st.markdown("\n\n".join(reasons), unsafe_allow_html=True)
+        with right:
+            # Matriks di atas, kalimat jembatan di bawahnya, supaya muat di kolom yang sempit saat sidebar terbuka
+            st.markdown(section_title(t["matrix_title"]), help=t["segment_help"], unsafe_allow_html=True)
+            st.html(charts.segment_matrix(segment_id, t))
+            st.markdown(t["segment_bridge"].format(
+                value=value_text("Customer_Value", value), position=t[f"position_{position}"],
+                cutoff=fmt_number(lang, cutoff, 2), risk=t["level"][risk_level], level=t["level"][value_level],
+                segment=segment["name"],
+            ))
 
-    # Rencana langsung mengikuti matriks, karena langkahnya bergantung pada segmen. Status hipotesis dan konteks waktu
-    # di satu baris keterangan, catatan asumsi di ikon bantuan judul
+    # Rencana di bawah kedua bagian. Konteks waktu, status hipotesis, dan asumsi di ikon bantuan judul
     st.markdown(section_title(t["now_title"]), help=t["now_caption"], unsafe_allow_html=True)
     st.markdown(segment["summary"])
-    st.caption(t["now_intro"])
     st.html(charts.plan_timeline(segment["steps"]))
     lines = []
     personal = personal_hints(main[:3]) if result.contact else []
@@ -460,10 +468,10 @@ with tab_business:
     lines.append(f"**{t['now_caution']}:** {segment['caution']}")
     st.markdown("\n\n".join(lines))
 
-    # Pengingat satu baris, diberi jarak karena berlaku untuk seluruh hasil, bukan bagian rencana. Kalimat keterbatasan
-    # lengkap (keputusan 2) ada di tab Keterbatasan & data
+    # Satu catatan di paling bawah (keputusan 48, catatan tunggal): asosiatif, bukan peluang, bukan uang, hipotesis,
+    # dan pengingat keterbatasan. Kalimat keterbatasan lengkap (keputusan 2) ada di tab Keterbatasan & data
     with st.container(key="limit_note"):
-        st.caption(f":material/info: {t['limitation_box']}")
+        st.caption(t["notes"])
 
 # --- Tab 2: Detail teknis (pembaca teknis): bagaimana model sampai ke skor pelanggan ini --------------------
 with tab_technical:
@@ -537,6 +545,24 @@ with tab_model:
             }
             for ratio_name, row in bundle.thresholds.iterrows()
         ]).set_index(columns["ratio"])
+    )
+
+    # Cara prioritas ditentukan (keputusan 48, celah penjelasan): matriks di tab hasil dijelaskan di sini. Batas nilai
+    # diambil dari data latih, bukan diketik tangan
+    st.subheader(t["prio_title"])
+    st.markdown(t["prio_text"].format(cutoff=fmt_number(lang, bundle.value_cutoff, 2)))
+    prio = t["prio_table"]
+    st.table(
+        pd.DataFrame([
+            {
+                prio["segment"]: t["segments"][seg]["name"],
+                prio["risk"]: t["level"][risk].capitalize(),
+                prio["value"]: t["level"][value_level_].capitalize(),
+                prio["focus"]: t["segments"][seg]["focus"],
+            }
+            for risk, row in charts.MATRIX_LAYOUT
+            for seg, value_level_ in zip(row, ("high", "low"))
+        ]).sort_values(prio["segment"]).set_index(prio["segment"])
     )
 
 # --- Tab 4: Keterbatasan & data -------------------------------------------------------------------------
