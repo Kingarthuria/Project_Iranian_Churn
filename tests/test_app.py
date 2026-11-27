@@ -96,7 +96,8 @@ def test_plain_explanation_follows_decision(app):
 
 def test_ratio_table_is_static_table(app):
     # st.table membungkus kalimat panjang, sedangkan st.dataframe memotongnya
-    assert len(app.table) == 1
+    # Dua tabel di tab Cara kerja model: skor minimal per rasio dan prioritas per segmen
+    assert len(app.table) == 2
 
 
 def test_hints_moved_to_help(app):
@@ -144,8 +145,8 @@ def sorted_ages(app):
 
 
 def test_short_limitation_reminder_and_segment_help(app):
-    # Di bawah hasil cukup pengingat satu baris, kalimat lengkap tetap di tab Keterbatasan & data
-    assert any(TEXTS["id"]["limitation_box"] in c.value for c in app.caption)
+    # Di bawah hasil cukup satu catatan, kalimat lengkap tetap di tab Keterbatasan & data
+    assert any(TEXTS["id"]["notes"] in c.value for c in app.caption)
     assert LIMITATION_ID in all_markdown(app)
     # Detail teknis segmen ada di ikon bantuan kalimat segmen
     assert any(m.help == TEXTS["id"]["segment_help"] for m in app.markdown)
@@ -187,21 +188,63 @@ def test_segment_matrix_puts_high_value_on_the_left():
     assert html.index(t["matrix_cols"]["high"]) < html.index(t["matrix_cols"]["low"])
 
 
-def test_results_follow_one_reading_path(app):
-    # Keputusan 48, alur baca: judul bagian berupa pertanyaan berurutan (kenapa, seberapa diprioritaskan, apa yang
-    # dilakukan) di satu kolom. Hanya matriks dan kalimat jembatannya yang bersebelahan
+def test_reasons_and_priority_side_by_side(app):
+    # Keputusan 48, susulan: "Kenapa skornya begini?" dan "Seberapa diprioritaskan?" berdampingan sebagai dua bagian
+    # terpisah, masing-masing dengan judul pertanyaan. Rencana menyusul di bawahnya, selebar halaman
     t = TEXTS["id"]
     business = app.tabs[0]
-    text = text_of(business)
-    order = [text.index(t[key]) for key in ("reasons_title", "matrix_title", "now_title")]
-    assert order == sorted(order)
-    assert all('class="section-q"' in m.value for m in business.markdown if t["matrix_title"] in m.value)
-    column = next(c for c in business.columns if any("segment-matrix" in e.proto.body for e in c.get("html")))
-    assert not any(t["reasons_title"] in m.value for m in column.markdown)
-    bridge = " ".join(m.value for c in business.columns for m in c.markdown)
+    columns = [c for c in business.columns if c.markdown]
+    left = next(c for c in columns if any(t["reasons_title"] in m.value for m in c.markdown))
+    right = next(c for c in columns if any(t["matrix_title"] in m.value for m in c.markdown))
+    assert left is not right
+    assert any("segment-matrix" in e.proto.body for e in right.get("html"))
+    assert not any(t["reasons_title"] in m.value for m in right.markdown)
+    bridge = " ".join(m.value for m in right.markdown)
     assert "Risiko rendah dan nilai tinggi menempatkannya di **Prioritas II**." in bridge
+    assert all('class="section-q"' in m.value for m in right.markdown if t["matrix_title"] in m.value)
+    # Rencana tidak berada di dalam kolom, dan muncul setelah kedua bagian
+    assert not any(t["now_title"] in m.value for c in columns for m in c.markdown)
+    text = text_of(business)
+    assert text.index(t["reasons_title"]) < text.index(t["matrix_title"]) < text.index(t["now_title"])
     # Matriks lama (grafik Altair yang meregang) tidak dipakai lagi di tab hasil
     assert len(business.get("vega_lite_chart")) == 0
+
+
+def test_single_note_at_bottom(app):
+    # Keputusan 48, catatan tunggal: selain sumber data, tab hasil hanya punya satu kalimat rujukan di paling bawah
+    # yang menunjuk ke tiga tab lain
+    t = TEXTS["id"]
+    business = app.tabs[0]
+    captions = [c.value for c in business.caption]
+    assert captions == [t["business_source"].format(source=t["sources"]["median"]), t["notes"]]
+    for tab in ("Detail teknis", "Cara kerja model", "Keterbatasan & data"):
+        assert tab in t["notes"]
+    # Isi tiap batasan ada di ikon bantuan judul di samping hal yang dijelaskannya
+    helps = {m.help for m in business.markdown if m.help} | {business.subheader[0].help}
+    assert t["reasons_help"] in helps and "bukan sebab" in t["reasons_help"]
+    assert t["scale_caption"] in helps and "bukan peluang" in t["scale_caption"]
+    assert t["segment_help"] in helps and "bukan jumlah" in t["segment_help"]
+    assert t["now_caption"] in helps and "hipotesis" in t["now_caption"]
+
+
+def test_other_tabs_explain_every_result_element(app):
+    # Celah penjelasan (keputusan 48): semua yang tampil di tab hasil juga dijelaskan di tab lain
+    t = TEXTS["id"]
+    technical, model, limits = app.tabs[1], app.tabs[2], app.tabs[3]
+    # "umumnya" di butir alasan = nilai tengah data latih
+    assert any("nilai tengah data latih" in c.value for c in technical.caption)
+    # Matriks prioritas: batas risiko dan nilai, dengan nilai tengah dari data latih, dan arti keempat segmen
+    assert t["prio_title"] in [h.value for h in model.subheader]
+    assert any("232,68" in m.value and "skor minimal" in m.value for m in model.markdown)
+    prio = model.table[1].value
+    assert list(prio.index) == ["Prioritas I", "Prioritas II", "Prioritas III", "Prioritas IV"]
+    assert prio.loc["Prioritas III", t["prio_table"]["risk"]] == "Tinggi"
+    assert prio.loc["Prioritas III", t["prio_table"]["value"]] == "Rendah"
+    # Rekomendasi adalah hipotesis, dan saran khusus berasal dari alasan risiko teratas
+    limits_text = " ".join(m.value for m in limits.markdown)
+    assert "Rekomendasi adalah hipotesis" in limits_text and "Disesuaikan dengan pelanggan ini" in limits_text
+    assert LIMITATION_ID in limits_text
+
 
 def test_ratio_lives_in_sidebar_and_changes_decision(app):
     # Rasio biaya ada di sidebar, di kotak Pengaturan keputusan antara grup isian dan tombol hitung, bukan di tab
@@ -222,7 +265,6 @@ def test_business_tab_follows_what_so_what_now_what(app):
     # Keputusan 48: 3 kartu metrik diganti skala keputusan. Catatan skor (bukan peluang terkalibrasi) tetap tampil
     assert len(business.metric) == 0
     assert "decision-scale" in scale_html(business)
-    assert t["scale_caption"] in [c.value for c in business.caption]
     assert t["insight_no_contact"] in text_of(business)
     assert "Prioritas II" in text_of(business)
     text = " ".join(m.value for m in business.markdown)
@@ -232,8 +274,7 @@ def test_business_tab_follows_what_so_what_now_what(app):
     timeline = next(e.proto.body for e in business.get("html") if "plan-timeline" in e.proto.body)
     assert timeline.count('class="step"') == len(segment["steps"])
     assert "Sepanjang tahun" in timeline and "Akhir bulan ke-12" in timeline
-    # Susulan teks keputusan 48: konteks waktu satu baris, catatan hipotesis di ikon bantuan judul rekomendasi
-    assert t["now_intro"] in [c.value for c in business.caption]
+    # Konteks waktu, status hipotesis, dan asumsi di ikon bantuan judul rekomendasi
     assert any(m.help == t["now_caption"] and t["now_title"] in m.value for m in business.markdown)
     # Pelanggan yang tidak dihubungi tidak mendapat saran yang disesuaikan
     assert t["personal_title"] not in text

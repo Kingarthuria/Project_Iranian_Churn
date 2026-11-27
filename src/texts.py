@@ -188,6 +188,10 @@ TEXTS = {
         "insight_no_contact": "Menurut model, pola pelanggan ini **mirip pelanggan yang bertahan**.",
         # Alasan dikelompokkan dengan subjudul (keputusan 48 langkah 2), bukan satu paragraf panjang
         "reasons_title": "Kenapa skornya begini?",
+        "reasons_help": (
+            "Ini pola yang dipakai model untuk menghitung skor, bukan sebab pelanggan churn. Grafik lengkapnya ada di "
+            "tab Detail teknis."
+        ),
         "item_prefix": "",
         "groups": {
             "raise": "▲ Menaikkan risiko",
@@ -204,10 +208,6 @@ TEXTS = {
             "nilai {level} menempatkannya di **{segment}**."
         ),
         "now_title": "Apa yang perlu dilakukan?",
-        "now_intro": (
-            "Hipotesis untuk siklus tahun berikutnya, perlu diuji. Waktu mengikuti siklus data: perilaku dicatat di "
-            "bulan 1–9, status churn dilihat di akhir bulan ke‑12."
-        ),
         "now_caution": "Yang perlu diperhatikan",
         "personal_title": "Disesuaikan dengan pelanggan ini",
         # Saran tambahan dari alasan risiko pelanggan ini (hanya untuk pelanggan yang disarankan dihubungi)
@@ -220,13 +220,10 @@ TEXTS = {
             ),
             "low_usage": "Karena pemakaiannya di bawah umumnya, tawarkan paket yang lebih sesuai dengan kebutuhannya.",
         },
-        "reasons_caption": (
-            "Ini pola yang dipakai model, bukan sebab pelanggan churn. Rinciannya ada di tab **Detail teknis**."
-        ),
         "why_caption": (
             "Grafik menunjukkan dorongan tiap fitur, dari skor dasar (rata-rata model) sampai skor akhir pelanggan "
             "ini. Merah menaikkan skor dan biru menurunkan. Ini menggambarkan cara model bekerja, bukan sebab "
-            "pelanggan churn."
+            "pelanggan churn. Pembanding “umumnya” di tab hasil adalah nilai tengah data latih."
         ),
         "waterfall_base": "Skor dasar",
         "waterfall_final": "Skor akhir",
@@ -254,6 +251,7 @@ TEXTS = {
             "I": {
                 "name": "Prioritas I",
                 "desc": "Risiko tinggi, nilai terhitung tinggi",
+                "focus": "Didahulukan dan dihubungi secara pribadi.",
                 "summary": (
                     "Pelanggan ini paling layak didahulukan. Kemungkinan churn-nya tinggi, dan nilainya di atas "
                     "nilai tengah, sehingga kehilangan dia paling terasa dibanding pelanggan lain."
@@ -278,6 +276,7 @@ TEXTS = {
             "II": {
                 "name": "Prioritas II",
                 "desc": "Risiko rendah, nilai terhitung tinggi",
+                "focus": "Dijaga hubungannya, tanpa potongan harga besar.",
                 "summary": (
                     "Pelanggan ini bernilai tinggi dan kemungkinan besar bertahan. Fokusnya adalah menjaga hubungan "
                     "baik, bukan mencegah churn."
@@ -297,6 +296,7 @@ TEXTS = {
             "III": {
                 "name": "Prioritas III",
                 "desc": "Risiko tinggi, nilai terhitung rendah",
+                "focus": "Dihubungi dengan cara murah, setelah Prioritas I.",
                 "summary": (
                     "Pelanggan ini kemungkinan churn, tetapi nilainya di bawah nilai tengah. Ia tetap perlu "
                     "dihubungi, tetapi dengan cara yang murah dan setelah pelanggan Prioritas I selesai ditangani."
@@ -317,6 +317,7 @@ TEXTS = {
             "IV": {
                 "name": "Prioritas IV",
                 "desc": "Risiko rendah, nilai terhitung rendah",
+                "focus": "Belum perlu tindakan khusus, cukup dipantau.",
                 "summary": (
                     "Pelanggan ini kemungkinan bertahan dan nilainya di bawah nilai tengah, jadi belum perlu "
                     "tindakan khusus."
@@ -336,6 +337,7 @@ TEXTS = {
         "business_title": "Perlukah pelanggan ini dihubungi?",
         "business_source": "Berdasarkan: {source}",
         "now_caption": (
+            "Waktu mengikuti siklus data: perilaku dicatat di bulan 1–9, status churn dilihat di akhir bulan ke-12. "
             "Semua langkah adalah hipotesis yang perlu diuji, dan contoh penawaran hanyalah gambaran. Rekomendasi "
             "mengasumsikan pola pelanggan di tahun berikutnya mirip dengan data ini. Rinciannya ada di tab "
             "Keterbatasan & data."
@@ -343,21 +345,17 @@ TEXTS = {
         # Tab Detail teknis
         "tech_customer_title": "Bagaimana model sampai ke skor ini?",
         "position_title": "Posisi skor terhadap skor minimal",
-        # Catatan segmen versi singkat untuk pembaca awam. Detail teknis ada di ikon bantuan judul segmen
-        "segment_note": (
-            # Batas nilai sudah disebut di kalimat segmen, jadi catatan ini tidak mengulangnya
-            "Pelanggan masuk kelompok risiko tinggi jika disarankan untuk dihubungi. Nilai terhitung bukan jumlah "
-            "uang."
-        ),
         "segment_help": (
-            "Nilai terhitung adalah kolom Customer_Value dari UCI, tanpa rumus dan satuan. Di demo, segmen memakai "
+            "Pelanggan masuk kelompok risiko tinggi jika disarankan untuk dihubungi. Nilai terhitung bukan jumlah "
+            "uang: nilai ini adalah kolom Customer_Value dari UCI, tanpa rumus dan satuan. Di demo, segmen memakai "
             "skor satu model final, sedangkan notebook memakai suara mayoritas dari 10 ulangan out-of-fold, jadi "
             "pelanggan di dekat batas bisa berbeda segmen."
         ),
-        # Pengingat singkat di bawah hasil. Kalimat keterbatasan lengkap ada di tab Keterbatasan & data
-        "limitation_box": (
-            "**Catatan:** skor model bisa terlalu optimistis karena data memuat pola berulang. Selengkapnya di tab "
-            "**Keterbatasan & data**."
+        # Satu kalimat rujukan di paling bawah tab hasil (keputusan 48, catatan tunggal). Isi batasannya dijelaskan di
+        # ikon bantuan tiap bagian dan di tab lain, termasuk kalimat keterbatasan lengkap di tab Keterbatasan & data
+        "notes": (
+            ":material/info: Hasil di tab ini punya batasan yang sebaiknya dipahami sebelum dipakai. Penjelasannya ada "
+            "di tab **Detail teknis**, **Cara kerja model**, dan **Keterbatasan & data**."
         ),
         # Tab 2: cara kerja model
         "flow_title": "Alur data dan model",
@@ -405,6 +403,16 @@ TEXTS = {
         ),
         "ratio_table": {"ratio": "Rasio", "threshold": "Skor minimal dihubungi", "range": "Rentang 10 ulangan",
                         "meaning": "Arti"},
+        # Tab Cara kerja model: cara prioritas ditentukan (keputusan 48, celah penjelasan)
+        "prio_title": "Bagaimana prioritas ditentukan?",
+        "prio_text": (
+            "Risiko saja belum cukup untuk menentukan urutan, karena nilai tiap pelanggan berbeda. Karena itu "
+            "pelanggan dibagi ke empat segmen dari dua hal. **Risiko** tergolong tinggi jika skornya mencapai skor "
+            "minimal untuk dihubungi pada rasio biaya yang dipilih. **Nilai terhitung** tergolong tinggi jika sama "
+            "dengan atau di atas nilai tengah data latih ({cutoff}). Nilai terhitung adalah kolom Customer_Value dari "
+            "UCI dan bukan jumlah uang."
+        ),
+        "prio_table": {"segment": "Segmen", "risk": "Risiko", "value": "Nilai terhitung", "focus": "Fokus tindakan"},
         # Tab 3: keterbatasan dan data
         "lim_pattern_title": "Pola berulang per 50 baris",
         "lim_pattern_text": (
@@ -434,6 +442,9 @@ TEXTS = {
             ("**Umur di formulir adalah perkiraan.** Tiap kelompok usia ditampilkan dengan nilai kolom `Age` yang "
             "selalu berpasangan dengannya di data ({ages}), lalu dibaca sebagai umur dalam tahun. UCI tidak "
             "menjelaskan arti `Age`, jadi ini asumsi. Model tetap memakai kelompok 1–5."),
+            ("**Rekomendasi adalah hipotesis.** Langkah dan contoh penawaran belum pernah diuji dan hanya gambaran. "
+             "Saran “Disesuaikan dengan pelanggan ini” diambil dari alasan risiko teratas pelanggan: pernah komplain, "
+             "non-aktif, kegagalan panggilan di atas umumnya, atau pemakaian di bawah umumnya."),
             ("**Waktu tindakan adalah tafsiran.** Menurut UCI, fitur berasal dari 9 bulan pertama dan status churn "
             "dicatat di akhir bulan ke-12. Jeda 3 bulan di antaranya dipakai sebagai waktu untuk menghubungi "
             "pelanggan, padahal UCI tidak menyebut kapan pelanggan benar-benar berhenti. Rekomendasi juga "
@@ -599,6 +610,10 @@ TEXTS = {
         "insight_contact": "According to the model, this customer's pattern is **similar to customers who churned**.",
         "insight_no_contact": "According to the model, this customer's pattern is **similar to customers who stayed**.",
         "reasons_title": "Why this score?",
+        "reasons_help": (
+            "These are patterns the model uses to compute the score, not causes of churn. The full chart is in the "
+            "Technical details tab."
+        ),
         "item_prefix": "The customer ",
         "groups": {
             "raise": "▲ Raises the risk",
@@ -614,10 +629,6 @@ TEXTS = {
             "combination of {risk} risk and {level} value places it in **{segment}**."
         ),
         "now_title": "What should be done?",
-        "now_intro": (
-            "A hypothesis for next year's cycle that needs testing. Timing follows the data cycle: behaviour is "
-            "recorded in months 1–9, churn status is checked at the end of month 12."
-        ),
         "now_caution": "Keep in mind",
         "personal_title": "Tailored to this customer",
         "hints": {
@@ -629,13 +640,10 @@ TEXTS = {
             ),
             "low_usage": "Because their usage is below typical, offer a plan that better fits their needs.",
         },
-        "reasons_caption": (
-            "These are patterns the model uses, not causes of churn. The details are in the **Technical details** tab."
-        ),
         "why_caption": (
             "The chart shows each feature's push, from the base score (the model average) to this customer's final "
             "score. Red raises the score and blue lowers it. This describes how the model works, not why a customer "
-            "churns."
+            "churns. The “typical” comparison in the results tab is the median of the training data."
         ),
         "waterfall_base": "Base score",
         "waterfall_final": "Final score",
@@ -662,6 +670,7 @@ TEXTS = {
             "I": {
                 "name": "Priority I",
                 "desc": "High risk, high calculated value",
+                "focus": "Handled first, with a personal contact.",
                 "summary": (
                     "This customer deserves attention first. The churn risk is high and the value is above the "
                     "middle value, so losing this customer would hurt more than losing others."
@@ -686,6 +695,7 @@ TEXTS = {
             "II": {
                 "name": "Priority II",
                 "desc": "Low risk, high calculated value",
+                "focus": "Keep the relationship, without large discounts.",
                 "summary": (
                     "This customer has high value and will most likely stay. The focus is keeping a good "
                     "relationship, not preventing churn."
@@ -704,6 +714,7 @@ TEXTS = {
             "III": {
                 "name": "Priority III",
                 "desc": "High risk, low calculated value",
+                "focus": "Contacted cheaply, after Priority I.",
                 "summary": (
                     "This customer may churn, but their value is below the middle value. They still need contact, "
                     "but in a cheap way and after Priority I customers have been handled."
@@ -724,6 +735,7 @@ TEXTS = {
             "IV": {
                 "name": "Priority IV",
                 "desc": "Low risk, low calculated value",
+                "focus": "No special action yet, just monitor.",
                 "summary": (
                     "This customer will likely stay and their value is below the middle value, so no special action "
                     "is needed yet."
@@ -742,24 +754,22 @@ TEXTS = {
         "business_title": "Should this customer be contacted?",
         "business_source": "Based on: {source}",
         "now_caption": (
-            "All steps are hypotheses that need testing, and the example offers are only illustrations. The "
+            "Timing follows the data cycle: behaviour is recorded in months 1–9, churn status is checked at the end "
+            "of month 12. All steps are hypotheses that need testing, and the example offers are only illustrations. The "
             "recommendation assumes that next year's customer patterns resemble this data. Details are in the "
             "Limitations & data tab."
         ),
         "tech_customer_title": "How did the model reach this score?",
         "position_title": "Score position against the minimum score",
-        "segment_note": (
-            "A customer is high risk if they are suggested for contact. The calculated value is not an amount of "
-            "money."
-        ),
         "segment_help": (
-            "The calculated value is the Customer_Value column from UCI, with no formula or unit. In the demo, the "
+            "A customer is high risk if they are suggested for contact. The calculated value is not an amount of "
+            "money: it is the Customer_Value column from UCI, with no formula or unit. In the demo, the "
             "segment uses the score of one final model, while the notebook uses a majority vote over 10 out-of-fold "
             "repeats, so customers near the minimum score may fall in a different segment."
         ),
-        "limitation_box": (
-            "**Note:** model scores may be overly optimistic because the data contains a repeating pattern. More in "
-            "the **Limitations & data** tab."
+        "notes": (
+            ":material/info: The results in this tab have limitations worth understanding before use. They are "
+            "explained in the **Technical details**, **How the model works**, and **Limitations & data** tabs."
         ),
         "flow_title": "Data and model flow",
         "flow": {
@@ -807,6 +817,14 @@ TEXTS = {
         ),
         "ratio_table": {"ratio": "Ratio", "threshold": "Minimum score to contact", "range": "Range over 10 repeats",
                         "meaning": "Meaning"},
+        "prio_title": "How is the priority set?",
+        "prio_text": (
+            "Risk alone does not set the order, because customers differ in value. So customers are split into four "
+            "segments by two things. **Risk** is high if the score reaches the minimum score to contact at the chosen "
+            "cost ratio. **Calculated value** is high if it is equal to or above the middle value of the training "
+            "data ({cutoff}). The calculated value is the Customer_Value column from UCI and is not an amount of money."
+        ),
+        "prio_table": {"segment": "Segment", "risk": "Risk", "value": "Calculated value", "focus": "Action focus"},
         "lim_pattern_title": "A pattern repeating every 50 rows",
         "lim_pattern_text": (
             "Within this pattern, rows in the same position in the data file, for example rows 1, 51, and 101, tend "
@@ -834,6 +852,9 @@ TEXTS = {
             ("**Ages in the form are estimates.** Each age group is shown with the value of the `Age` column it is "
             "always paired with in the data ({ages}), read as age in years. UCI does not explain `Age`, so this is an "
             "assumption. The model still uses groups 1–5."),
+            ("**The recommendation is a hypothesis.** The steps and example offers have not been tested and are only "
+             "illustrations. The “Tailored to this customer” advice comes from the customer's top risk reasons: a "
+             "complaint, inactive status, call failures above typical, or usage below typical."),
             ("**The timing of actions is an interpretation.** According to UCI, features come from the first 9 months "
             "and the churn status is recorded at the end of month 12. The 3-month gap in between is used as the time "
             "to contact customers, although UCI does not say when customers actually leave. The recommendation "
