@@ -37,6 +37,15 @@ def test_app_runs_in_indonesian_by_default(app):
     assert len(app.tabs) == 4
 
 
+def test_portfolio_note_not_repeated(app):
+    # "Proyek portofolio, bukan sistem produksi" cukup sekali di subjudul, tidak diulang di pengantar
+    for lang in ("id", "en"):
+        assert "portfolio" not in TEXTS[lang]["intro"].lower() and "portofolio" not in TEXTS[lang]["intro"].lower()
+    assert "portofolio" in TEXTS["id"]["subtitle"] and "portfolio" in TEXTS["en"]["subtitle"]
+    text = " ".join(m.value for m in app.main.markdown) + " ".join(c.value for c in app.main.caption)
+    assert text.lower().count("portofolio") == 1
+
+
 def test_limitation_always_visible(app):
     assert LIMITATION_ID in all_markdown(app)
 
@@ -218,7 +227,9 @@ def test_business_tab_follows_what_so_what_now_what(app):
     timeline = next(e.proto.body for e in business.get("html") if "plan-timeline" in e.proto.body)
     assert timeline.count('class="step"') == len(segment["steps"])
     assert "Sepanjang tahun" in timeline and "Akhir bulan ke-12" in timeline
-    assert any(t["now_intro"] in c.value and t["now_caption"] in c.value for c in business.caption)
+    # Susulan teks keputusan 48: konteks waktu satu baris, catatan hipotesis di ikon bantuan judul rekomendasi
+    assert t["now_intro"] in [c.value for c in business.caption]
+    assert any(m.help == t["now_caption"] and t["now_title"] in m.value for m in business.markdown)
     # Pelanggan yang tidak dihubungi tidak mendapat saran yang disesuaikan
     assert t["personal_title"] not in text
 

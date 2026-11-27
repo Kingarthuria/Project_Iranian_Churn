@@ -102,7 +102,12 @@ LAYOUT_CSS = """
 .segment-matrix .cell.on { background: #0F172A; color: #FFFFFF; font-weight: 600; }
 .segment-matrix .cell.on small { font-weight: 400; font-size: 0.6875rem; }
 /* 10) Linimasa rencana (src/charts.py, plan_timeline): titik dan garis menunjukkan urutan waktu */
-.plan-timeline { display: grid; grid-auto-columns: 1fr; grid-auto-flow: column; margin: 0.5rem 0 0.25rem; }
+.plan-timeline { display: grid; grid-auto-columns: 1fr; grid-auto-flow: column; margin: 0.5rem 0 1.25rem; }
+/* 12) Susulan teks keputusan 48: blok teks di halaman utama dibatasi sekitar 72 karakter per baris, supaya tetap
+      nyaman dibaca saat sidebar ditutup. Skala, matriks, linimasa, tabel, dan grafik tetap selebar halaman */
+[data-testid="stMain"] :is([data-testid="stMarkdownContainer"], [data-testid="stCaptionContainer"]) { max-width: 72ch; }
+/*    Pengingat keterbatasan diberi jarak dari bagian rencana */
+.st-key-limit_note { margin-top: 1rem; }
 .plan-timeline .step { padding-right: 1.5rem; }
 .plan-timeline .mark { display: flex; align-items: center; height: 12px; margin-bottom: 0.625rem; }
 .plan-timeline .mark::before { content: ""; width: 12px; height: 12px; border-radius: 50%; background: #0F172A;
@@ -423,10 +428,11 @@ with tab_business:
         st.caption(t["segment_note"])
 
     # The Now What: rekomendasi rinci untuk siklus 12 bulan berikutnya, dengan langkah bertahap per segmen
-    # Keputusan 48 langkah 2: langkah per segmen sebagai linimasa. Konteks siklus 12 bulan dan catatan hipotesis tetap
-    # tertulis di atas linimasa
-    st.markdown(f"**{t['now_title']}**\n\n{segment['summary']}")
-    st.caption(f"{t['now_intro']} {t['now_caption']}")
+    # Keputusan 48 langkah 2: langkah per segmen sebagai linimasa. Susulan teks: kata "hipotesis, perlu diuji" cukup di
+    # judul, catatan hipotesis dan asumsi di ikon bantuan judul, dan konteks waktu satu baris di atas linimasa
+    st.markdown(f"**{t['now_title']}**", help=t["now_caption"])
+    st.markdown(segment["summary"])
+    st.caption(t["now_intro"])
     st.html(charts.plan_timeline(segment["steps"]))
     lines = []
     personal = personal_hints(main[:3]) if result.contact else []
@@ -435,8 +441,10 @@ with tab_business:
     lines.append(f"**{t['now_caution']}:** {segment['caution']}")
     st.markdown("\n\n".join(lines))
 
-    # Pengingat satu baris. Kalimat keterbatasan lengkap (keputusan 2) ada di tab Keterbatasan & data
-    st.caption(f":material/info: {t['limitation_box']}")
+    # Pengingat satu baris, diberi jarak karena berlaku untuk seluruh hasil, bukan bagian rencana. Kalimat keterbatasan
+    # lengkap (keputusan 2) ada di tab Keterbatasan & data
+    with st.container(key="limit_note"):
+        st.caption(f":material/info: {t['limitation_box']}")
 
 # --- Tab 2: Detail teknis (pembaca teknis): bagaimana model sampai ke skor pelanggan ini --------------------
 with tab_technical:

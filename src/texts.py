@@ -35,9 +35,10 @@ TEXTS = {
         ),
         "howto_title": "Cara memakai demo ini",
         "intro": (
-            "Demo ini memberi **skor risiko churn** untuk satu pelanggan dan menyarankan apakah pelanggan itu "
-            "**perlu dihubungi**. Model yang dipakai adalah XGBoost dengan 12 fitur dari 9 bulan pertama data "
-            "pelanggan. Ini proyek portofolio, bukan sistem produksi."
+            # Hanya yang belum ada di subjudul (keputusan 48, teks): cara kerja model. Penegasan proyek portofolio
+            # cukup di subjudul yang selalu terlihat
+            "Model XGBoost menilai 12 fitur dari 9 bulan pertama data pelanggan, lalu menyarankan apakah pelanggan "
+            "itu **perlu dihubungi**."
         ),
         "steps": (
             "**1.** Isi data pelanggan atau pilih contoh di sidebar  \n"
@@ -205,8 +206,7 @@ TEXTS = {
         ),
         "now_title": "Rekomendasi untuk siklus tahun berikutnya (hipotesis, perlu diuji)",
         "now_intro": (
-            "Data ini mencakup satu siklus 12 bulan: perilaku pelanggan dicatat selama 9 bulan pertama, lalu status "
-            "churn dilihat di akhir bulan ke-12. Rekomendasi di bawah memakai siklus yang sama untuk tahun berikutnya."
+            "Waktu mengikuti siklus data: perilaku dicatat di bulan 1–9, status churn dilihat di akhir bulan ke‑12."
         ),
         "now_caution": "Yang perlu diperhatikan",
         "personal_title": "Disesuaikan dengan pelanggan ini",
@@ -337,7 +337,8 @@ TEXTS = {
         "business_source": "Berdasarkan: {source}",
         "now_caption": (
             "Semua langkah adalah hipotesis yang perlu diuji, dan contoh penawaran hanyalah gambaran. Rekomendasi "
-            "mengasumsikan pola pelanggan di tahun berikutnya mirip dengan data ini."
+            "mengasumsikan pola pelanggan di tahun berikutnya mirip dengan data ini. Rinciannya ada di tab "
+            "Keterbatasan & data."
         ),
         # Tab Detail teknis
         "tech_customer_title": "Bagaimana model sampai ke skor ini?",
@@ -455,9 +456,8 @@ TEXTS = {
         ),
         "howto_title": "How to use this demo",
         "intro": (
-            "This demo gives a **churn risk score** for one customer and suggests whether that customer "
-            "**should be contacted**. The model is XGBoost with 12 features from the first 9 months of customer "
-            "data. This is a portfolio project, not a production system."
+            "An XGBoost model scores 12 features from the first 9 months of customer data, then suggests whether "
+            "the customer **should be contacted**."
         ),
         "steps": (
             "**1.** Fill in customer data or pick an example in the sidebar  \n"
@@ -616,9 +616,8 @@ TEXTS = {
         ),
         "now_title": "Recommendation for the next yearly cycle (hypothesis, needs testing)",
         "now_intro": (
-            "This data covers one 12-month cycle: customer behaviour is recorded during the first 9 months, then "
-            "the churn status is checked at the end of month 12. The recommendation below uses the same cycle for "
-            "the next year."
+            "Timing follows the data cycle: behaviour is recorded in months 1–9, churn status is checked at the end "
+            "of month 12."
         ),
         "now_caution": "Keep in mind",
         "personal_title": "Tailored to this customer",
@@ -745,7 +744,8 @@ TEXTS = {
         "business_source": "Based on: {source}",
         "now_caption": (
             "All steps are hypotheses that need testing, and the example offers are only illustrations. The "
-            "recommendation assumes that next year's customer patterns resemble this data."
+            "recommendation assumes that next year's customer patterns resemble this data. Details are in the "
+            "Limitations & data tab."
         ),
         "tech_customer_title": "How did the model reach this score?",
         "position_title": "Score position against the minimum score",
