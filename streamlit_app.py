@@ -8,6 +8,7 @@ Semua teks tampilan ada di src/texts.py (Bahasa Indonesia dan Inggris).
 """
 import os
 import time
+from html import escape
 
 import pandas as pd
 import streamlit as st
@@ -106,6 +107,18 @@ LAYOUT_CSS = """
 /* 12) Susulan teks keputusan 48: blok teks di halaman utama dibatasi sekitar 72 karakter per baris, supaya tetap
       nyaman dibaca saat sidebar ditutup. Skala, matriks, linimasa, tabel, dan grafik tetap selebar halaman */
 [data-testid="stMain"] :is([data-testid="stMarkdownContainer"], [data-testid="stCaptionContainer"]) { max-width: 72ch; }
+/* 13) Alur baca keputusan 48: konten utama dibatasi sekitar 1.080 px supaya teks, skala, matriks, dan linimasa berada
+      dalam satu kolom. Judul bagian 18px semibold dengan jarak di atasnya, lebih besar dari label di dalam bagian */
+[data-testid="stMainBlockContainer"] { max-width: 1080px; }
+[data-testid="stMarkdownContainer"] p.section-q { font-size: 1.125rem !important; font-weight: 600;
+  margin: 1.75rem 0 0.25rem !important; }
+/*    Wadah judul selebar teksnya, supaya ikon bantuan menempel di samping judul, bukan di ujung batas 72 karakter */
+/*    Streamlit memberi margin bawah -16px pada wadah teks, sehingga baris judul + ikon hanya setinggi ikon dan ikon
+      tampak naik. Margin itu dinolkan untuk judul bagian */
+[data-testid="stMarkdownContainer"]:has(> p.section-q:only-child) { width: fit-content; margin-bottom: 0 !important; }
+/*    Jarak atas judul berikon dipindah ke wadahnya, supaya ikon bantuan sejajar dengan baris judul */
+[data-testid="stMarkdownContainer"] > p.section-q:only-child { margin: 0 !important; }
+[data-testid="stElementContainer"]:has(p.section-q:only-child) { margin-top: 1.5rem; }
 /*    Pengingat keterbatasan diberi jarak dari bagian rencana */
 .st-key-limit_note { margin-top: 1rem; }
 .plan-timeline .step { padding-right: 1.5rem; }
@@ -113,7 +126,7 @@ LAYOUT_CSS = """
 .plan-timeline .mark::before { content: ""; width: 12px; height: 12px; border-radius: 50%; background: #0F172A;
   flex: none; }
 .plan-timeline .step:not(:last-child) .mark::after { content: ""; flex: 1; height: 2px; background: #0F172A; }
-.plan-timeline .when { font-weight: 600; margin: 0 0 0.25rem; }
+.plan-timeline .when { font-weight: 600; font-size: 0.9375rem; margin: 0 0 0.25rem; }
 .plan-timeline .what { font-size: 0.9375rem; line-height: 1.55; margin: 0; }
 @media (prefers-reduced-motion: reduce) {
   .decision-scale .marker, .decision-scale .tag, .decision-scale .lane.on { animation: none; } }
@@ -367,6 +380,11 @@ def personal_hints(factors) -> list[str]:
     return hints
 
 
+def section_title(text: str) -> str:
+    # Judul bagian di tab hasil (keputusan 48, alur): satu tingkat ukuran di atas teks isi, tanpa tautan jangkar
+    return f'<p class="section-q">{escape(text)}</p>'
+
+
 def reason_item(contribution) -> str:
     # Satu butir alasan: kalimat utuh dengan huruf besar di awal dan titik di akhir
     text = t["item_prefix"] + reason_phrase(contribution)
@@ -400,26 +418,28 @@ with tab_business:
     # (merah menaikkan, biru menahan), sama dengan skala dan grafik di tab teknis
     groups = (("raise", main[:3]), ("lower_slight", other[:2])) if result.contact else (
         ("lower", main[:3]), ("raise_slight", other[:2]))
-    reasons = [f"**{t['reasons_title']}**", t[f"insight_{mode}"]]
+    reasons = [section_title(t["reasons_title"]), t[f"insight_{mode}"]]
     for group, factors in groups:
         if factors:
             direction = "up" if group.startswith("raise") else "down"
             items = "\n".join(f"- {reason_item(c)}" for c in factors)
             reasons.append(f'<span class="reason-head {direction}">{t["groups"][group]}</span>\n\n{items}')
 
-    # Alasan di kiri, matriks prioritas di kanan (keputusan 48, sesuai mockup v5). Matriks berlebar tetap, jadi
-    # tidak meregang saat sidebar ditutup. Di layar sempit Streamlit menumpuk kedua kolom
+    # Satu jalur baca dari atas ke bawah (keputusan 48, alur): keputusan, kenapa, seberapa diprioritaskan, lalu apa yang
+    # dilakukan. Judul bagian berupa pertanyaan dengan satu tingkat ukuran, di atas label di dalam bagian
+    st.markdown("\n\n".join(reasons), unsafe_allow_html=True)
+    st.caption(t["reasons_caption"])
+
+    # Matriks berlebar sel tetap di kiri dan kalimat jembatan di sampingnya, jadi tidak meregang saat sidebar ditutup
     value, cutoff = customer.Customer_Value, bundle.value_cutoff
     position = "above" if value > cutoff else "equal" if value == cutoff else "below"
     risk_level = "high" if result.contact else "low"
     value_level = "high" if value >= cutoff else "low"
-    left, right = st.columns([1.15, 1], gap="large")
+    st.markdown(section_title(t["matrix_title"]), help=t["segment_help"], unsafe_allow_html=True)
+    left, right = st.columns([0.45, 0.55], gap="large", vertical_alignment="center")
     with left:
-        st.markdown("\n\n".join(reasons), unsafe_allow_html=True)
-        st.caption(t["reasons_caption"])
-    with right:
-        st.markdown(f"**{t['matrix_title']}**", help=t["segment_help"])
         st.html(charts.segment_matrix(segment_id, t))
+    with right:
         st.markdown(t["segment_bridge"].format(
             value=value_text("Customer_Value", value), position=t[f"position_{position}"],
             cutoff=fmt_number(lang, cutoff, 2), risk=t["level"][risk_level], level=t["level"][value_level],
@@ -427,10 +447,9 @@ with tab_business:
         ))
         st.caption(t["segment_note"])
 
-    # The Now What: rekomendasi rinci untuk siklus 12 bulan berikutnya, dengan langkah bertahap per segmen
-    # Keputusan 48 langkah 2: langkah per segmen sebagai linimasa. Susulan teks: kata "hipotesis, perlu diuji" cukup di
-    # judul, catatan hipotesis dan asumsi di ikon bantuan judul, dan konteks waktu satu baris di atas linimasa
-    st.markdown(f"**{t['now_title']}**", help=t["now_caption"])
+    # Rencana langsung mengikuti matriks, karena langkahnya bergantung pada segmen. Status hipotesis dan konteks waktu
+    # di satu baris keterangan, catatan asumsi di ikon bantuan judul
+    st.markdown(section_title(t["now_title"]), help=t["now_caption"], unsafe_allow_html=True)
     st.markdown(segment["summary"])
     st.caption(t["now_intro"])
     st.html(charts.plan_timeline(segment["steps"]))

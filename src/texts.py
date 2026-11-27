@@ -143,9 +143,8 @@ TEXTS = {
         "scale_threshold": "Skor minimal untuk dihubungi ({ratio}): {threshold}",
         "scale_aria": "{decision}. Skor risiko {score}, skor minimal untuk dihubungi {threshold}.",
         "scale_caption": (
-            "Skor model antara 0 dan 1 untuk mengurutkan pelanggan, bukan peluang yang terkalibrasi. Pelanggan "
-            "disarankan dihubungi jika skornya sama dengan atau di atas skor minimal, yang bergantung pada rasio biaya "
-            "di sidebar. Jarak angka pada sumbu bertingkat (skala log)."
+            "Skor model (0–1) untuk mengurutkan pelanggan, bukan peluang yang terkalibrasi. Skor minimal mengikuti "
+            "rasio biaya di sidebar, dan sumbu memakai skala log."
         ),
         # Penjelasan hasil dalam bahasa awam, dipilih sesuai keputusan
         "position_explain_contact": (
@@ -188,7 +187,7 @@ TEXTS = {
         "insight_contact": "Menurut model, pola pelanggan ini **mirip pelanggan yang churn**.",
         "insight_no_contact": "Menurut model, pola pelanggan ini **mirip pelanggan yang bertahan**.",
         # Alasan dikelompokkan dengan subjudul (keputusan 48 langkah 2), bukan satu paragraf panjang
-        "reasons_title": "Kenapa skornya begini",
+        "reasons_title": "Kenapa skornya begini?",
         "item_prefix": "",
         "groups": {
             "raise": "▲ Menaikkan risiko",
@@ -204,9 +203,10 @@ TEXTS = {
             "Nilai terhitungnya {value}, {position} nilai tengah semua pelanggan ({cutoff}). Risiko {risk} dan "
             "nilai {level} menempatkannya di **{segment}**."
         ),
-        "now_title": "Rekomendasi untuk siklus tahun berikutnya (hipotesis, perlu diuji)",
+        "now_title": "Apa yang perlu dilakukan?",
         "now_intro": (
-            "Waktu mengikuti siklus data: perilaku dicatat di bulan 1–9, status churn dilihat di akhir bulan ke‑12."
+            "Hipotesis untuk siklus tahun berikutnya, perlu diuji. Waktu mengikuti siklus data: perilaku dicatat di "
+            "bulan 1–9, status churn dilihat di akhir bulan ke‑12."
         ),
         "now_caution": "Yang perlu diperhatikan",
         "personal_title": "Disesuaikan dengan pelanggan ini",
@@ -244,7 +244,7 @@ TEXTS = {
         "table_shap": "Dorongan (log-odds)",
         "segment_title": "Segmen risiko × nilai",
         # Matriks prioritas HTML (keputusan 48): label baris dan kolom, dan kata untuk kalimat jembatan
-        "matrix_title": "Posisi di matriks prioritas",
+        "matrix_title": "Seberapa diprioritaskan?",
         "matrix_rows": {"high": "Risiko tinggi", "low": "Risiko rendah"},
         "matrix_cols": {"high": "Nilai tinggi", "low": "Nilai rendah"},
         "matrix_aria": "Matriks prioritas risiko × nilai terhitung. Pelanggan ini di {segment}.",
@@ -556,9 +556,8 @@ TEXTS = {
         "scale_threshold": "Minimum score to contact ({ratio}): {threshold}",
         "scale_aria": "{decision}. Risk score {score}, minimum score to contact {threshold}.",
         "scale_caption": (
-            "Model score between 0 and 1 for ranking customers, not a calibrated probability. A customer is suggested "
-            "for contact if their score is equal to or above the minimum score, which depends on the cost ratio in "
-            "the sidebar. The axis uses stepped spacing (log scale)."
+            "Model score (0–1) for ranking customers, not a calibrated probability. The minimum score follows the "
+            "cost ratio in the sidebar, and the axis uses a log scale."
         ),
         "position_explain_contact": (
             "**This customer should be contacted.** Their risk score is {score}, which reaches the minimum score to "
@@ -599,7 +598,7 @@ TEXTS = {
         "subject": "",
         "insight_contact": "According to the model, this customer's pattern is **similar to customers who churned**.",
         "insight_no_contact": "According to the model, this customer's pattern is **similar to customers who stayed**.",
-        "reasons_title": "Why this score",
+        "reasons_title": "Why this score?",
         "item_prefix": "The customer ",
         "groups": {
             "raise": "▲ Raises the risk",
@@ -614,10 +613,10 @@ TEXTS = {
             "Its calculated value is {value}, {position} the middle value of all customers ({cutoff}). This "
             "combination of {risk} risk and {level} value places it in **{segment}**."
         ),
-        "now_title": "Recommendation for the next yearly cycle (hypothesis, needs testing)",
+        "now_title": "What should be done?",
         "now_intro": (
-            "Timing follows the data cycle: behaviour is recorded in months 1–9, churn status is checked at the end "
-            "of month 12."
+            "A hypothesis for next year's cycle that needs testing. Timing follows the data cycle: behaviour is "
+            "recorded in months 1–9, churn status is checked at the end of month 12."
         ),
         "now_caution": "Keep in mind",
         "personal_title": "Tailored to this customer",
@@ -653,7 +652,7 @@ TEXTS = {
         "table_value": "Value",
         "table_shap": "Push (log-odds)",
         "segment_title": "Risk × value segment",
-        "matrix_title": "Position in the priority matrix",
+        "matrix_title": "How high is the priority?",
         "matrix_rows": {"high": "High risk", "low": "Low risk"},
         "matrix_cols": {"high": "High value", "low": "Low value"},
         "matrix_aria": "Priority matrix of risk × calculated value. This customer is in {segment}.",

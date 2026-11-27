@@ -187,13 +187,18 @@ def test_segment_matrix_puts_high_value_on_the_left():
     assert html.index(t["matrix_cols"]["high"]) < html.index(t["matrix_cols"]["low"])
 
 
-def test_reasons_and_matrix_side_by_side(app):
-    # Keputusan 48: alasan di kolom kiri dan matriks berlebar tetap di kolom kanan, dengan kalimat jembatan pendek
+def test_results_follow_one_reading_path(app):
+    # Keputusan 48, alur baca: judul bagian berupa pertanyaan berurutan (kenapa, seberapa diprioritaskan, apa yang
+    # dilakukan) di satu kolom. Hanya matriks dan kalimat jembatannya yang bersebelahan
     t = TEXTS["id"]
     business = app.tabs[0]
-    column = next(c for c in business.columns if any(t["matrix_title"] in m.value for m in c.markdown))
-    assert any("segment-matrix" in e.proto.body for e in column.get("html"))
-    bridge = " ".join(m.value for m in column.markdown)
+    text = text_of(business)
+    order = [text.index(t[key]) for key in ("reasons_title", "matrix_title", "now_title")]
+    assert order == sorted(order)
+    assert all('class="section-q"' in m.value for m in business.markdown if t["matrix_title"] in m.value)
+    column = next(c for c in business.columns if any("segment-matrix" in e.proto.body for e in c.get("html")))
+    assert not any(t["reasons_title"] in m.value for m in column.markdown)
+    bridge = " ".join(m.value for c in business.columns for m in c.markdown)
     assert "Risiko rendah dan nilai tinggi menempatkannya di **Prioritas II**." in bridge
     # Matriks lama (grafik Altair yang meregang) tidak dipakai lagi di tab hasil
     assert len(business.get("vega_lite_chart")) == 0
